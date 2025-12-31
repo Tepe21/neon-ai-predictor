@@ -23,7 +23,6 @@
       transition: background 0.8s ease;
     }
 
-    /* BACKGROUNDS */
     body.abstract {
       background:
         radial-gradient(circle at 20% 20%, rgba(34,211,238,0.35), transparent 40%),
@@ -60,7 +59,6 @@
       font-size: 13px;
     }
 
-    /* Toggle */
     #bgBtn {
       width: 100%;
       margin-bottom: 18px;
@@ -111,6 +109,17 @@
       color: #020617;
     }
 
+    #notifyBtn {
+      margin-top: 12px;
+      width: 100%;
+      padding: 12px;
+      border-radius: 14px;
+      border: 1px solid rgba(34,211,238,0.6);
+      background: rgba(255,255,255,0.05);
+      color: #67e8f9;
+      cursor: pointer;
+    }
+
     .result {
       margin-top: 18px;
       padding: 14px;
@@ -148,6 +157,8 @@
     </select>
 
     <button id="analyzeBtn">AI ANALYZE</button>
+
+    <button id="notifyBtn">🔔 Enable Alerts (Premium)</button>
 
     <div id="output"></div>
   </div>
@@ -198,6 +209,22 @@
           ${d.value.tag} AI EDGE
         </div>`;
     });
+  };
+
+  /* === STAGE 1: REQUEST NOTIFICATION PERMISSION === */
+  document.getElementById("notifyBtn").onclick = async () => {
+    if (!("Notification" in window)) {
+      alert("Notifications not supported");
+      return;
+    }
+
+    const permission = await Notification.requestPermission();
+
+    if (permission === "granted") {
+      alert("✅ Notifications enabled!");
+    } else {
+      alert("❌ Notifications denied");
+    }
   };
 
   /* SERVICE WORKER REGISTER */

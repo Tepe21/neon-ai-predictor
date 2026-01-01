@@ -16,7 +16,7 @@ router.post("/", (req, res) => {
   res.json({ ok: true });
 });
 
-router.get("/test", async (req, res) => {
+ => {
   const payload = JSON.stringify({
     title: "🔥 NEON AI ALERT",
     body: "Test notification successful!"

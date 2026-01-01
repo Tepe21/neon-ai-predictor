@@ -4,6 +4,8 @@ import webpush from "../push.js";
 const router = express.Router();
 const subscribers = [];
 
+console.log("✅ subscribe.js loaded");
+
 router.post("/", (req, res) => {
   const { subscription, premium } = req.body;
 
@@ -15,6 +17,8 @@ router.post("/", (req, res) => {
 });
 
 router.get("/test", async (req, res) => {
+  console.log("🔥 /api/subscribe/test HIT");
+
   const payload = JSON.stringify({
     title: "🔥 NEON AI ALERT",
     body: "Test notification successful!"
@@ -31,4 +35,4 @@ router.get("/test", async (req, res) => {
   res.json({ sent: subscribers.length });
 });
 
-export { router, subscribers };
+export default router;

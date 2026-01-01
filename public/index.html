@@ -1,237 +1,52 @@
 <!DOCTYPE html>
-<html lang="el">
+<html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Neon AI Predictor</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-
-  <!-- PWA -->
-  <link rel="manifest" href="/manifest.json">
-  <meta name="theme-color" content="#22d3ee">
-
-  <style>
-    * { box-sizing: border-box; }
-
-    body {
-      margin: 0;
-      min-height: 100vh;
-      font-family: "Segoe UI", Arial, sans-serif;
-      color: #e5e7eb;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: background 0.8s ease;
-    }
-
-    body.abstract {
-      background:
-        radial-gradient(circle at 20% 20%, rgba(34,211,238,0.35), transparent 40%),
-        radial-gradient(circle at 80% 30%, rgba(168,85,247,0.30), transparent 45%),
-        radial-gradient(circle at 50% 80%, rgba(56,189,248,0.25), transparent 50%),
-        linear-gradient(180deg, #020617 0%, #000 100%);
-    }
-
-    body.stadium {
-      background:
-        radial-gradient(circle at 50% 60%, rgba(0,255,255,0.18), transparent 55%),
-        radial-gradient(circle at 20% 40%, rgba(34,211,238,0.12), transparent 50%),
-        linear-gradient(180deg, #020617 0%, #000 100%);
-    }
-
-    .app {
-      width: 100%;
-      max-width: 420px;
-      padding: 20px;
-      text-align: center;
-    }
-
-    h1 {
-      margin-bottom: 6px;
-      font-size: 26px;
-      background: linear-gradient(90deg, #22d3ee, #a855f7);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-    }
-
-    .subtitle {
-      color: #94a3b8;
-      margin-bottom: 12px;
-      font-size: 13px;
-    }
-
-    #bgBtn {
-      width: 100%;
-      margin-bottom: 18px;
-      padding: 10px 0;
-      background: rgba(255,255,255,0.05);
-      border: 1px solid rgba(34,211,238,0.6);
-      color: #67e8f9;
-      border-radius: 14px;
-      backdrop-filter: blur(10px);
-      cursor: pointer;
-    }
-
-    .card {
-      background: rgba(15,23,42,0.75);
-      backdrop-filter: blur(16px);
-      padding: 22px;
-      border-radius: 20px;
-      box-shadow: 0 0 35px rgba(56,189,248,0.25);
-    }
-
-    input, select {
-      width: 100%;
-      padding: 14px;
-      margin-top: 14px;
-      border-radius: 14px;
-      border: 1px solid rgba(34,211,238,0.4);
-      background: #020617;
-      color: #67e8f9;
-      font-size: 15px;
-      appearance: none;
-    }
-
-    select option {
-      background: #020617;
-      color: #67e8f9;
-    }
-
-    #analyzeBtn {
-      width: 100%;
-      margin-top: 20px;
-      padding: 14px;
-      border-radius: 18px;
-      border: none;
-      font-size: 16px;
-      font-weight: bold;
-      cursor: pointer;
-      background: linear-gradient(90deg, #22d3ee, #a855f7);
-      color: #020617;
-    }
-
-    #notifyBtn {
-      margin-top: 12px;
-      width: 100%;
-      padding: 12px;
-      border-radius: 14px;
-      border: 1px solid rgba(34,211,238,0.6);
-      background: rgba(255,255,255,0.05);
-      color: #67e8f9;
-      cursor: pointer;
-    }
-
-    .result {
-      margin-top: 18px;
-      padding: 14px;
-      border-radius: 14px;
-    }
-
-    .NORMAL { background: rgba(34,197,94,0.2); }
-    .HIGH { background: rgba(249,115,22,0.25); }
-    .LOCK {
-      background: rgba(239,68,68,0.25);
-      box-shadow: inset 0 0 18px rgba(239,68,68,0.6);
-    }
-  </style>
+<meta charset="UTF-8">
+<title>Neon AI Predictor</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
 </head>
 
-<body class="abstract">
+<body>
+<h2>Neon AI Predictor</h2>
 
-<div class="app">
-  <h1>NEON AI PREDICTOR</h1>
-  <div class="subtitle">Live Football Intelligence</div>
-
-  <button id="bgBtn">🎛 Switch Background</button>
-
-  <div class="card">
-    <input id="match" placeholder="Match (e.g. Arsenal vs Spurs)">
-
-    <select id="market">
-      <option value="corners">Corners</option>
-      <option value="goals">Goals</option>
-    </select>
-
-    <select id="time">
-      <option value="FT">Full Time</option>
-      <option value="HT">Half Time</option>
-    </select>
-
-    <button id="analyzeBtn">AI ANALYZE</button>
-
-    <button id="notifyBtn">🔔 Enable Alerts (Premium)</button>
-
-    <div id="output"></div>
-  </div>
-</div>
+<button id="notifyBtn">🔔 Enable Alerts (Premium)</button>
 
 <script>
-  /* Background toggle */
-  let bg = "abstract";
-  document.getElementById("bgBtn").onclick = () => {
-    document.body.className = bg === "abstract" ? "stadium" : "abstract";
-    bg = bg === "abstract" ? "stadium" : "abstract";
-  };
+function urlBase64ToUint8Array(base64String) {
+  const padding = "=".repeat((4 - base64String.length % 4) % 4);
+  const base64 = (base64String + padding)
+    .replace(/-/g, "+")
+    .replace(/_/g, "/");
 
-  /* Analyze */
-  document.getElementById("analyzeBtn").onclick = () => {
-    const match = document.getElementById("match").value;
+  const rawData = atob(base64);
+  return Uint8Array.from([...rawData].map(char => char.charCodeAt(0)));
+}
 
-    if (!match) {
-      output.innerHTML = '<div class="result NORMAL">Enter a match</div>';
-      return;
-    }
+if ("serviceWorker" in navigator) {
+  navigator.serviceWorker.register("/sw.js");
+}
 
-    fetch("/api/predict", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        match,
-        market: market.value,
-        time: time.value
-      })
-    })
-    .then(r => r.json())
-    .then(d => {
-      if (!d.result || !d.result.pick) {
-        output.innerHTML = '<div class="result NORMAL">NO STATISTICAL EDGE</div>';
-        return;
-      }
+document.getElementById("notifyBtn").onclick = async () => {
+  const permission = await Notification.requestPermission();
+  if (permission !== "granted") return;
 
-      if (d.value.tag === "BOMB") {
-        output.innerHTML =
-          '<div class="result LOCK">💣 VALUE BOMB<br>PREMIUM REQUIRED</div>';
-        return;
-      }
+  const reg = await navigator.serviceWorker.ready;
 
-      output.innerHTML =
-        `<div class="result ${d.value.tag}">
-          <b>${d.result.pick}</b><br>
-          ${d.value.tag} AI EDGE
-        </div>`;
-    });
-  };
+  const sub = await reg.pushManager.subscribe({
+    userVisibleOnly: true,
+    applicationServerKey: urlBase64ToUint8Array(
+      "BJfVfAdIgz1Z_6fvwxaMptZpAi6AH6H_AZwzowXNUy3bPBE8rPlkj6ERrym3mFBP1jqLevxISzX7m65BieoFj8E"
+    )
+  });
 
-  /* === STAGE 1: REQUEST NOTIFICATION PERMISSION === */
-  document.getElementById("notifyBtn").onclick = async () => {
-    if (!("Notification" in window)) {
-      alert("Notifications not supported");
-      return;
-    }
+  await fetch("/api/subscribe", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ subscription: sub, premium: true })
+  });
 
-    const permission = await Notification.requestPermission();
-
-    if (permission === "granted") {
-      alert("✅ Notifications enabled!");
-    } else {
-      alert("❌ Notifications denied");
-    }
-  };
-
-  /* SERVICE WORKER REGISTER */
-  if ("serviceWorker" in navigator) {
-    navigator.serviceWorker.register("/sw.js");
-  }
+  alert("Notifications enabled!");
+};
 </script>
-
 </body>
 </html>

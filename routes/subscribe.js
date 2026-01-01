@@ -17,22 +17,23 @@ router.post("/", (req, res) => {
 });
 
 router.get("/test", async (req, res) => {
-  console.log("🔥 /api/subscribe/test HIT");
-
   const payload = JSON.stringify({
     title: "🔥 NEON AI ALERT",
     body: "Test notification successful!"
   });
 
+  let sent = 0;
+
   for (const sub of subscribers) {
     try {
       await webpush.sendNotification(sub, payload);
+      sent++;
     } catch (e) {
       console.error("Push error:", e);
     }
   }
 
-  res.json({ sent: subscribers.length });
+  res.json({ sent });
 });
 
 export default router;

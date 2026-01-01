@@ -17,7 +17,7 @@ app.use(express.json());
 app.use("/api/predict", predictRoute);
 app.use("/api/subscribe", subscribeRoute);
 
-// STATIC
+// STATIC FILES
 app.use(express.static(path.join(__dirname, "public")));
 
 // FALLBACK
@@ -26,5 +26,5 @@ app.get("*", (req, res) => {
 });
 
 app.listen(PORT, () => {
-  console.log(`🚀 Server running on port ${PORT}`);
+  console.log("🚀 Server running on port", PORT);
 });

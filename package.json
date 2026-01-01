@@ -1,11 +1,13 @@
 {
   "name": "live-predictor-backend",
-  "version": "1.0.0",
   "type": "module",
+  "version": "1.0.0",
   "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
   "dependencies": {
-    "express": "^4.18.2",
-    "cors": "^2.8.5",
-    "node-fetch": "^3.3.2"
+    "express": "^4.19.2",
+    "web-push": "^3.6.7"
   }
 }

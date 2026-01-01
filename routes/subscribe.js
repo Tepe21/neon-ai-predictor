@@ -14,7 +14,6 @@ router.post("/", (req, res) => {
   res.json({ ok: true });
 });
 
-// TEST PUSH ENDPOINT
 router.get("/test", async (req, res) => {
   const payload = JSON.stringify({
     title: "🔥 NEON AI ALERT",

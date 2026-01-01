@@ -23,7 +23,7 @@
 
   .app {
     width: 100%;
-    max-width: 380px;
+    max-width: 400px;
     padding: 28px;
     border-radius: 18px;
     background: rgba(10, 15, 30, 0.75);
@@ -33,15 +33,25 @@
   }
 
   h1 {
-    margin: 0 0 6px;
-    font-size: 28px;
-    letter-spacing: 1px;
+    margin: 0;
+    font-size: 26px;
   }
 
   .subtitle {
-    font-size: 14px;
+    font-size: 13px;
     opacity: 0.7;
-    margin-bottom: 26px;
+    margin-bottom: 18px;
+  }
+
+  input, select {
+    width: 100%;
+    margin-bottom: 12px;
+    padding: 12px;
+    border-radius: 10px;
+    border: none;
+    background: #0f172a;
+    color: #eaf6ff;
+    font-size: 14px;
   }
 
   button {
@@ -54,23 +64,36 @@
     transition: all 0.2s ease;
   }
 
-  #notifyBtn {
+  #analyzeBtn {
     background: linear-gradient(135deg, #00e5ff, #7c4dff);
     color: #001018;
     font-weight: 600;
-    box-shadow: 0 0 18px rgba(0, 229, 255, 0.6);
+    margin-top: 6px;
   }
 
-  #notifyBtn:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 0 26px rgba(124, 77, 255, 0.9);
-  }
-
-  .status {
+  #notifyBtn {
     margin-top: 14px;
-    font-size: 13px;
-    opacity: 0.85;
+    background: transparent;
+    color: #7dd3fc;
+    border: 1px solid rgba(125, 211, 252, 0.4);
   }
+
+  .result {
+    margin-top: 18px;
+    padding: 14px;
+    border-radius: 12px;
+    background: rgba(0,0,0,0.35);
+    display: none;
+  }
+
+  .tag {
+    margin-top: 6px;
+    font-weight: bold;
+  }
+
+  .HIGH { color: #38bdf8; }
+  .BOMB { color: #f87171; }
+  .NORMAL { color: #9ca3af; }
 </style>
 </head>
 
@@ -80,8 +103,26 @@
   <h1>Neon AI Predictor</h1>
   <div class="subtitle">Live Football Intelligence</div>
 
+  <input id="match" placeholder="Match (e.g. Arsenal vs Spurs)" />
+
+  <select id="market">
+    <option value="corners">Corners</option>
+    <option value="goals">Goals</option>
+  </select>
+
+  <select id="time">
+    <option value="HT">Half Time</option>
+    <option value="FT">Full Time</option>
+  </select>
+
+  <button id="analyzeBtn">🤖 AI ANALYZE</button>
+
+  <div class="result" id="resultBox">
+    <div id="pick"></div>
+    <div class="tag" id="tag"></div>
+  </div>
+
   <button id="notifyBtn">🔔 Enable Alerts (Premium)</button>
-  <div class="status" id="status"></div>
 </div>
 
 <script>
@@ -99,14 +140,32 @@ if ("serviceWorker" in navigator) {
   navigator.serviceWorker.register("/sw.js");
 }
 
-const statusEl = document.getElementById("status");
+// AI ANALYZE
+document.getElementById("analyzeBtn").onclick = async () => {
+  const match = document.getElementById("match").value;
+  const market = document.getElementById("market").value;
+  const time = document.getElementById("time").value;
 
+  const res = await fetch("/api/predict", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ match, market, time })
+  });
+
+  const data = await res.json();
+
+  document.getElementById("pick").textContent = data.result.pick;
+  const tagEl = document.getElementById("tag");
+  tagEl.textContent = data.value.tag;
+  tagEl.className = "tag " + data.value.tag;
+
+  document.getElementById("resultBox").style.display = "block";
+};
+
+// PUSH SUBSCRIBE
 document.getElementById("notifyBtn").onclick = async () => {
   const permission = await Notification.requestPermission();
-  if (permission !== "granted") {
-    statusEl.textContent = "❌ Notifications blocked";
-    return;
-  }
+  if (permission !== "granted") return;
 
   const reg = await navigator.serviceWorker.ready;
 
@@ -123,7 +182,7 @@ document.getElementById("notifyBtn").onclick = async () => {
     body: JSON.stringify({ subscription: sub, premium: true })
   });
 
-  statusEl.textContent = "✅ Premium alerts enabled";
+  alert("Premium alerts enabled");
 };
 </script>
 

@@ -32,9 +32,13 @@
     text-align: center;
   }
 
+  /* 🔥 NEON TITLE */
   h1 {
     margin: 0;
-    font-size: 26px;
+    font-size: 28px;
+    background: linear-gradient(90deg, #00e5ff, #7c4dff);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
   }
 
   .subtitle {
@@ -43,15 +47,33 @@
     margin-bottom: 18px;
   }
 
-  input, select {
+  /* INPUT */
+  input {
     width: 100%;
     margin-bottom: 12px;
     padding: 12px;
     border-radius: 10px;
-    border: none;
+    border: 1px solid rgba(0,229,255,0.4);
     background: #0f172a;
-    color: #eaf6ff;
+    color: #00e5ff;
     font-size: 14px;
+  }
+
+  /* SELECTS – NEON */
+  select {
+    width: 100%;
+    margin-bottom: 12px;
+    padding: 12px;
+    border-radius: 10px;
+    border: 1px solid rgba(124,77,255,0.5);
+    background: #0f172a;
+    color: #7dd3fc;
+    font-size: 14px;
+  }
+
+  select option {
+    background: #020617;
+    color: #7dd3fc;
   }
 
   button {
@@ -64,6 +86,7 @@
     transition: all 0.2s ease;
   }
 
+  /* AI ANALYZE */
   #analyzeBtn {
     background: linear-gradient(135deg, #00e5ff, #7c4dff);
     color: #001018;
@@ -71,11 +94,19 @@
     margin-top: 6px;
   }
 
+  /* ENABLE ALERTS */
   #notifyBtn {
     margin-top: 14px;
     background: transparent;
-    color: #7dd3fc;
-    border: 1px solid rgba(125, 211, 252, 0.4);
+    color: #00e5ff;
+    border: 1px solid rgba(0,229,255,0.5);
+  }
+
+  #notifyBtn.enabled {
+    background: rgba(0,229,255,0.15);
+    color: #22d3ee;
+    border-color: #22d3ee;
+    cursor: default;
   }
 
   .result {
@@ -106,13 +137,13 @@
   <input id="match" placeholder="Match (e.g. Arsenal vs Spurs)" />
 
   <select id="market">
-    <option value="corners">Corners</option>
-    <option value="goals">Goals</option>
+    <option value="corners">⚽ Corners</option>
+    <option value="goals">🥅 Goals</option>
   </select>
 
   <select id="time">
-    <option value="HT">Half Time</option>
-    <option value="FT">Full Time</option>
+    <option value="HT">⏱ Half Time</option>
+    <option value="FT">⏰ Full Time</option>
   </select>
 
   <button id="analyzeBtn">🤖 AI ANALYZE</button>
@@ -162,8 +193,10 @@ document.getElementById("analyzeBtn").onclick = async () => {
   document.getElementById("resultBox").style.display = "block";
 };
 
-// PUSH SUBSCRIBE
-document.getElementById("notifyBtn").onclick = async () => {
+// 🔔 ENABLE ALERTS – FIXED FEEDBACK
+document.getElementById("notifyBtn").onclick = async function () {
+  if (this.classList.contains("enabled")) return;
+
   const permission = await Notification.requestPermission();
   if (permission !== "granted") return;
 
@@ -182,7 +215,8 @@ document.getElementById("notifyBtn").onclick = async () => {
     body: JSON.stringify({ subscription: sub, premium: true })
   });
 
-  alert("Premium alerts enabled");
+  this.textContent = "✅ Alerts Enabled";
+  this.classList.add("enabled");
 };
 </script>
 

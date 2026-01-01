@@ -1,0 +1,35 @@
+import express from "express";
+import webpush from "../push.js";
+
+const router = express.Router();
+const subscribers = [];
+
+router.post("/", (req, res) => {
+  const { subscription, premium } = req.body;
+
+  if (premium && subscription) {
+    subscribers.push(subscription);
+  }
+
+  res.json({ ok: true });
+});
+
+// TEST PUSH ENDPOINT
+router.get("/test", async (req, res) => {
+  const payload = JSON.stringify({
+    title: "🔥 NEON AI ALERT",
+    body: "Test notification successful!"
+  });
+
+  for (const sub of subscribers) {
+    try {
+      await webpush.sendNotification(sub, payload);
+    } catch (e) {
+      console.error("Push error:", e);
+    }
+  }
+
+  res.json({ sent: subscribers.length });
+});
+
+export { router, subscribers };

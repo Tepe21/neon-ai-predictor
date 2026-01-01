@@ -30,9 +30,10 @@
     backdrop-filter: blur(12px);
     box-shadow: 0 0 40px rgba(0, 200, 255, 0.25);
     text-align: center;
+    position: relative;
+    z-index: 1;
   }
 
-  /* 🔥 NEON TITLE */
   h1 {
     margin: 0;
     font-size: 28px;
@@ -47,7 +48,6 @@
     margin-bottom: 18px;
   }
 
-  /* INPUT */
   input {
     width: 100%;
     margin-bottom: 12px;
@@ -59,7 +59,6 @@
     font-size: 14px;
   }
 
-  /* SELECTS – NEON */
   select {
     width: 100%;
     margin-bottom: 12px;
@@ -84,9 +83,9 @@
     font-size: 15px;
     cursor: pointer;
     transition: all 0.2s ease;
+    pointer-events: auto;
   }
 
-  /* AI ANALYZE */
   #analyzeBtn {
     background: linear-gradient(135deg, #00e5ff, #7c4dff);
     color: #001018;
@@ -94,16 +93,22 @@
     margin-top: 6px;
   }
 
-  /* ENABLE ALERTS */
+  /* 🔔 ENABLE ALERTS – FIXED */
   #notifyBtn {
     margin-top: 14px;
     background: transparent;
     color: #00e5ff;
-    border: 1px solid rgba(0,229,255,0.5);
+    border: 1px solid rgba(0,229,255,0.6);
+    position: relative;
+    z-index: 10;
+  }
+
+  #notifyBtn:hover {
+    background: rgba(0,229,255,0.1);
   }
 
   #notifyBtn.enabled {
-    background: rgba(0,229,255,0.15);
+    background: rgba(0,229,255,0.18);
     color: #22d3ee;
     border-color: #22d3ee;
     cursor: default;
@@ -137,7 +142,7 @@
   <input id="match" placeholder="Match (e.g. Arsenal vs Spurs)" />
 
   <select id="market">
-    <option value="corners">⚽ Corners</option>
+    <option value="corners">🚩 Corners</option>
     <option value="goals">🥅 Goals</option>
   </select>
 
@@ -193,12 +198,17 @@ document.getElementById("analyzeBtn").onclick = async () => {
   document.getElementById("resultBox").style.display = "block";
 };
 
-// 🔔 ENABLE ALERTS – FIXED FEEDBACK
-document.getElementById("notifyBtn").onclick = async function () {
-  if (this.classList.contains("enabled")) return;
+// 🔔 ENABLE ALERTS – 100% CLICKABLE
+const notifyBtn = document.getElementById("notifyBtn");
+
+notifyBtn.addEventListener("click", async () => {
+  if (notifyBtn.classList.contains("enabled")) return;
 
   const permission = await Notification.requestPermission();
-  if (permission !== "granted") return;
+  if (permission !== "granted") {
+    alert("Notifications blocked");
+    return;
+  }
 
   const reg = await navigator.serviceWorker.ready;
 
@@ -215,9 +225,9 @@ document.getElementById("notifyBtn").onclick = async function () {
     body: JSON.stringify({ subscription: sub, premium: true })
   });
 
-  this.textContent = "✅ Alerts Enabled";
-  this.classList.add("enabled");
-};
+  notifyBtn.textContent = "✅ Alerts Enabled";
+  notifyBtn.classList.add("enabled");
+});
 </script>
 
 </body>

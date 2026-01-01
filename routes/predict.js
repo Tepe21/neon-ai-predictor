@@ -17,9 +17,10 @@ router.post("/", async (req, res) => {
   // 🔔 PUSH ΜΟΝΟ ΑΝ ΥΠΑΡΧΕΙ VALUE
   if (tag !== "NORMAL") {
     const payload = JSON.stringify({
-      title: tag === "BOMB" ? "💣 VALUE BOMB" : "🔥 VALUE ALERT",
-      body: pick
-    });
+  title: tag === "BOMB" ? "💣 AI Football Picks – BOMB" : "🔥 AI Football Picks – VALUE",
+  body: pick
+});
+
 
     for (const sub of subscribers) {
       try {

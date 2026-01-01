@@ -1,15 +1,88 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Neon AI Predictor</title>
-<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<style>
+  * {
+    box-sizing: border-box;
+    font-family: "Segoe UI", system-ui, sans-serif;
+  }
+
+  body {
+    margin: 0;
+    height: 100vh;
+    background: radial-gradient(circle at top, #1b2b4a, #05070c);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #eaf6ff;
+  }
+
+  .app {
+    width: 100%;
+    max-width: 380px;
+    padding: 28px;
+    border-radius: 18px;
+    background: rgba(10, 15, 30, 0.75);
+    backdrop-filter: blur(12px);
+    box-shadow: 0 0 40px rgba(0, 200, 255, 0.25);
+    text-align: center;
+  }
+
+  h1 {
+    margin: 0 0 6px;
+    font-size: 28px;
+    letter-spacing: 1px;
+  }
+
+  .subtitle {
+    font-size: 14px;
+    opacity: 0.7;
+    margin-bottom: 26px;
+  }
+
+  button {
+    width: 100%;
+    padding: 14px;
+    border-radius: 12px;
+    border: none;
+    font-size: 15px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  #notifyBtn {
+    background: linear-gradient(135deg, #00e5ff, #7c4dff);
+    color: #001018;
+    font-weight: 600;
+    box-shadow: 0 0 18px rgba(0, 229, 255, 0.6);
+  }
+
+  #notifyBtn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 0 26px rgba(124, 77, 255, 0.9);
+  }
+
+  .status {
+    margin-top: 14px;
+    font-size: 13px;
+    opacity: 0.85;
+  }
+</style>
 </head>
 
 <body>
-<h2>Neon AI Predictor</h2>
 
-<button id="notifyBtn">🔔 Enable Alerts (Premium)</button>
+<div class="app">
+  <h1>Neon AI Predictor</h1>
+  <div class="subtitle">Live Football Intelligence</div>
+
+  <button id="notifyBtn">🔔 Enable Alerts (Premium)</button>
+  <div class="status" id="status"></div>
+</div>
 
 <script>
 function urlBase64ToUint8Array(base64String) {
@@ -19,23 +92,28 @@ function urlBase64ToUint8Array(base64String) {
     .replace(/_/g, "/");
 
   const rawData = atob(base64);
-  return Uint8Array.from([...rawData].map(char => char.charCodeAt(0)));
+  return Uint8Array.from([...rawData].map(c => c.charCodeAt(0)));
 }
 
 if ("serviceWorker" in navigator) {
   navigator.serviceWorker.register("/sw.js");
 }
 
+const statusEl = document.getElementById("status");
+
 document.getElementById("notifyBtn").onclick = async () => {
   const permission = await Notification.requestPermission();
-  if (permission !== "granted") return;
+  if (permission !== "granted") {
+    statusEl.textContent = "❌ Notifications blocked";
+    return;
+  }
 
   const reg = await navigator.serviceWorker.ready;
 
   const sub = await reg.pushManager.subscribe({
     userVisibleOnly: true,
     applicationServerKey: urlBase64ToUint8Array(
-      "BJfVfAdIgz1Z_6fvwxaMptZpAi6AH6H_AZwzowXNUy3bPBE8rPlkj6ERrym3mFBP1jqLevxISzX7m65BieoFj8E"
+      "ΒΑΛΕ_ΕΔΩ_ΤΟ_VAPID_PUBLIC_KEY"
     )
   });
 
@@ -45,8 +123,9 @@ document.getElementById("notifyBtn").onclick = async () => {
     body: JSON.stringify({ subscription: sub, premium: true })
   });
 
-  alert("Notifications enabled!");
+  statusEl.textContent = "✅ Premium alerts enabled";
 };
 </script>
+
 </body>
 </html>

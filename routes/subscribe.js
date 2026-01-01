@@ -2,6 +2,8 @@ import express from "express";
 import webpush from "../push.js";
 
 const router = express.Router();
+
+// 👇 ΠΡΟΣΟΧΗ: export ΚΑΝΟΝΙΚΑ, ΟΧΙ inline
 const subscribers = [];
 
 console.log("✅ subscribe.js loaded");
@@ -16,7 +18,7 @@ router.post("/", (req, res) => {
   res.json({ ok: true });
 });
 
- => {
+router.get("/test", async (req, res) => {
   const payload = JSON.stringify({
     title: "🔥 NEON AI ALERT",
     body: "Test notification successful!"
@@ -36,4 +38,6 @@ router.post("/", (req, res) => {
   res.json({ sent });
 });
 
+// ⬇️ ΣΩΣΤΟ export
+export { subscribers };
 export default router;

@@ -5,21 +5,20 @@ import { subscribers } from "./subscribe.js";
 const router = express.Router();
 
 router.post("/", async (req, res) => {
-  // --- MOCK LIVE DATA (μετά API) ---
-  const result = {
-    pick: "Over 9.5 Corners",
-    confidence: Math.random()
-  };
+  // MOCK confidence (μετά real stats)
+  const confidence = Math.random();
 
   let tag = "NORMAL";
-  if (result.confidence > 0.75) tag = "HIGH";
-  if (result.confidence > 0.9) tag = "BOMB";
+  if (confidence > 0.75) tag = "HIGH";
+  if (confidence > 0.9) tag = "BOMB";
 
-  // --- AUTO PUSH ONLY IF VALUE ---
+  const pick = "Over 9.5 Corners";
+
+  // 🔔 PUSH ΜΟΝΟ ΑΝ ΥΠΑΡΧΕΙ VALUE
   if (tag !== "NORMAL") {
     const payload = JSON.stringify({
       title: tag === "BOMB" ? "💣 VALUE BOMB" : "🔥 VALUE ALERT",
-      body: result.pick
+      body: pick
     });
 
     for (const sub of subscribers) {
@@ -32,7 +31,7 @@ router.post("/", async (req, res) => {
   }
 
   res.json({
-    result: { pick: result.pick },
+    result: { pick },
     value: { tag }
   });
 });

@@ -1,0 +1,219 @@
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: 'Inter', sans-serif;
+  background: radial-gradient(circle at top, #0a1a2f, #05080d);
+  color: #ffffff;
+  min-height: 100vh;
+}
+
+/* LANGUAGE SWITCH */
+.lang-switch {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  display: flex;
+  gap: 8px;
+  z-index: 10000;
+}
+.lang-switch button {
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(0,246,255,0.4);
+  color: #00f6ff;
+  font-size: 12px;
+  padding: 6px 10px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+/* ONBOARDING */
+.onboarding {
+  position: fixed;
+  inset: 0;
+  background: radial-gradient(circle at top, #081726, #000);
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+.onboarding.hidden { display:none; }
+
+.progress-dots {
+  display:flex; gap:10px; margin-bottom:18px;
+}
+.dot {
+  width:8px; height:8px; border-radius:50%;
+  background:rgba(255,255,255,.25);
+}
+.dot.active {
+  background:#00f6ff;
+  box-shadow:0 0 10px rgba(0,246,255,.9);
+}
+
+.onboarding-screen {
+  display:none;
+  max-width:420px; width:90%;
+  padding:28px;
+  text-align:center;
+  background:rgba(255,255,255,.06);
+  border-radius:18px;
+  backdrop-filter: blur(14px);
+  box-shadow:0 0 40px rgba(0,246,255,.15);
+  animation: fadeSlide .45s ease;
+}
+.onboarding-screen.active { display:block; }
+
+.onboarding h2 {
+  font-family:'Orbitron',sans-serif;
+  font-size:22px;
+  margin-bottom:14px;
+  background:linear-gradient(90deg,#00f6ff,#7cffc4);
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+}
+.onboarding p {
+  font-size:15px;
+  line-height:1.55;
+  color:#d0eaff;
+}
+.onboarding button {
+  width:100%;
+  padding:14px;
+  margin-top:14px;
+  background:linear-gradient(135deg,rgba(0,246,255,.28),rgba(124,255,196,.18));
+  border:1px solid rgba(0,246,255,.6);
+  color:#00f6ff;
+  font-size:15px;
+  border-radius:12px;
+  cursor:pointer;
+}
+.onboarding button.secondary {
+  background:transparent;
+  border:none;
+  color:#8faabb;
+  font-size:13px;
+}
+.activate-glow {
+  animation:pulseGlow 1.8s infinite;
+}
+@keyframes pulseGlow {
+  0%{box-shadow:0 0 10px rgba(0,246,255,.3)}
+  50%{box-shadow:0 0 28px rgba(0,246,255,.9)}
+  100%{box-shadow:0 0 10px rgba(0,246,255,.3)}
+}
+.ai-status {
+  margin-top:14px;
+  font-size:12px;
+  color:#9fb6c6;
+}
+
+/* APP */
+#app { padding:24px; }
+#app .sub { color:#9fb6c6; }
+
+/* LIVE SCANNER */
+.scanner {
+  margin-top:20px;
+  padding:16px;
+  border-radius:16px;
+  background:rgba(255,255,255,.05);
+  backdrop-filter: blur(12px);
+  box-shadow:0 0 30px rgba(0,246,255,.15);
+  animation: scannerPulse 3s infinite;
+}
+.scanner-title {
+  font-family:'Orbitron',sans-serif;
+  font-size:14px;
+  margin-bottom:6px;
+  color:#7cffc4;
+}
+.scanner-text {
+  font-size:13px;
+  color:#d0eaff;
+}
+@keyframes scannerPulse {
+  0%{box-shadow:0 0 18px rgba(0,246,255,.12)}
+  50%{box-shadow:0 0 32px rgba(0,246,255,.35)}
+  100%{box-shadow:0 0 18px rgba(0,246,255,.12)}
+}
+
+/* ALERTS */
+.alerts {
+  display:flex;
+  flex-direction:column;
+  gap:14px;
+  margin-top:18px;
+}
+
+.alert {
+  padding:16px;
+  border-radius:14px;
+  background:rgba(255,255,255,.06);
+  backdrop-filter: blur(10px);
+  box-shadow:0 0 22px rgba(0,0,0,.35);
+  animation: popIn .35s ease;
+}
+
+/* NORMAL */
+.alert.normal {
+  border-left:4px solid #6fdcff;
+}
+
+/* HIGH VALUE */
+.alert.high {
+  border-left:4px solid #7cff9b;
+  box-shadow:0 0 26px rgba(124,255,155,.35);
+}
+
+/* VALUE BOMB */
+.alert.bomb {
+  border-left:4px solid #ff7c7c;
+  box-shadow:0 0 32px rgba(255,124,124,.55);
+}
+
+.alert .top {
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:6px;
+}
+.alert .type {
+  font-family:'Orbitron',sans-serif;
+  font-size:12px;
+}
+.alert .conf {
+  font-size:13px;
+  font-weight:600;
+}
+.alert .body {
+  font-size:14px;
+  color:#e8f6ff;
+  margin:6px 0;
+}
+.alert .meta {
+  font-size:12px;
+  color:#9fb6c6;
+}
+
+.demo-btn {
+  margin-top:16px;
+  width:100%;
+  background:transparent;
+  color:#8faabb;
+  border:1px dashed rgba(255,255,255,.25);
+  padding:12px;
+  border-radius:12px;
+  cursor:pointer;
+}
+
+@keyframes popIn {
+  from { opacity:0; transform:translateY(10px) scale(.98); }
+  to { opacity:1; transform:none; }
+}
+
+@keyframes fadeSlide {
+  from { opacity:0; transform:translateY(20px) scale(.97); }
+  to { opacity:1; transform:none; }
+}

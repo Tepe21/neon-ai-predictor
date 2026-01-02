@@ -1,234 +1,89 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>AI Football Picks</title>
+  <meta charset="UTF-8" />
+  <title>AI Football Picks</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-<style>
-  * {
-    box-sizing: border-box;
-    font-family: "Segoe UI", system-ui, sans-serif;
-  }
-
-  body {
-    margin: 0;
-    height: 100vh;
-    background: radial-gradient(circle at top, #1b2b4a, #05070c);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: #eaf6ff;
-  }
-
-  .app {
-    width: 100%;
-    max-width: 400px;
-    padding: 28px;
-    border-radius: 18px;
-    background: rgba(10, 15, 30, 0.75);
-    backdrop-filter: blur(12px);
-    box-shadow: 0 0 40px rgba(0, 200, 255, 0.25);
-    text-align: center;
-    position: relative;
-    z-index: 1;
-  }
-
-  h1 {
-    margin: 0;
-    font-size: 28px;
-    background: linear-gradient(90deg, #00e5ff, #7c4dff);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-  }
-
-  .subtitle {
-    font-size: 13px;
-    opacity: 0.7;
-    margin-bottom: 18px;
-  }
-
-  input {
-    width: 100%;
-    margin-bottom: 12px;
-    padding: 12px;
-    border-radius: 10px;
-    border: 1px solid rgba(0,229,255,0.4);
-    background: #0f172a;
-    color: #00e5ff;
-    font-size: 14px;
-  }
-
-  select {
-    width: 100%;
-    margin-bottom: 12px;
-    padding: 12px;
-    border-radius: 10px;
-    border: 1px solid rgba(124,77,255,0.5);
-    background: #0f172a;
-    color: #7dd3fc;
-    font-size: 14px;
-  }
-
-  select option {
-    background: #020617;
-    color: #7dd3fc;
-  }
-
-  button {
-    width: 100%;
-    padding: 14px;
-    border-radius: 12px;
-    border: none;
-    font-size: 15px;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    pointer-events: auto;
-  }
-
-  #analyzeBtn {
-    background: linear-gradient(135deg, #00e5ff, #7c4dff);
-    color: #001018;
-    font-weight: 600;
-    margin-top: 6px;
-  }
-
-  /* 🔔 ENABLE ALERTS – FIXED */
-  #notifyBtn {
-    margin-top: 14px;
-    background: transparent;
-    color: #00e5ff;
-    border: 1px solid rgba(0,229,255,0.6);
-    position: relative;
-    z-index: 10;
-  }
-
-  #notifyBtn:hover {
-    background: rgba(0,229,255,0.1);
-  }
-
-  #notifyBtn.enabled {
-    background: rgba(0,229,255,0.18);
-    color: #22d3ee;
-    border-color: #22d3ee;
-    cursor: default;
-  }
-
-  .result {
-    margin-top: 18px;
-    padding: 14px;
-    border-radius: 12px;
-    background: rgba(0,0,0,0.35);
-    display: none;
-  }
-
-  .tag {
-    margin-top: 6px;
-    font-weight: bold;
-  }
-
-  .HIGH { color: #38bdf8; }
-  .BOMB { color: #f87171; }
-  .NORMAL { color: #9ca3af; }
-</style>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css" />
 </head>
-
 <body>
 
-<div class="app">
-  <h1>AI Football Picks</h1>
-  <div class="subtitle">Live Football Intelligence</div>
-
-  <input id="match" placeholder="Match (e.g. Arsenal vs Spurs)" />
-
-  <select id="market">
-    <option value="corners">🚩 Corners</option>
-    <option value="goals">🥅 Goals</option>
-  </select>
-
-  <select id="time">
-    <option value="HT">⏱ Half Time</option>
-    <option value="FT">⏰ Full Time</option>
-  </select>
-
-  <button id="analyzeBtn">🤖 AI ANALYZE</button>
-
-  <div class="result" id="resultBox">
-    <div id="pick"></div>
-    <div class="tag" id="tag"></div>
-  </div>
-
-  <button id="notifyBtn">🔔 Enable Alerts (Premium)</button>
+<!-- LANGUAGE SWITCH -->
+<div class="lang-switch">
+  <button onclick="setLanguage('en')">EN</button>
+  <button onclick="setLanguage('gr')">GR</button>
 </div>
 
-<script>
-function urlBase64ToUint8Array(base64String) {
-  const padding = "=".repeat((4 - base64String.length % 4) % 4);
-  const base64 = (base64String + padding)
-    .replace(/-/g, "+")
-    .replace(/_/g, "/");
+<!-- ONBOARDING -->
+<div id="onboarding" class="onboarding">
+  <div class="progress-dots">
+    <span class="dot active"></span>
+    <span class="dot"></span>
+    <span class="dot"></span>
+  </div>
 
-  const rawData = atob(base64);
-  return Uint8Array.from([...rawData].map(c => c.charCodeAt(0)));
-}
+  <div class="onboarding-screen active">
+    <h2 data-key="title1"></h2>
+    <p data-key="text1"></p>
+    <button onclick="nextOnboarding()" data-key="continue"></button>
+  </div>
 
-if ("serviceWorker" in navigator) {
-  navigator.serviceWorker.register("/sw.js");
-}
+  <div class="onboarding-screen">
+    <h2 data-key="title2"></h2>
+    <p data-key="text2"></p>
+    <ul>
+      <li data-key="bullet1"></li>
+      <li data-key="bullet2"></li>
+      <li data-key="bullet3"></li>
+    </ul>
+    <button onclick="nextOnboarding()" data-key="next"></button>
+  </div>
 
-// AI ANALYZE
-document.getElementById("analyzeBtn").onclick = async () => {
-  const match = document.getElementById("match").value;
-  const market = document.getElementById("market").value;
-  const time = document.getElementById("time").value;
+  <div class="onboarding-screen">
+    <h2 data-key="title3"></h2>
+    <p data-key="text3"></p>
+    <button class="activate-glow" onclick="finishOnboarding()" data-key="activate"></button>
+    <button class="secondary" onclick="finishOnboarding()" data-key="skip"></button>
+    <div class="ai-status">🧠 <span data-key="status"></span></div>
+  </div>
+</div>
 
-  const res = await fetch("/api/predict", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ match, market, time })
-  });
+<!-- MAIN APP -->
+<div id="app" style="display:none;">
 
-  const data = await res.json();
+  <h1>AI Football Picks</h1>
+  <p class="sub" data-key="testmode"></p>
 
-  document.getElementById("pick").textContent = data.result.pick;
-  const tagEl = document.getElementById("tag");
-  tagEl.textContent = data.value.tag;
-  tagEl.className = "tag " + data.value.tag;
+  <!-- LIVE SCANNER -->
+  <div class="scanner">
+    <div class="scanner-title">🧠 AI Live Scanner</div>
+    <div id="scannerText" class="scanner-text"></div>
+  </div>
 
-  document.getElementById("resultBox").style.display = "block";
-};
+  <!-- PUSH BUTTON -->
+  <button class="demo-btn" onclick="enablePush()">
+    🔔 Enable Push Notifications
+  </button>
 
-// 🔔 ENABLE ALERTS – 100% CLICKABLE
-const notifyBtn = document.getElementById("notifyBtn");
+  <!-- ALERT FEED -->
+  <div id="alerts" class="alerts"></div>
 
-notifyBtn.addEventListener("click", async () => {
-  if (notifyBtn.classList.contains("enabled")) return;
+  <!-- DEMO ALERT -->
+  <button class="demo-btn" onclick="spawnDemoAlert()">
+    Spawn demo alert
+  </button>
 
-  const permission = await Notification.requestPermission();
-  if (permission !== "granted") {
-    alert("Notifications blocked");
-    return;
-  }
+</div>
 
-  const reg = await navigator.serviceWorker.ready;
-
-  const sub = await reg.pushManager.subscribe({
-    userVisibleOnly: true,
-    applicationServerKey: urlBase64ToUint8Array(
-      "BJfVfAdIgz1Z_6fvwxaMptZpAi6AH6H_AZwzowXNUy3bPBE8rPlkj6ERrym3mFBP1jqLevxISzX7m65BieoFj8E"
-    )
-  });
-
-  await fetch("/api/subscribe", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ subscription: sub, premium: true })
-  });
-
-  notifyBtn.textContent = "✅ Alerts Enabled";
-  notifyBtn.classList.add("enabled");
-});
+<!-- PUSH MODULE -->
+<script type="module">
+  import { enablePush } from "./push.js";
+  window.enablePush = enablePush;
 </script>
 
+<!-- MAIN APP LOGIC -->
+<script src="app.js"></script>
 </body>
 </html>

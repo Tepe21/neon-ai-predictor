@@ -19,8 +19,8 @@ app.use(express.static(path.join(__dirname, "public")));
 ΒΑΖΕΙΣ ΤΑ ΠΡΑΓΜΑΤΙΚΑ VAPID KEYS ΠΟΥ ΕΧΕΙΣ
 */
 
-const VAPID_PUBLIC_KEY = "BJFVfAdIgz1Z6fwxaMptZpAi6AH6H_AZwzowXNUy3bPBE8rPlkj6ERrym3mFBP1jqlE8Xxxxxxxxxxxxx";
-const VAPID_PRIVATE_KEY = "zWMkQSBKV7Khsno1a6whAv01lu4R9oVy6tf9H8dRAtA";
+const VAPID_PUBLIC_KEY = "BIMzPAE_dr2geB-QXq4v4gJYsDekCTki-_5QRFxbk_VpWfWl5YeJny_ISvJFH8M-nUibeGrurqkCww0VnuyOntQ";
+const VAPID_PRIVATE_KEY = "Kmx4XDTOJ4RGmIWa8w-5f__0qUqduUxNMquF5wbwX5E";
 
 /* -------------------------------------------- */
 

@@ -1,9 +1,14 @@
 import express from "express";
+import { calculateGoalProbability } from "../services/goalProbability.js";
 
 const router = express.Router();
 
 const API_URL = "https://v3.football.api-sports.io/fixtures";
 
+// =====================================
+// 🔴 LIVE MATCHES + GOAL PROBABILITY
+// Endpoint: GET /api/live/matches
+// =====================================
 router.get("/live/matches", async (req, res) => {
   try {
     const response = await fetch(`${API_URL}?live=all`, {
@@ -14,10 +19,11 @@ router.get("/live/matches", async (req, res) => {
 
     const data = await response.json();
 
-    if (!data.response) {
+    if (!data || !data.response) {
       return res.json([]);
     }
 
+    // 🔹 Βασικά δεδομένα αγώνα
     const matches = data.response.map((m) => ({
       id: m.fixture.id,
       league: m.league.name,
@@ -29,7 +35,21 @@ router.get("/live/matches", async (req, res) => {
       status: m.fixture.status.short
     }));
 
-    res.json(matches);
+    // 🧠 Goal Probability Engine (65’–80’)
+    const analyzed = matches
+      .map((match) => {
+        const analysis = calculateGoalProbability(match);
+        if (!analysis) return null;
+
+        return {
+          ...match,
+          confidence: analysis.confidence,
+          tag: analysis.tag
+        };
+      })
+      .filter(Boolean);
+
+    res.json(analyzed);
   } catch (err) {
     console.error("LIVE MATCHES ERROR:", err.message);
     res.status(500).json({ error: "Live matches failed" });

@@ -1,13 +1,25 @@
+import express from "express";
+import fetch from "node-fetch";
+
+const router = express.Router();
+
 router.get("/live-raw", async (req, res) => {
-  const url = "https://api-football-v1.p.rapidapi.com/v3/fixtures?live=all";
+  try {
+    const response = await fetch(
+      "https://api-football-v1.p.rapidapi.com/v3/fixtures?live=all",
+      {
+        headers: {
+          "X-RapidAPI-Key": process.env.API_FOOTBALL_KEY,
+          "X-RapidAPI-Host": "api-football-v1.p.rapidapi.com"
+        }
+      }
+    );
 
-  const response = await fetch(url, {
-    headers: {
-      "x-rapidapi-key": process.env.API_FOOTBALL_KEY,
-      "x-rapidapi-host": "api-football-v1.p.rapidapi.com"
-    }
-  });
-
-  const data = await response.json();
-  res.json(data);
+    const data = await response.json();
+    res.json(data);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 });
+
+export default router;

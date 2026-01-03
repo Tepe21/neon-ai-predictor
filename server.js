@@ -3,6 +3,9 @@ import webpush from "web-push";
 import path from "path";
 import { fileURLToPath } from "url";
 
+// ROUTES
+import liveRoutes from "./routes/live.js";
+
 /* ===============================
    BASIC SETUP
 ================================ */
@@ -19,23 +22,24 @@ app.use(express.json());
 app.use(express.static(path.join(__dirname, "public")));
 
 /* ===============================
-   VAPID KEYS
-   ⚠️ ΑΛΛΑΖΕΙΣ ΜΟΝΟ ΑΝ ΧΡΕΙΑΖΕΤΑΙ
+   VAPID KEYS (PUSH)
 ================================ */
 const VAPID_PUBLIC_KEY =
   "BH0I8IqO8zfTxP6kVP1TJuGTR6APnBAjyIK58kAC0yLIdwPdqXyfAA8sSHNv25j7YmvjumvrvRMK9gwq6ljcX6s";
 
 const VAPID_PRIVATE_KEY =
-  "Kmx4XDTOJ4RGmIWa8w-5f__0qUqduUxNMquF5wbwX5E"; // 👈 αν δεν το έχεις ήδη βάλει σωστά
+  process.env.VAPID_PRIVATE_KEY; // 👈 από Render ENV
 
-webpush.setVapidDetails(
-  "mailto:admin@aifootballpicks.com",
-  VAPID_PUBLIC_KEY,
-  VAPID_PRIVATE_KEY
-);
+if (VAPID_PRIVATE_KEY) {
+  webpush.setVapidDetails(
+    "mailto:admin@aifootballpicks.com",
+    VAPID_PUBLIC_KEY,
+    VAPID_PRIVATE_KEY
+  );
+}
 
 /* ===============================
-   SHARED SUBSCRIPTIONS STORE
+   PUSH SUBSCRIPTIONS (TEMP STORAGE)
 ================================ */
 const subscriptions = [];
 
@@ -52,7 +56,7 @@ app.get("/health", (req, res) => {
 });
 
 // Subscribe to push notifications
-app.post("/api/subscribe", (req, res) => {
+app.post("/api/subscribe", async (req, res) => {
   const sub = req.body;
 
   if (!sub || !sub.endpoint) {
@@ -67,20 +71,38 @@ app.post("/api/subscribe", (req, res) => {
     subscriptions.push(sub);
   }
 
-  console.log("🔔 Subscriptions count:", subscriptions.length);
+  // 🔔 TEST PUSH ON SUBSCRIBE (για επιβεβαίωση)
+  try {
+    const payload = JSON.stringify({
+      title: "✅ Push Enabled",
+      body: "AI Football Picks – Alerts are now active!",
+    });
 
+    await webpush.sendNotification(sub, payload);
+  } catch (err) {
+    console.error("Push test failed:", err.message);
+  }
+
+  console.log("🔔 Subscriptions:", subscriptions.length);
   res.json({ success: true });
 });
 
-// TEST PUSH (GET)
+// ===============================
+// ⚽ LIVE MATCHES ROUTE (API-FOOTBALL)
+// ===============================
+app.use("/api/live", liveRoutes);
+
+// ===============================
+// 🔔 TEST PUSH ENDPOINT
+// ===============================
 app.get("/api/push/test", async (req, res) => {
   if (subscriptions.length === 0) {
-    return res.json({ sent: 0, error: "No subscriptions" });
+    return res.json({ sent: 0 });
   }
 
   const payload = JSON.stringify({
     title: "🚨 TEST ALERT",
-    body: "AI Football Picks – Push notifications are LIVE!",
+    body: "This is a manual test push notification.",
   });
 
   let sent = 0;
@@ -90,7 +112,7 @@ app.get("/api/push/test", async (req, res) => {
       await webpush.sendNotification(sub, payload);
       sent++;
     } catch (err) {
-      console.error("❌ Push error:", err.message);
+      console.error("Push error:", err.message);
     }
   }
 

@@ -5,85 +5,85 @@
   <title>AI Football Picks</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600&family=Inter:wght@400;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css" />
+  <!-- PWA -->
+  <link rel="manifest" href="/manifest.json" />
+  <meta name="theme-color" content="#0ff" />
+
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background: radial-gradient(circle at top, #00fff0, #02030f 60%);
+      color: #eaffff;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .card {
+      background: rgba(0,0,0,0.45);
+      backdrop-filter: blur(12px);
+      padding: 30px;
+      border-radius: 16px;
+      box-shadow: 0 0 40px rgba(0,255,255,0.25);
+      max-width: 420px;
+      width: 100%;
+      text-align: center;
+    }
+
+    h1 {
+      margin-top: 0;
+      color: #00fff0;
+      text-shadow: 0 0 10px #00fff0;
+    }
+
+    button {
+      margin-top: 20px;
+      padding: 14px 20px;
+      font-size: 16px;
+      border-radius: 10px;
+      border: none;
+      cursor: pointer;
+      background: linear-gradient(90deg, #00fff0, #7f7cff);
+      color: #000;
+      font-weight: bold;
+    }
+
+    button:hover {
+      opacity: 0.9;
+    }
+  </style>
 </head>
+
 <body>
 
-<!-- LANGUAGE SWITCH -->
-<div class="lang-switch">
-  <button onclick="setLanguage('en')">EN</button>
-  <button onclick="setLanguage('gr')">GR</button>
-</div>
+  <div class="card">
+    <h1>AI Football Picks</h1>
+    <p>Live Goal Scanner (Test Mode)</p>
 
-<!-- ONBOARDING -->
-<div id="onboarding" class="onboarding">
-  <div class="progress-dots">
-    <span class="dot active"></span>
-    <span class="dot"></span>
-    <span class="dot"></span>
+    <button onclick="enablePush()">
+      🔔 Enable Push Notifications
+    </button>
   </div>
 
-  <div class="onboarding-screen active">
-    <h2 data-key="title1"></h2>
-    <p data-key="text1"></p>
-    <button onclick="nextOnboarding()" data-key="continue"></button>
-  </div>
+  <!-- 🔑 VAPID PUBLIC KEY (ΣΩΣΤΑ ΠΕΡΑΣΜΕΝΟ) -->
+  <script>
+    window.VAPID_PUBLIC_KEY =
+      "BH0I8IqO8zfTxP6kVP1TJuGTR6APnBAjyIK58kAC0yLIdwPdqXyfAA8sSHNv25j7YmvjumvrvRMK9gwq6ljcX6s";
+  </script>
 
-  <div class="onboarding-screen">
-    <h2 data-key="title2"></h2>
-    <p data-key="text2"></p>
-    <ul>
-      <li data-key="bullet1"></li>
-      <li data-key="bullet2"></li>
-      <li data-key="bullet3"></li>
-    </ul>
-    <button onclick="nextOnboarding()" data-key="next"></button>
-  </div>
+  <!-- Service Worker -->
+  <script>
+    if ("serviceWorker" in navigator) {
+      navigator.serviceWorker.register("/sw.js")
+        .then(() => console.log("✅ Service Worker registered"))
+        .catch(err => console.error("SW error", err));
+    }
+  </script>
 
-  <div class="onboarding-screen">
-    <h2 data-key="title3"></h2>
-    <p data-key="text3"></p>
-    <button class="activate-glow" onclick="finishOnboarding()" data-key="activate"></button>
-    <button class="secondary" onclick="finishOnboarding()" data-key="skip"></button>
-    <div class="ai-status">🧠 <span data-key="status"></span></div>
-  </div>
-</div>
+  <!-- Push logic -->
+<script src="/push.js?v=2"></script>
 
-<!-- MAIN APP -->
-<div id="app" style="display:none;">
-
-  <h1>AI Football Picks</h1>
-  <p class="sub" data-key="testmode"></p>
-
-  <!-- LIVE SCANNER -->
-  <div class="scanner">
-    <div class="scanner-title">🧠 AI Live Scanner</div>
-    <div id="scannerText" class="scanner-text"></div>
-  </div>
-
-  <!-- PUSH BUTTON -->
-  <button class="demo-btn" onclick="enablePush()">
-    🔔 Enable Push Notifications
-  </button>
-
-  <!-- ALERT FEED -->
-  <div id="alerts" class="alerts"></div>
-
-  <!-- DEMO ALERT -->
-  <button class="demo-btn" onclick="spawnDemoAlert()">
-    Spawn demo alert
-  </button>
-
-</div>
-
-<!-- PUSH MODULE -->
-<script type="module">
-  import { enablePush } from "./push.js";
-  window.enablePush = enablePush;
-</script>
-
-<!-- MAIN APP LOGIC -->
-<script src="app.js"></script>
 </body>
 </html>

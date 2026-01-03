@@ -1,83 +1,79 @@
 import express from "express";
-import path from "path";
-import { fileURLToPath } from "url";
 import webpush from "web-push";
-
-import liveRoutes from "./routes/live.js";
-import { processAlerts } from "./services/alertEngine.js";
+import path from "path";
+import fs from "fs";
 
 const app = express();
-const PORT = process.env.PORT || 3000;
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
 app.use(express.json());
-app.use(express.static(path.join(__dirname, "public")));
 
-// ===============================
-// 🔔 VAPID SETUP
-// ===============================
-const VAPID_PUBLIC_KEY =
-  "BH0I8IqO8zfTxP6kVP1TJuGTR6APnBAjyIK58kAC0yLIdwPdqXyfAA8sSHNv25j7YmvjumvrvRMK9gwq6ljcX6s";
-
+// ====== VAPID ======
+const VAPID_PUBLIC_KEY = process.env.VAPID_PUBLIC_KEY;
 const VAPID_PRIVATE_KEY = process.env.VAPID_PRIVATE_KEY;
 
+if (!VAPID_PUBLIC_KEY || !VAPID_PRIVATE_KEY) {
+  console.error("❌ Missing VAPID keys");
+  process.exit(1);
+}
+
 webpush.setVapidDetails(
-  "mailto:admin@aifootballpicks.com",
+  "mailto:test@example.com",
   VAPID_PUBLIC_KEY,
   VAPID_PRIVATE_KEY
 );
 
-// ===============================
-// 🔐 SUBSCRIPTIONS STORE
-// ===============================
-const subscriptions = [];
+// ====== STORAGE (simple JSON file) ======
+const SUBS_FILE = "./subscriptions.json";
+let subscriptions = [];
 
-// ===============================
-// 🔐 SUBSCRIBE (PREMIUM FLAG)
-// ===============================
+if (fs.existsSync(SUBS_FILE)) {
+  subscriptions = JSON.parse(fs.readFileSync(SUBS_FILE));
+}
+
+// ====== STATIC FILES ======
+app.use(express.static("public"));
+
+// ====== HEALTH CHECK ======
+app.get("/health", (req, res) => {
+  res.json({ status: "ok", subscriptions: subscriptions.length });
+});
+
+// ====== SUBSCRIBE ======
 app.post("/api/subscribe", (req, res) => {
-  const { subscription, isPremium } = req.body;
+  const sub = req.body;
 
-  if (!subscription || !subscription.endpoint) {
-    return res.status(400).json({ error: "Invalid subscription" });
-  }
-
-  const exists = subscriptions.find(
-    (s) => s.endpoint === subscription.endpoint
-  );
-
+  const exists = subscriptions.find(s => s.endpoint === sub.endpoint);
   if (!exists) {
-    subscriptions.push({
-      ...subscription,
-      isPremium: Boolean(isPremium)
-    });
+    subscriptions.push(sub);
+    fs.writeFileSync(SUBS_FILE, JSON.stringify(subscriptions, null, 2));
   }
 
   res.json({ success: true });
 });
 
-// ===============================
-// ⚽ LIVE ROUTES
-// ===============================
-app.use("/api", liveRoutes);
+// ====== PUSH TEST ======
+app.get("/api/push/test", async (req, res) => {
+  let sent = 0;
 
-// ===============================
-// 🔔 AUTO ALERT SCANNER (60")
-// ===============================
-setInterval(async () => {
-  try {
-    const res = await fetch("http://localhost:3000/api/live/matches");
-    const matches = await res.json();
-
-    await processAlerts(matches, subscriptions);
-  } catch (err) {
-    console.error("Alert scanner error:", err.message);
+  for (const sub of subscriptions) {
+    try {
+      await webpush.sendNotification(
+        sub,
+        JSON.stringify({
+          title: "🔥 AI Football Picks",
+          body: "Test push notification",
+        })
+      );
+      sent++;
+    } catch (err) {
+      console.error("Push error:", err.message);
+    }
   }
-}, 60 * 1000);
 
-// ===============================
+  res.json({ sent });
+});
+
+// ====== START ======
+const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-  console.log(`🚀 Server running on port ${PORT}`);
+  console.log("🚀 Server running on port", PORT);
 });

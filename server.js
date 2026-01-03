@@ -89,3 +89,29 @@ const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log("🚀 Server running on port", PORT);
 });
+// ===============================
+// 🔔 TEST PUSH ENDPOINT
+// ===============================
+app.get("/api/push/test", async (req, res) => {
+  if (!global.subscriptions || global.subscriptions.length === 0) {
+    return res.json({ sent: 0, error: "No subscriptions" });
+  }
+
+  const payload = JSON.stringify({
+    title: "🚨 TEST ALERT",
+    body: "AI Football Picks – Push notifications are LIVE!",
+  });
+
+  let sent = 0;
+
+  for (const sub of global.subscriptions) {
+    try {
+      await webpush.sendNotification(sub, payload);
+      sent++;
+    } catch (err) {
+      console.error("Push error:", err.message);
+    }
+  }
+
+  res.json({ sent });
+});

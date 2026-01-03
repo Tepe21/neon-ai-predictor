@@ -3,26 +3,30 @@ import webpush from "web-push";
 import path from "path";
 import { fileURLToPath } from "url";
 
+/* ===============================
+   BASIC SETUP
+================================ */
 const app = express();
+const PORT = process.env.PORT || 3000;
 
-/* ---------------- PATH SETUP ---------------- */
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-/* ---------------- MIDDLEWARE ---------------- */
+/* ===============================
+   MIDDLEWARE
+================================ */
 app.use(express.json());
 app.use(express.static(path.join(__dirname, "public")));
 
-/* ---------------- VAPID KEYS ---------------- */
-/*
-⚠️ ΕΔΩ ΘΑ ΑΛΛΑΞΕΙΣ ΜΟΝΟ ΑΥΤΕΣ ΤΙΣ 2 ΓΡΑΜΜΕΣ
-ΒΑΖΕΙΣ ΤΑ ΠΡΑΓΜΑΤΙΚΑ VAPID KEYS ΠΟΥ ΕΧΕΙΣ
-*/
+/* ===============================
+   VAPID KEYS
+   ⚠️ ΑΛΛΑΖΕΙΣ ΜΟΝΟ ΑΝ ΧΡΕΙΑΖΕΤΑΙ
+================================ */
+const VAPID_PUBLIC_KEY =
+  "BH0I8IqO8zfTxP6kVP1TJuGTR6APnBAjyIK58kAC0yLIdwPdqXyfAA8sSHNv25j7YmvjumvrvRMK9gwq6ljcX6s";
 
-const VAPID_PUBLIC_KEY = "BIMzPAE_dr2geB-QXq4v4gJYsDekCTki-_5QRFxbk_VpWfWl5YeJny_ISvJFH8M-nUibeGrurqkCww0VnuyOntQ";
-const VAPID_PRIVATE_KEY = "Kmx4XDTOJ4RGmIWa8w-5f__0qUqduUxNMquF5wbwX5E";
-
-/* -------------------------------------------- */
+const VAPID_PRIVATE_KEY =
+  "Kmx4XDTOJ4RGmIWa8w-5f__0qUqduUxNMquF5wbwX5E"; // 👈 αν δεν το έχεις ήδη βάλει σωστά
 
 webpush.setVapidDetails(
   "mailto:admin@aifootballpicks.com",
@@ -30,35 +34,53 @@ webpush.setVapidDetails(
   VAPID_PRIVATE_KEY
 );
 
-/* ---------------- TEMP STORAGE ---------------- */
-/*
-Για test κρατάμε subscriptions στη μνήμη.
-Αργότερα θα μπουν DB + paid users.
-*/
-let subscriptions = [];
+/* ===============================
+   SHARED SUBSCRIPTIONS STORE
+================================ */
+const subscriptions = [];
 
-/* ---------------- ROUTES ---------------- */
+/* ===============================
+   ROUTES
+================================ */
 
-/* Subscribe user to push */
+// Health check
+app.get("/health", (req, res) => {
+  res.json({
+    status: "ok",
+    subscriptions: subscriptions.length,
+  });
+});
+
+// Subscribe to push notifications
 app.post("/api/subscribe", (req, res) => {
-  const subscription = req.body;
+  const sub = req.body;
 
-  // απλό guard
-  if (!subscription || !subscription.endpoint) {
+  if (!sub || !sub.endpoint) {
     return res.status(400).json({ error: "Invalid subscription" });
   }
 
-  subscriptions.push(subscription);
-  console.log("🔔 New subscription. Total:", subscriptions.length);
+  const exists = subscriptions.find(
+    (s) => s.endpoint === sub.endpoint
+  );
+
+  if (!exists) {
+    subscriptions.push(sub);
+  }
+
+  console.log("🔔 Subscriptions count:", subscriptions.length);
 
   res.json({ success: true });
 });
 
-/* Test push notification */
-app.post("/api/push/test", async (req, res) => {
+// TEST PUSH (GET)
+app.get("/api/push/test", async (req, res) => {
+  if (subscriptions.length === 0) {
+    return res.json({ sent: 0, error: "No subscriptions" });
+  }
+
   const payload = JSON.stringify({
-    title: "AI Football Alert",
-    body: "High Value detected · 78% probability",
+    title: "🚨 TEST ALERT",
+    body: "AI Football Picks – Push notifications are LIVE!",
   });
 
   let sent = 0;
@@ -75,43 +97,9 @@ app.post("/api/push/test", async (req, res) => {
   res.json({ sent });
 });
 
-/* Health check */
-app.get("/health", (req, res) => {
-  res.json({
-    status: "ok",
-    subscriptions: subscriptions.length
-  });
-});
-
-/* ---------------- START SERVER ---------------- */
-const PORT = process.env.PORT || 3000;
-
+/* ===============================
+   START SERVER
+================================ */
 app.listen(PORT, () => {
-  console.log("🚀 Server running on port", PORT);
-});
-// ===============================
-// 🔔 TEST PUSH ENDPOINT
-// ===============================
-app.get("/api/push/test", async (req, res) => {
-  if (!global.subscriptions || global.subscriptions.length === 0) {
-    return res.json({ sent: 0, error: "No subscriptions" });
-  }
-
-  const payload = JSON.stringify({
-    title: "🚨 TEST ALERT",
-    body: "AI Football Picks – Push notifications are LIVE!",
-  });
-
-  let sent = 0;
-
-  for (const sub of global.subscriptions) {
-    try {
-      await webpush.sendNotification(sub, payload);
-      sent++;
-    } catch (err) {
-      console.error("Push error:", err.message);
-    }
-  }
-
-  res.json({ sent });
+  console.log(`🚀 Server running on port ${PORT}`);
 });

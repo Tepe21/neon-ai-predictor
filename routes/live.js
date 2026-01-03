@@ -1,5 +1,4 @@
 import express from "express";
-import fetch from "node-fetch";
 
 const router = express.Router();
 
@@ -17,7 +16,9 @@ router.get("/live-raw", async (req, res) => {
 
     const data = await response.json();
     res.json(data);
+
   } catch (err) {
+    console.error("LIVE ERROR:", err);
     res.status(500).json({ error: err.message });
   }
 });

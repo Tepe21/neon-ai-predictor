@@ -1,23 +1,15 @@
 import express from "express";
-import fetch from "node-fetch";
 
 const router = express.Router();
-
-/*
-  API-Football (RapidAPI)
-  Χρησιμοποιούμε TEST MODE / LIVE fixtures
-*/
 
 const API_KEY = process.env.API_FOOTBALL_KEY;
 const API_HOST = "api-football-v1.p.rapidapi.com";
 
-// 👉 LIVE MATCHES
 router.get("/", async (req, res) => {
   try {
     const response = await fetch(
       "https://api-football-v1.p.rapidapi.com/v3/fixtures?live=all",
       {
-        method: "GET",
         headers: {
           "x-rapidapi-key": API_KEY,
           "x-rapidapi-host": API_HOST,
@@ -27,11 +19,10 @@ router.get("/", async (req, res) => {
 
     const data = await response.json();
 
-    if (!data || !data.response) {
+    if (!data?.response) {
       return res.json([]);
     }
 
-    // 🔥 Κρατάμε μόνο χρήσιμα fields
     const matches = data.response.map((m) => ({
       id: m.fixture.id,
       league: m.league.name,

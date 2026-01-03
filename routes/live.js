@@ -5,11 +5,10 @@ const router = express.Router();
 router.get("/live-raw", async (req, res) => {
   try {
     const response = await fetch(
-      "https://api-football-v1.p.rapidapi.com/v3/fixtures?live=all",
+      "https://v3.football.api-sports.io/fixtures?live=all",
       {
         headers: {
-          "X-RapidAPI-Key": process.env.API_FOOTBALL_KEY,
-          "X-RapidAPI-Host": "api-football-v1.p.rapidapi.com"
+          "x-apisports-key": process.env.API_FOOTBALL_KEY
         }
       }
     );
@@ -18,7 +17,7 @@ router.get("/live-raw", async (req, res) => {
     res.json(data);
 
   } catch (err) {
-    console.error("LIVE ERROR:", err);
+    console.error("LIVE API ERROR:", err.message);
     res.status(500).json({ error: err.message });
   }
 });

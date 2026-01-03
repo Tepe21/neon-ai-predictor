@@ -3,87 +3,108 @@
 <head>
   <meta charset="UTF-8" />
   <title>AI Football Picks</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
-  <!-- PWA -->
-  <link rel="manifest" href="/manifest.json" />
-  <meta name="theme-color" content="#0ff" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <style>
     body {
       margin: 0;
-      font-family: Arial, Helvetica, sans-serif;
-      background: radial-gradient(circle at top, #00fff0, #02030f 60%);
-      color: #eaffff;
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .card {
-      background: rgba(0,0,0,0.45);
-      backdrop-filter: blur(12px);
-      padding: 30px;
-      border-radius: 16px;
-      box-shadow: 0 0 40px rgba(0,255,255,0.25);
-      max-width: 420px;
-      width: 100%;
-      text-align: center;
+      font-family: Arial, sans-serif;
+      background: radial-gradient(circle at top, #0f2027, #000);
+      color: #fff;
     }
 
     h1 {
-      margin-top: 0;
-      color: #00fff0;
-      text-shadow: 0 0 10px #00fff0;
+      text-align: center;
+      margin: 20px 0;
+      color: #00ffe0;
+      text-shadow: 0 0 10px #00ffe0;
     }
 
-    button {
-      margin-top: 20px;
-      padding: 14px 20px;
-      font-size: 16px;
-      border-radius: 10px;
-      border: none;
-      cursor: pointer;
-      background: linear-gradient(90deg, #00fff0, #7f7cff);
-      color: #000;
+    .card {
+      background: rgba(255,255,255,0.05);
+      border-radius: 12px;
+      padding: 15px;
+      margin: 15px;
+      box-shadow: 0 0 20px rgba(0,255,255,0.15);
+    }
+
+    .teams {
+      font-size: 18px;
       font-weight: bold;
     }
 
-    button:hover {
-      opacity: 0.9;
+    .meta {
+      font-size: 14px;
+      opacity: 0.8;
+      margin-top: 5px;
+    }
+
+    .confidence {
+      margin-top: 10px;
+      height: 10px;
+      background: #222;
+      border-radius: 6px;
+      overflow: hidden;
+    }
+
+    .bar {
+      height: 100%;
+      background: linear-gradient(90deg, #00ff88, #00ffe0);
+    }
+
+    .tag {
+      margin-top: 10px;
+      font-weight: bold;
+    }
+
+    .high {
+      color: #ffcc00;
+    }
+
+    .bomb {
+      color: #ff0044;
+      text-shadow: 0 0 8px #ff0044;
     }
   </style>
 </head>
-
 <body>
 
-  <div class="card">
-    <h1>AI Football Picks</h1>
-    <p>Live Goal Scanner (Test Mode)</p>
+<h1>⚽ AI Football Picks</h1>
 
-    <button onclick="enablePush()">
-      🔔 Enable Push Notifications
-    </button>
-  </div>
+<div id="matches"></div>
 
-  <!-- 🔑 VAPID PUBLIC KEY (ΣΩΣΤΑ ΠΕΡΑΣΜΕΝΟ) -->
-  <script>
-    window.VAPID_PUBLIC_KEY =
-      "BH0I8IqO8zfTxP6kVP1TJuGTR6APnBAjyIK58kAC0yLIdwPdqXyfAA8sSHNv25j7YmvjumvrvRMK9gwq6ljcX6s";
-  </script>
+<script>
+async function loadMatches() {
+  const res = await fetch("/api/live/matches");
+  const data = await res.json();
 
-  <!-- Service Worker -->
-  <script>
-    if ("serviceWorker" in navigator) {
-      navigator.serviceWorker.register("/sw.js")
-        .then(() => console.log("✅ Service Worker registered"))
-        .catch(err => console.error("SW error", err));
-    }
-  </script>
+  const container = document.getElementById("matches");
+  container.innerHTML = "";
 
-  <!-- Push logic -->
-<script src="/push.js?v=2"></script>
+  data.forEach(m => {
+    const card = document.createElement("div");
+    card.className = "card";
+
+    card.innerHTML = `
+      <div class="teams">${m.home} vs ${m.away}</div>
+      <div class="meta">${m.score} • ${m.minute}' • ${m.league}</div>
+
+      <div class="confidence">
+        <div class="bar" style="width:${m.confidence}%"></div>
+      </div>
+
+      <div class="tag ${m.tag === "VALUE BOMB" ? "bomb" : "high"}">
+        ${m.tag} • ${m.confidence}%
+      </div>
+    `;
+
+    container.appendChild(card);
+  });
+}
+
+setInterval(loadMatches, 30000);
+loadMatches();
+</script>
 
 </body>
 </html>

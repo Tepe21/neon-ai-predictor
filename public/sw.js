@@ -1,11 +1,11 @@
-self.addEventListener("push", event => {
-  if (!event.data) return;
+self.addEventListener("push", (event) => {
+  const data = event.data ? event.data.json() : {};
 
-  const data = event.data.json();
-
-  self.registration.showNotification(data.title, {
-    body: data.body,
-    icon: "/icon.png",
-    badge: "/icon.png"
-  });
+  self.registration.showNotification(
+    data.title || "AI Football Alert",
+    {
+      body: data.body || "High probability goal detected ⚽",
+      icon: "/icon-192.png",
+    }
+  );
 });

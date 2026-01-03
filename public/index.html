@@ -3,108 +3,79 @@
 <head>
   <meta charset="UTF-8" />
   <title>AI Football Picks</title>
+
   <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#0ff" />
+
+  <link rel="manifest" href="/manifest.json" />
 
   <style>
     body {
       margin: 0;
-      font-family: Arial, sans-serif;
-      background: radial-gradient(circle at top, #0f2027, #000);
-      color: #fff;
-    }
-
-    h1 {
-      text-align: center;
-      margin: 20px 0;
-      color: #00ffe0;
-      text-shadow: 0 0 10px #00ffe0;
+      min-height: 100vh;
+      background: radial-gradient(circle at top, #00ffff33, #02040f 60%);
+      color: #eaffff;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
 
     .card {
-      background: rgba(255,255,255,0.05);
-      border-radius: 12px;
-      padding: 15px;
-      margin: 15px;
-      box-shadow: 0 0 20px rgba(0,255,255,0.15);
+      background: rgba(10, 20, 40, 0.85);
+      border-radius: 16px;
+      padding: 32px;
+      box-shadow: 0 0 40px #00ffff55;
+      text-align: center;
+      max-width: 360px;
+      width: 100%;
     }
 
-    .teams {
-      font-size: 18px;
-      font-weight: bold;
+    h1 {
+      margin-top: 0;
+      color: #00ffff;
+      text-shadow: 0 0 10px #00ffffaa;
     }
 
-    .meta {
+    button {
+      margin-top: 20px;
+      padding: 14px 20px;
+      border-radius: 999px;
+      border: none;
+      cursor: pointer;
+      font-size: 16px;
+      font-weight: 600;
+      background: linear-gradient(90deg, #00ffff, #7f5cff);
+      color: #02040f;
+      box-shadow: 0 0 20px #00ffff88;
+    }
+
+    button:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    #status {
+      margin-top: 16px;
       font-size: 14px;
-      opacity: 0.8;
-      margin-top: 5px;
-    }
-
-    .confidence {
-      margin-top: 10px;
-      height: 10px;
-      background: #222;
-      border-radius: 6px;
-      overflow: hidden;
-    }
-
-    .bar {
-      height: 100%;
-      background: linear-gradient(90deg, #00ff88, #00ffe0);
-    }
-
-    .tag {
-      margin-top: 10px;
-      font-weight: bold;
-    }
-
-    .high {
-      color: #ffcc00;
-    }
-
-    .bomb {
-      color: #ff0044;
-      text-shadow: 0 0 8px #ff0044;
+      opacity: 0.9;
     }
   </style>
 </head>
+
 <body>
+  <div class="card">
+    <h1>⚽ AI Football Picks</h1>
+    <p>Live Goal Scanner</p>
 
-<h1>⚽ AI Football Picks</h1>
+    <button id="enablePushBtn">
+      🔔 Enable Notifications
+    </button>
 
-<div id="matches"></div>
+    <div id="status"></div>
+  </div>
 
-<script>
-async function loadMatches() {
-  const res = await fetch("/api/live/matches");
-  const data = await res.json();
-
-  const container = document.getElementById("matches");
-  container.innerHTML = "";
-
-  data.forEach(m => {
-    const card = document.createElement("div");
-    card.className = "card";
-
-    card.innerHTML = `
-      <div class="teams">${m.home} vs ${m.away}</div>
-      <div class="meta">${m.score} • ${m.minute}' • ${m.league}</div>
-
-      <div class="confidence">
-        <div class="bar" style="width:${m.confidence}%"></div>
-      </div>
-
-      <div class="tag ${m.tag === "VALUE BOMB" ? "bomb" : "high"}">
-        ${m.tag} • ${m.confidence}%
-      </div>
-    `;
-
-    container.appendChild(card);
-  });
-}
-
-setInterval(loadMatches, 30000);
-loadMatches();
-</script>
-
+  <!-- MUST be last -->
+  <script src="/push.js"></script>
 </body>
 </html>

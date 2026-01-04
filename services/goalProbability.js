@@ -1,45 +1,72 @@
-// =====================================
-// 🧠 GOAL PROBABILITY ENGINE (v1)
-// =====================================
+/**
+ * Goal Probability Engine v1
+ * Returns ONE suggested market per match
+ */
 
-export function calculateGoalProbability(match) {
-  const minute = match.minute;
-
-  if (!minute || minute < 65 || minute > 80) {
+export function calculateGoalProbability({ minute, score, odds }) {
+  if (!minute || minute < 65 || !score || !odds?.length) {
     return null;
   }
 
-  const [homeGoals, awayGoals] = match.score
-    .split("-")
-    .map(Number);
-
-  let probability = 0;
-
-  // ⏱ Base probability by minute
-  if (minute >= 65 && minute <= 69) probability = 55;
-  else if (minute >= 70 && minute <= 74) probability = 62;
-  else if (minute >= 75 && minute <= 80) probability = 68;
-
+  const [homeGoals, awayGoals] = score.split("-").map(Number);
   const totalGoals = homeGoals + awayGoals;
 
-  // ⚽ Score modifiers
-  if (homeGoals === 0 && awayGoals === 0) probability += 10;
-  else if (homeGoals === awayGoals) probability += 8;
-  else probability += 4;
+  // Βρίσκουμε όλα τα Over lines
+  const overLines = odds
+    .filter(o => o.value.toLowerCase().includes("over"))
+    .map(o => ({
+      line: o.value,
+      odd: parseFloat(o.odd)
+    }))
+    .filter(o => o.odd >= 1.70 && o.odd <= 2.30); // value window
 
-  // Too many goals already
-  if (totalGoals >= 3) probability -= 5;
+  if (!overLines.length) return null;
 
-  // Clamp between 0–95
-  probability = Math.max(0, Math.min(95, probability));
+  // Επιλέγουμε line με βάση game state
+  let selected = null;
 
-  // Tag
-  let tag = null;
-  if (probability >= 80) tag = "VALUE BOMB";
-  else if (probability >= 70) tag = "HIGH VALUE";
+  for (const o of overLines) {
+    const lineGoals = parseFloat(o.line.replace("Over ", ""));
+
+    // Λογική επιλογής line
+    if (
+      (totalGoals === 0 && lineGoals <= 2.5) ||
+      (totalGoals === 1 && lineGoals <= 2.5) ||
+      (totalGoals === 2 && lineGoals <= 3.5)
+    ) {
+      selected = o;
+      break;
+    }
+  }
+
+  if (!selected) return null;
+
+  // Υπολογισμός confidence
+  let confidence = 60;
+
+  // Minute factor
+  if (minute >= 70 && minute <= 75) confidence += 6;
+  if (minute >= 76 && minute <= 82) confidence += 10;
+  if (minute > 82) confidence += 6;
+
+  // Score factor
+  if (totalGoals === 0) confidence += 8;
+  if (totalGoals === 1) confidence += 6;
+
+  // Odds sanity
+  if (selected.odd >= 1.90 && selected.odd <= 2.15) confidence += 6;
+
+  if (confidence > 92) confidence = 92;
+
+  // Level
+  let level = "normal";
+  if (confidence >= 85) level = "bomb";
+  else if (confidence >= 75) level = "high";
 
   return {
-    confidence: probability,
-    tag
+    market: `${selected.line} Goals`,
+    odd: selected.odd,
+    confidence,
+    level
   };
 }

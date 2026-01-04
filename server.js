@@ -2,6 +2,7 @@ import express from "express";
 import path from "path";
 import { fileURLToPath } from "url";
 import { calculateGoalProbability } from "./services/goalProbability.js";
+import { addSubscription, sendAlertOnce } from "./services/pushService.js";
 
 const app = express();
 app.use(express.json());
@@ -12,11 +13,17 @@ const __dirname = path.dirname(__filename);
 // Serve frontend
 app.use(express.static(path.join(__dirname, "public")));
 
-// API-Football (direct)
+// API-Football
 const API_KEY = process.env.API_FOOTBALL_KEY;
 const BASE_URL = "https://v3.football.api-sports.io";
 
-// ---- LIVE ALERTS WITH ENGINE ----
+// ---- SUBSCRIBE FOR PUSH ----
+app.post("/api/subscribe", (req, res) => {
+  addSubscription(req.body);
+  res.json({ success: true });
+});
+
+// ---- LIVE ALERTS WITH ENGINE + PUSH ----
 app.get("/api/live-alerts", async (req, res) => {
   try {
     const fixturesRes = await fetch(`${BASE_URL}/fixtures?live=all`, {
@@ -42,7 +49,6 @@ app.get("/api/live-alerts", async (req, res) => {
       const bookmakers = oddsData.response?.[0]?.bookmakers || [];
 
       let odds = [];
-
       for (const b of bookmakers) {
         for (const bet of b.bets) {
           if (bet.name.toLowerCase().includes("over")) {
@@ -52,7 +58,6 @@ app.get("/api/live-alerts", async (req, res) => {
         }
         if (odds.length) break;
       }
-
       if (!odds.length) continue;
 
       const score = `${f.goals.home}-${f.goals.away}`;
@@ -65,7 +70,7 @@ app.get("/api/live-alerts", async (req, res) => {
 
       if (!result) continue;
 
-      alerts.push({
+      const alert = {
         type: "goal",
         match: `${f.teams.home.name} – ${f.teams.away.name}`,
         minute,
@@ -74,7 +79,12 @@ app.get("/api/live-alerts", async (req, res) => {
         odd: result.odd,
         confidence: result.confidence,
         level: result.level
-      });
+      };
+
+      alerts.push(alert);
+
+      // 🔔 PUSH (ΜΟΝΟ High / Bomb, ΜΙΑ ΦΟΡΑ)
+      await sendAlertOnce(alert);
     }
 
     res.json(alerts);

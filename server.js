@@ -1,7 +1,9 @@
 import express from "express";
 import path from "path";
 import { fileURLToPath } from "url";
+
 import { calculateGoalProbability } from "./services/goalProbability.js";
+import { calculateCornerProbability } from "./services/cornerProbability.js";
 import { addSubscription, sendAlertOnce } from "./services/pushService.js";
 
 const app = express();
@@ -10,20 +12,18 @@ app.use(express.json());
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// Serve frontend
 app.use(express.static(path.join(__dirname, "public")));
 
-// API-Football
 const API_KEY = process.env.API_FOOTBALL_KEY;
 const BASE_URL = "https://v3.football.api-sports.io";
 
-// ---- SUBSCRIBE FOR PUSH ----
+/* ---------- PUSH SUBSCRIBE ---------- */
 app.post("/api/subscribe", (req, res) => {
   addSubscription(req.body);
   res.json({ success: true });
 });
 
-// ---- LIVE ALERTS WITH ENGINE + PUSH ----
+/* ---------- LIVE ALERTS (GOALS + CORNERS) ---------- */
 app.get("/api/live-alerts", async (req, res) => {
   try {
     const fixturesRes = await fetch(`${BASE_URL}/fixtures?live=all`, {
@@ -40,51 +40,83 @@ app.get("/api/live-alerts", async (req, res) => {
       if (!minute || minute < 65) continue;
 
       const fixtureId = f.fixture.id;
+      const score = `${f.goals.home}-${f.goals.away}`;
 
+      /* ---- ODDS ---- */
       const oddsRes = await fetch(`${BASE_URL}/odds?fixture=${fixtureId}`, {
         headers: { "x-apisports-key": API_KEY }
       });
-
       const oddsData = await oddsRes.json();
       const bookmakers = oddsData.response?.[0]?.bookmakers || [];
 
-      let odds = [];
+      /* ---- GOALS ODDS ---- */
+      let goalOdds = [];
+      /* ---- CORNERS ODDS ---- */
+      let cornerOdds = [];
+
       for (const b of bookmakers) {
         for (const bet of b.bets) {
-          if (bet.name.toLowerCase().includes("over")) {
-            odds = bet.values;
-            break;
+          if (bet.name.toLowerCase().includes("goal")) {
+            goalOdds = bet.values;
+          }
+          if (bet.name.toLowerCase().includes("corner")) {
+            cornerOdds = bet.values;
           }
         }
-        if (odds.length) break;
       }
-      if (!odds.length) continue;
 
-      const score = `${f.goals.home}-${f.goals.away}`;
+      /* ---------- GOAL ENGINE ---------- */
+      if (goalOdds.length) {
+        const goalResult = calculateGoalProbability({
+          minute,
+          score,
+          odds: goalOdds
+        });
 
-      const result = calculateGoalProbability({
-        minute,
-        score,
-        odds
-      });
+        if (goalResult) {
+          const alert = {
+            type: "goal",
+            match: `${f.teams.home.name} – ${f.teams.away.name}`,
+            minute,
+            score,
+            market: goalResult.market,
+            odd: goalResult.odd,
+            confidence: goalResult.confidence,
+            level: goalResult.level
+          };
 
-      if (!result) continue;
+          alerts.push(alert);
+          await sendAlertOnce(alert);
+        }
+      }
 
-      const alert = {
-        type: "goal",
-        match: `${f.teams.home.name} – ${f.teams.away.name}`,
-        minute,
-        score,
-        market: result.market,
-        odd: result.odd,
-        confidence: result.confidence,
-        level: result.level
-      };
+      /* ---------- CORNER ENGINE ---------- */
+      if (cornerOdds.length) {
+        const cornerResult = calculateCornerProbability({
+          minute,
+          corners: {
+            home: f.statistics?.[0]?.statistics?.find(s => s.type === "Corner Kicks")?.value || 0,
+            away: f.statistics?.[1]?.statistics?.find(s => s.type === "Corner Kicks")?.value || 0
+          },
+          odds: cornerOdds
+        });
 
-      alerts.push(alert);
+        if (cornerResult) {
+          const alert = {
+            type: "corner",
+            match: `${f.teams.home.name} – ${f.teams.away.name}`,
+            minute,
+            score,
+            market: cornerResult.market,
+            odd: cornerResult.odd,
+            confidence: cornerResult.confidence,
+            level: cornerResult.level
+          };
 
-      // 🔔 PUSH (ΜΟΝΟ High / Bomb, ΜΙΑ ΦΟΡΑ)
-      await sendAlertOnce(alert);
+          alerts.push(alert);
+          await sendAlertOnce(alert);
+        }
+      }
     }
 
     res.json(alerts);

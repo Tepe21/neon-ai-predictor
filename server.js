@@ -1,5 +1,4 @@
 import express from "express";
-import fetch from "node-fetch";
 import path from "path";
 import { fileURLToPath } from "url";
 
@@ -9,52 +8,51 @@ app.use(express.json());
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+// Serve frontend
 app.use(express.static(path.join(__dirname, "public")));
 
+// 🔑 API-Football DIRECT key (όχι RapidAPI)
 const API_KEY = process.env.API_FOOTBALL_KEY;
-const API_HOST = "api-football-v1.p.rapidapi.com";
+const BASE_URL = "https://v3.football.api-sports.io";
 
-const headers = {
-  "x-rapidapi-key": API_KEY,
-  "x-rapidapi-host": API_HOST
-};
-
-// ---- LIVE MATCHES WITH ODDS ----
+// ---- LIVE MATCHES WITH ODDS (65+ only) ----
 app.get("/api/live-matches", async (req, res) => {
   try {
     // 1️⃣ Live fixtures
-    const fixturesRes = await fetch(
-      "https://api-football-v1.p.rapidapi.com/v3/fixtures?live=all",
-      { headers }
-    );
-    const fixturesData = await fixturesRes.json();
+    const fixturesRes = await fetch(`${BASE_URL}/fixtures?live=all`, {
+      headers: {
+        "x-apisports-key": API_KEY
+      }
+    });
 
+    const fixturesData = await fixturesRes.json();
     const fixtures = fixturesData.response || [];
 
     const results = [];
 
     for (const f of fixtures) {
       const minute = f.fixture.status.elapsed;
-      if (minute < 65) continue; // ⛔ μόνο 65+
+      if (!minute || minute < 65) continue; // ⛔ μόνο 65+
 
       const fixtureId = f.fixture.id;
 
-      // 2️⃣ Odds για κάθε fixture
-      const oddsRes = await fetch(
-        `https://api-football-v1.p.rapidapi.com/v3/odds?fixture=${fixtureId}`,
-        { headers }
-      );
-      const oddsData = await oddsRes.json();
+      // 2️⃣ Odds για το συγκεκριμένο fixture
+      const oddsRes = await fetch(`${BASE_URL}/odds?fixture=${fixtureId}`, {
+        headers: {
+          "x-apisports-key": API_KEY
+        }
+      });
 
+      const oddsData = await oddsRes.json();
       const bookmakers = oddsData.response?.[0]?.bookmakers || [];
 
-      // βρίσκουμε market Over Goals (παράδειγμα)
+      // ψάχνουμε Over Goals market
       let overMarket = null;
 
       for (const b of bookmakers) {
         for (const bet of b.bets) {
-          if (bet.name.includes("Over")) {
-            overMarket = bet;
+          if (bet.name.toLowerCase().includes("over")) {
+            overMarket = bet.values;
             break;
           }
         }
@@ -66,14 +64,14 @@ app.get("/api/live-matches", async (req, res) => {
         match: `${f.teams.home.name} – ${f.teams.away.name}`,
         minute,
         score: `${f.goals.home}-${f.goals.away}`,
-        odds: overMarket ? overMarket.values : [],
+        odds: overMarket || []
       });
     }
 
     res.json(results);
 
   } catch (err) {
-    console.error(err);
+    console.error("LIVE MATCH ERROR:", err);
     res.status(500).json({ error: "Live matches fetch failed" });
   }
 });

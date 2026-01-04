@@ -6,18 +6,53 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
   <style>
+    /* ---------- BACKGROUND ---------- */
     body {
       margin: 0;
       font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
-      background: radial-gradient(circle at top, #0f172a, #020617 70%);
-      color: #e5e7eb;
       min-height: 100vh;
+      color: #e5e7eb;
+      background:
+        radial-gradient(circle at 20% 20%, #22d3ee33, transparent 40%),
+        radial-gradient(circle at 80% 30%, #a855f733, transparent 40%),
+        radial-gradient(circle at 50% 80%, #6366f133, transparent 40%),
+        #020617;
     }
 
     .app {
       max-width: 1100px;
       margin: 0 auto;
       padding: 20px;
+    }
+
+    /* ---------- HEADER ---------- */
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 25px;
+    }
+
+    .title {
+      font-size: 22px;
+      font-weight: 700;
+      color: #22d3ee;
+    }
+
+    .lang-toggle button {
+      background: rgba(255,255,255,0.08);
+      border: none;
+      color: #e5e7eb;
+      padding: 6px 10px;
+      border-radius: 8px;
+      cursor: pointer;
+      margin-left: 6px;
+    }
+
+    .lang-toggle button.active {
+      background: linear-gradient(90deg, #22d3ee, #6366f1);
+      color: #020617;
+      font-weight: 700;
     }
 
     /* ---------- TABS ---------- */
@@ -34,7 +69,6 @@
       background: rgba(255,255,255,0.05);
       color: #cbd5f5;
       font-weight: 600;
-      user-select: none;
     }
 
     .tab.active {
@@ -53,11 +87,12 @@
 
     /* ---------- CARDS ---------- */
     .card {
-      background: rgba(15, 23, 42, 0.85);
+      background: rgba(15, 23, 42, 0.88);
       border-radius: 18px;
       padding: 20px;
-      box-shadow: 0 0 30px rgba(0,0,0,0.4);
       margin-bottom: 16px;
+      box-shadow: 0 0 30px rgba(0,0,0,0.4);
+      backdrop-filter: blur(6px);
     }
 
     /* ---------- SEARCH ---------- */
@@ -85,35 +120,17 @@
       border-left: 4px solid;
     }
 
-    .alert.goal {
-      border-color: #22c55e;
-    }
-
-    .alert.corner {
-      border-color: #a855f7;
-    }
-
-    .alert strong {
-      display: block;
-      font-size: 15px;
-    }
+    .goal { border-color: #22c55e; }
+    .corner { border-color: #a855f7; }
 
     .confidence {
       font-weight: bold;
       margin-top: 4px;
     }
 
-    .normal {
-      color: #93c5fd;
-    }
-
-    .high {
-      color: #facc15;
-    }
-
-    .bomb {
-      color: #f43f5e;
-    }
+    .normal { color: #93c5fd; }
+    .high { color: #facc15; }
+    .bomb { color: #f43f5e; }
 
     .cta {
       padding: 8px 14px;
@@ -124,100 +141,57 @@
       font-size: 13px;
       cursor: pointer;
     }
-
-    /* ---------- ANIMATIONS ---------- */
-
-    @keyframes glowNormal {
-      0%   { box-shadow: 0 0 0 rgba(147,197,253,0); }
-      50%  { box-shadow: 0 0 10px rgba(147,197,253,0.35); }
-      100% { box-shadow: 0 0 0 rgba(147,197,253,0); }
-    }
-
-    @keyframes glowHigh {
-      0%   { box-shadow: 0 0 0 rgba(250,204,21,0); }
-      50%  { box-shadow: 0 0 18px rgba(250,204,21,0.55); }
-      100% { box-shadow: 0 0 0 rgba(250,204,21,0); }
-    }
-
-    @keyframes glowBomb {
-      0%   { box-shadow: 0 0 0 rgba(244,63,94,0); }
-      50%  { box-shadow: 0 0 28px rgba(244,63,94,0.8); }
-      100% { box-shadow: 0 0 0 rgba(244,63,94,0); }
-    }
-
-    .alert.normal-glow {
-      animation: glowNormal 1.8s ease-in-out 1;
-    }
-
-    .alert.high-glow {
-      animation: glowHigh 1.6s ease-in-out 2;
-    }
-
-    .alert.bomb-glow {
-      animation: glowBomb 1.2s ease-in-out 3;
-    }
   </style>
 </head>
 
 <body>
   <div class="app">
 
+    <!-- HEADER -->
+    <div class="header">
+      <div class="title">⚽ AI Football Picks</div>
+      <div class="lang-toggle">
+        <button onclick="setLang('en')" id="btn-en" class="active">EN</button>
+        <button onclick="setLang('gr')" id="btn-gr">GR</button>
+      </div>
+    </div>
+
     <!-- TABS -->
     <div class="tabs">
-      <div class="tab active" onclick="showTab('search', this)">🔍 Search</div>
-      <div class="tab" onclick="showTab('alerts', this)">🔔 Live Alerts</div>
+      <div class="tab active" onclick="showTab('search', this)" data-i18n="search_tab">🔍 Search</div>
+      <div class="tab" onclick="showTab('alerts', this)" data-i18n="alerts_tab">🔔 Live Alerts</div>
     </div>
 
     <!-- SEARCH -->
     <div id="search" class="section active">
       <div class="search-grid">
         <div class="card search-card">
-          <h3>⚽ Match Search</h3>
-          <p>Search live matches and analyze goals or corners manually.</p>
+          <h3 data-i18n="search_title">⚽ Match Search</h3>
+          <p data-i18n="search_desc">Search live matches and analyze goals or corners manually.</p>
         </div>
 
         <div class="card search-card">
-          <h3>📊 Market Selection</h3>
-          <p>Goals / Corners – Half Time or Full Time.</p>
+          <h3 data-i18n="market_title">📊 Market Selection</h3>
+          <p data-i18n="market_desc">Goals / Corners – Half Time or Full Time.</p>
         </div>
 
         <div class="card search-card">
-          <h3>🧠 AI Analysis</h3>
-          <p>Get probability-based suggestions with confidence %.</p>
+          <h3 data-i18n="ai_title">🧠 AI Analysis</h3>
+          <p data-i18n="ai_desc">Probability-based suggestions with confidence %.</p>
         </div>
       </div>
     </div>
 
     <!-- LIVE ALERTS -->
     <div id="alerts" class="section">
-
-      <div class="card alert goal normal-glow">
+      <div class="card alert goal">
         <div>
-          <strong>⚽ GOAL | Normal</strong>
-          Napoli – Milan · 61’
-          <div class="confidence normal">Confidence: 71%</div>
-        </div>
-        <div class="cta">View</div>
-      </div>
-
-      <div class="card alert goal high-glow">
-        <div>
-          <strong>🔥 GOAL | High Value</strong>
+          <strong data-i18n="goal_high">🔥 GOAL | High Value</strong><br />
           Roma – Atalanta · 72’
           <div class="confidence high">Confidence: 78%</div>
         </div>
-        <div class="cta">View</div>
+        <div class="cta" data-i18n="view_btn">View</div>
       </div>
-
-      <div class="card alert corner bomb-glow">
-        <div>
-          <strong>💣 CORNERS | Value Bomb</strong>
-          Arsenal – Spurs · 68’
-          <div class="confidence bomb">Confidence: 85%</div>
-        </div>
-        <div class="cta">View</div>
-      </div>
-
     </div>
 
   </div>
@@ -226,9 +200,46 @@
     function showTab(id, el) {
       document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
       document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
-
       el.classList.add('active');
       document.getElementById(id).classList.add('active');
+    }
+
+    const translations = {
+      en: {
+        search_tab: "🔍 Search",
+        alerts_tab: "🔔 Live Alerts",
+        search_title: "⚽ Match Search",
+        search_desc: "Search live matches and analyze goals or corners manually.",
+        market_title: "📊 Market Selection",
+        market_desc: "Goals / Corners – Half Time or Full Time.",
+        ai_title: "🧠 AI Analysis",
+        ai_desc: "Probability-based suggestions with confidence %.",
+        goal_high: "🔥 GOAL | High Value",
+        view_btn: "View"
+      },
+      gr: {
+        search_tab: "🔍 Αναζήτηση",
+        alerts_tab: "🔔 Live Ειδοποιήσεις",
+        search_title: "⚽ Αναζήτηση Αγώνα",
+        search_desc: "Αναζήτησε live αγώνες και ανέλυσε γκολ ή κόρνερ.",
+        market_title: "📊 Επιλογή Αγοράς",
+        market_desc: "Γκολ / Κόρνερ – Ημίχρονο ή Τελικό.",
+        ai_title: "🧠 Ανάλυση AI",
+        ai_desc: "Προτάσεις βάσει πιθανοτήτων με confidence %.",
+        goal_high: "🔥 ΓΚΟΛ | Δυνατό",
+        view_btn: "Προβολή"
+      }
+    };
+
+    function setLang(lang) {
+      document.getElementById("btn-en").classList.remove("active");
+      document.getElementById("btn-gr").classList.remove("active");
+      document.getElementById("btn-" + lang).classList.add("active");
+
+      document.querySelectorAll("[data-i18n]").forEach(el => {
+        const key = el.getAttribute("data-i18n");
+        el.textContent = translations[lang][key];
+      });
     }
   </script>
 </body>

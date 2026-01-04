@@ -1,76 +1,243 @@
 <!DOCTYPE html>
 <html lang="el">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>AI Football Picks</title>
-  <style>
-    body{margin:0;font-family:Inter,system-ui;background:
-      radial-gradient(1200px 600px at 10% -10%, #1a2cff33, transparent),
-      radial-gradient(900px 500px at 110% 10%, #00ffd533, transparent),
-      #0b0f1a;color:#e9ecf1}
-    .wrap{max-width:1100px;margin:auto;padding:24px}
-    .tabs{display:flex;gap:10px}
-    .tab{padding:10px 14px;border-radius:10px;background:#12172a;cursor:pointer}
-    .tab.active{background:#1e2bff}
-    .card{background:#0f1530;border-radius:16px;padding:16px;margin-top:16px;box-shadow:0 0 0 1px #1c244a}
-    .row{display:flex;gap:10px;flex-wrap:wrap}
-    select,button{background:#0b0f1a;color:#fff;border:1px solid #2a36ff;border-radius:10px;padding:10px}
-    button{cursor:pointer}
-    .badge{padding:6px 10px;border-radius:999px}
-    .normal{background:#1c244a}
-    .high{background:#ff7a00}
-    .bomb{background:#ff005c}
-    .lang{float:right}
-  </style>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>AI Football Picks</title>
+
+<style>
+:root{
+  --neon-blue:#2b6cff;
+  --neon-pink:#ff2bd6;
+  --neon-green:#00ff9d;
+  --bg-dark:#070b1c;
+}
+
+*{box-sizing:border-box}
+
+body{
+  margin:0;
+  font-family:Inter,system-ui,Arial;
+  background:
+    radial-gradient(900px 400px at 10% -10%, rgba(43,108,255,.35), transparent),
+    radial-gradient(700px 300px at 90% 10%, rgba(255,43,214,.25), transparent),
+    linear-gradient(180deg,#050816,#070b1c 60%);
+  color:#eaf0ff;
+  min-height:100vh;
+}
+
+.wrap{
+  max-width:1100px;
+  margin:auto;
+  padding:30px 20px;
+}
+
+h1{
+  font-size:34px;
+  letter-spacing:.5px;
+  background:linear-gradient(90deg,var(--neon-blue),var(--neon-pink));
+  -webkit-background-clip:text;
+  color:transparent;
+  margin:0 0 20px;
+}
+
+/* ---------- TABS ---------- */
+.tabs{
+  display:flex;
+  gap:12px;
+  margin-bottom:20px;
+}
+
+.tab{
+  padding:12px 18px;
+  border-radius:14px;
+  background:#0c1230;
+  cursor:pointer;
+  font-weight:600;
+  letter-spacing:.3px;
+  border:1px solid #1c2b6a;
+  transition:.25s;
+  box-shadow:0 0 0 rgba(0,0,0,0);
+}
+
+.tab:hover{
+  box-shadow:0 0 18px rgba(43,108,255,.45);
+}
+
+.tab.active{
+  background:linear-gradient(135deg,var(--neon-blue),var(--neon-pink));
+  color:#fff;
+  box-shadow:0 0 22px rgba(255,43,214,.55);
+}
+
+/* ---------- CARDS ---------- */
+.card{
+  background:rgba(12,18,48,.85);
+  border-radius:20px;
+  padding:20px;
+  border:1px solid #1e2f7a;
+  box-shadow:
+    inset 0 0 40px rgba(43,108,255,.08),
+    0 0 30px rgba(0,0,0,.6);
+  display:none;
+}
+
+.card.active{display:block}
+
+/* ---------- FORM ---------- */
+.row{
+  display:flex;
+  gap:12px;
+  flex-wrap:wrap;
+  margin-top:10px;
+}
+
+select,input,button{
+  background:#070b1c;
+  color:#fff;
+  border:1px solid #2b3cff;
+  border-radius:14px;
+  padding:12px 14px;
+  font-size:15px;
+}
+
+select,input{
+  min-width:160px;
+}
+
+button{
+  cursor:pointer;
+  font-weight:700;
+  letter-spacing:.4px;
+  background:linear-gradient(135deg,var(--neon-green),var(--neon-blue));
+  border:none;
+  box-shadow:0 0 18px rgba(0,255,157,.45);
+  transition:.25s;
+}
+
+button:hover{
+  transform:translateY(-1px);
+  box-shadow:0 0 28px rgba(0,255,157,.75);
+}
+
+/* ---------- RESULT ---------- */
+.result{
+  margin-top:16px;
+  padding:16px;
+  border-radius:16px;
+  background:#050816;
+  border:1px solid #22308f;
+  font-size:14px;
+  white-space:pre-wrap;
+}
+
+/* ---------- BADGES ---------- */
+.badge{
+  display:inline-block;
+  padding:6px 12px;
+  border-radius:999px;
+  font-weight:700;
+  margin-top:10px;
+}
+
+.normal{background:#2b3cff}
+.high{background:#ff8c00}
+.bomb{background:#ff2b5c}
+
+/* ---------- LIVE ALERT ITEM ---------- */
+.alert{
+  padding:14px;
+  border-radius:14px;
+  margin-bottom:12px;
+  border:1px solid #2b3cff;
+  background:rgba(7,11,28,.85);
+  box-shadow:0 0 18px rgba(43,108,255,.25);
+}
+</style>
 </head>
+
 <body>
 <div class="wrap">
-  <div class="lang">
-    <select id="lang">
-      <option value="el">Ελληνικά</option>
-      <option value="en">English</option>
-    </select>
-  </div>
-
-  <h1>AI Football Picks</h1>
+  <h1>⚽ AI Football Picks</h1>
 
   <div class="tabs">
-    <div class="tab active">Search</div>
-    <div class="tab">Live Alerts</div>
+    <div class="tab active" onclick="switchTab('search')">🔍 Search</div>
+    <div class="tab" onclick="switchTab('live')">🔥 Live Alerts</div>
   </div>
 
-  <div class="card">
-    <h3>Manual Search</h3>
+  <!-- SEARCH -->
+  <div id="search" class="card active">
+    <h3>🧠 Manual Analysis</h3>
     <div class="row">
       <select id="mode">
-        <option value="live">Live</option>
-        <option value="upcoming">Upcoming</option>
+        <option value="live">🔴 Live</option>
+        <option value="upcoming">📅 Upcoming</option>
       </select>
       <select id="market">
-        <option value="goals">Goals</option>
-        <option value="corners">Corners</option>
+        <option value="goals">⚽ Goals</option>
+        <option value="corners">🚩 Corners</option>
       </select>
       <input id="fixtureId" placeholder="Fixture ID" />
-      <button onclick="runSearch()">Analyze</button>
+      <button onclick="runSearch()">⚡ Analyze</button>
     </div>
-    <pre id="out"></pre>
+    <div id="searchResult" class="result"></div>
+  </div>
+
+  <!-- LIVE ALERTS -->
+  <div id="live" class="card">
+    <h3>🚨 Live AI Alerts</h3>
+    <div id="alerts"></div>
   </div>
 </div>
 
 <script>
+function switchTab(tab){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.card').forEach(c=>c.classList.remove('active'));
+
+  if(tab==='search'){
+    document.querySelectorAll('.tab')[0].classList.add('active');
+    document.getElementById('search').classList.add('active');
+  }else{
+    document.querySelectorAll('.tab')[1].classList.add('active');
+    document.getElementById('live').classList.add('active');
+    loadLiveAlerts();
+  }
+}
+
 async function runSearch(){
   const res = await fetch('/api/search',{
     method:'POST',
     headers:{'Content-Type':'application/json'},
     body:JSON.stringify({
-      mode:document.getElementById('mode').value,
-      market:document.getElementById('market').value,
-      fixtureId:document.getElementById('fixtureId').value
+      mode:mode.value,
+      market:market.value,
+      fixtureId:fixtureId.value
     })
   });
   const j = await res.json();
-  document.getElementById('out').textContent = JSON.stringify(j,null,2);
+  searchResult.textContent = j ? JSON.stringify(j,null,2) : 'No value found';
+}
+
+async function loadLiveAlerts(){
+  alerts.innerHTML='Loading...';
+  const res = await fetch('/api/live-alerts');
+  const data = await res.json();
+  alerts.innerHTML='';
+  if(!data.length){
+    alerts.innerHTML='No live alerts right now.';
+    return;
+  }
+  data.forEach(a=>{
+    const d=document.createElement('div');
+    d.className='alert';
+    d.innerHTML=`
+      <strong>${a.match}</strong><br>
+      ${a.market} @ ${a.odd}<br>
+      <span class="badge ${a.level}">${a.level.toUpperCase()} • ${a.confidence}%</span>
+    `;
+    alerts.appendChild(d);
+  });
 }
 </script>
 </body>

@@ -1,97 +1,186 @@
 <!DOCTYPE html>
-<html lang="el">
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
   <title>AI Football Picks</title>
-
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
-  <!-- PWA -->
-  <link rel="manifest" href="/manifest.json" />
-  <meta name="theme-color" content="#00f5ff" />
 
   <style>
     body {
       margin: 0;
-      font-family: Arial, Helvetica, sans-serif;
-      background: radial-gradient(circle at top, #1a3a4a, #020617);
-      height: 100vh;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+      background: radial-gradient(circle at top, #0f172a, #020617 70%);
+      color: #e5e7eb;
+      min-height: 100vh;
+    }
+
+    .app {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    /* ---------- TABS ---------- */
+    .tabs {
       display: flex;
-      justify-content: center;
-      align-items: center;
-      color: #fff;
+      gap: 10px;
+      margin-bottom: 25px;
     }
 
-    .card {
-      background: rgba(10, 20, 35, 0.9);
-      padding: 30px 40px;
-      border-radius: 18px;
-      box-shadow: 0 0 40px rgba(0, 255, 255, 0.2);
-      text-align: center;
-      max-width: 360px;
-      width: 100%;
-    }
-
-    h1 {
-      margin: 0 0 10px;
-      font-size: 26px;
-      color: #00f5ff;
-      text-shadow: 0 0 10px rgba(0,255,255,0.6);
-    }
-
-    h2 {
-      margin: 0 0 25px;
-      font-size: 15px;
-      font-weight: normal;
-      color: #cbd5e1;
-    }
-
-    button {
-      border: none;
-      padding: 14px 22px;
-      font-size: 16px;
-      border-radius: 999px;
+    .tab {
+      padding: 12px 18px;
+      border-radius: 12px;
       cursor: pointer;
-      background: linear-gradient(90deg, #06b6d4, #6366f1);
+      background: rgba(255,255,255,0.05);
+      color: #cbd5f5;
+      font-weight: 600;
+    }
+
+    .tab.active {
+      background: linear-gradient(90deg, #22d3ee, #6366f1);
       color: #020617;
-      font-weight: bold;
-      box-shadow: 0 0 20px rgba(99,102,241,0.5);
     }
 
-    button:hover {
-      opacity: 0.9;
+    /* ---------- SECTIONS ---------- */
+    .section {
+      display: none;
     }
 
-    #push-status {
-      margin-top: 16px;
+    .section.active {
+      display: block;
+    }
+
+    /* ---------- CARDS ---------- */
+    .card {
+      background: rgba(15, 23, 42, 0.85);
+      border-radius: 18px;
+      padding: 20px;
+      box-shadow: 0 0 30px rgba(0,0,0,0.4);
+      margin-bottom: 16px;
+    }
+
+    /* ---------- SEARCH ---------- */
+    .search-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 16px;
+    }
+
+    .search-card h3 {
+      margin: 0 0 10px;
+      color: #22d3ee;
+    }
+
+    .search-card p {
       font-size: 14px;
-      color: #22c55e;
+      color: #cbd5f5;
+    }
+
+    /* ---------- ALERTS ---------- */
+    .alert {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-left: 4px solid;
+    }
+
+    .alert.goal {
+      border-color: #22c55e;
+    }
+
+    .alert.corner {
+      border-color: #a855f7;
+    }
+
+    .alert strong {
+      display: block;
+      font-size: 15px;
+    }
+
+    .confidence {
+      font-weight: bold;
+    }
+
+    .high {
+      color: #facc15;
+    }
+
+    .bomb {
+      color: #f43f5e;
+    }
+
+    .cta {
+      padding: 8px 14px;
+      border-radius: 999px;
+      background: linear-gradient(90deg, #22d3ee, #6366f1);
+      color: #020617;
+      font-weight: 700;
+      font-size: 13px;
+      cursor: pointer;
     }
   </style>
 </head>
+
 <body>
+  <div class="app">
 
-  <div class="card">
-    <h1>⚽ AI Football Picks</h1>
-    <h2>Live Goal Scanner</h2>
+    <!-- TABS -->
+    <div class="tabs">
+      <div class="tab active" onclick="showTab('search')">🔍 Search</div>
+      <div class="tab" onclick="showTab('alerts')">🔔 Live Alerts</div>
+    </div>
 
-    <button id="enable-push-btn">🔔 Enable Notifications</button>
+    <!-- SEARCH -->
+    <div id="search" class="section active">
+      <div class="search-grid">
+        <div class="card search-card">
+          <h3>⚽ Match Search</h3>
+          <p>Search live matches and analyze goals or corners manually.</p>
+        </div>
 
-    <div id="push-status"></div>
+        <div class="card search-card">
+          <h3>📊 Market Selection</h3>
+          <p>Goals / Corners – Half Time or Full Time.</p>
+        </div>
+
+        <div class="card search-card">
+          <h3>🧠 AI Analysis</h3>
+          <p>Get probability-based suggestions with confidence %.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- LIVE ALERTS -->
+    <div id="alerts" class="section">
+      <div class="card alert goal">
+        <div>
+          <strong>🔥 GOAL | High Value</strong>
+          Roma – Atalanta · 72’
+          <div class="confidence high">Confidence: 78%</div>
+        </div>
+        <div class="cta">View</div>
+      </div>
+
+      <div class="card alert corner">
+        <div>
+          <strong>💣 CORNERS | Value Bomb</strong>
+          Arsenal – Spurs · 68’
+          <div class="confidence bomb">Confidence: 85%</div>
+        </div>
+        <div class="cta">View</div>
+      </div>
+    </div>
+
   </div>
 
-  <!-- Service Worker register -->
   <script>
-    if ("serviceWorker" in navigator) {
-      navigator.serviceWorker
-        .register("/sw.js")
-        .then(() => console.log("Service Worker registered"))
-        .catch(err => console.error("SW error", err));
+    function showTab(id) {
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+
+      document.getElementById(id).classList.add('active');
+      event.target.classList.add('active');
     }
   </script>
-
-  <!-- Push logic -->
-  <script src="/push.js"></script>
-
 </body>
 </html>

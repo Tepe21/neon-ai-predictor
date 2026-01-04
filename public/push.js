@@ -1,9 +1,7 @@
-const VAPID_PUBLIC_KEY =
-  "BH0I8IqO8zfTxP6kVP1TJuGTR6APnBAjyIK58kAC0yLIdwPdqXyfAA8sSHNv25j7YmvjumvrvRMK9gwq6ljcX6s";
+/* ========= CONFIG ========= */
+const VAPID_PUBLIC_KEY = "BGI6hcqOvNTtAth3gopsUuQnaqXb_bHBNnUwDhVE-FblyV8a0wX6mGhiu-xVWvWwfK04ZiGqxzGZiZshMdYYI78";
 
-const btn = document.getElementById("enablePushBtn");
-const statusEl = document.getElementById("status");
-
+/* ========= HELPERS ========= */
 function urlBase64ToUint8Array(base64String) {
   const padding = "=".repeat((4 - (base64String.length % 4)) % 4);
   const base64 = (base64String + padding)
@@ -19,30 +17,36 @@ function urlBase64ToUint8Array(base64String) {
   return outputArray;
 }
 
-async function enablePush() {
+/* ========= MAIN ========= */
+window.enablePush = async function () {
   try {
-    btn.disabled = true;
-    statusEl.textContent = "Requesting permission...";
+    console.log("enablePush() called");
 
     if (!("serviceWorker" in navigator)) {
-      statusEl.textContent = "Service Worker not supported";
+      alert("Service Workers not supported");
       return;
     }
 
     const permission = await Notification.requestPermission();
     if (permission !== "granted") {
-      statusEl.textContent = "Permission denied";
-      btn.disabled = false;
+      alert("Notifications permission denied");
       return;
     }
 
-    const reg = await navigator.serviceWorker.register("/sw.js");
-    console.log("Service Worker registered");
+    const registration = await navigator.serviceWorker.ready;
+    console.log("Service Worker ready");
 
-    const subscription = await reg.pushManager.subscribe({
-      userVisibleOnly: true,
-      applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY),
-    });
+    let subscription = await registration.pushManager.getSubscription();
+
+    if (!subscription) {
+      subscription = await registration.pushManager.subscribe({
+        userVisibleOnly: true,
+        applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY),
+      });
+      console.log("New Push subscription:", subscription);
+    } else {
+      console.log("Existing Push subscription:", subscription);
+    }
 
     const res = await fetch("/api/subscribe", {
       method: "POST",
@@ -51,18 +55,17 @@ async function enablePush() {
     });
 
     const data = await res.json();
+    console.log("Backend response:", data);
 
     if (data.success) {
-      statusEl.textContent = "✅ Notifications enabled!";
+      document.getElementById("pushStatus").innerHTML =
+        "✅ Notifications enabled!";
     } else {
-      statusEl.textContent = "❌ Backend error";
-      btn.disabled = false;
+      alert("Subscription failed on server");
     }
   } catch (err) {
-    console.error(err);
-    statusEl.textContent = "❌ Error enabling notifications";
-    btn.disabled = false;
+    console.error("Push error:", err);
+    alert("Push setup failed. Check console.");
   }
-}
-
-btn.addEventListener("click", enablePush);
+};
+σ

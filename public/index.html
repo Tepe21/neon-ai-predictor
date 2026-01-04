@@ -4,91 +4,102 @@
   <meta charset="UTF-8" />
   <title>AI Football Picks</title>
 
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- PWA -->
+  <link rel="manifest" href="/manifest.json" />
   <meta name="theme-color" content="#0ff" />
 
-  <link rel="manifest" href="/manifest.json" />
-
+  <!-- Basic styling (inline για να μην μπλέξουμε με CSS αρχεία) -->
   <style>
     body {
       margin: 0;
-      min-height: 100vh;
-      background: radial-gradient(circle at top, #00ffff33, #02040f 60%);
-      color: #eaffff;
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+      font-family: Arial, Helvetica, sans-serif;
+      height: 100vh;
       display: flex;
       align-items: center;
       justify-content: center;
+      background: radial-gradient(circle at top, #1ddcff, #0b1020 60%);
+      color: white;
     }
 
     .card {
-      background: rgba(10, 20, 40, 0.85);
-      border-radius: 16px;
-      padding: 32px;
-      box-shadow: 0 0 40px #00ffff55;
+      background: rgba(10, 20, 40, 0.9);
+      border-radius: 20px;
+      padding: 30px 35px;
+      width: 340px;
       text-align: center;
-      max-width: 360px;
-      width: 100%;
+      box-shadow: 0 0 40px rgba(0, 255, 255, 0.25);
     }
 
-    h1 {
-      margin-top: 0;
+    .title {
+      font-size: 28px;
+      font-weight: bold;
       color: #00ffff;
-      text-shadow: 0 0 10px #00ffffaa;
+      margin-bottom: 6px;
     }
 
-    button {
-      margin-top: 20px;
-      padding: 14px 20px;
-      border-radius: 999px;
-      border: none;
-      cursor: pointer;
-      font-size: 16px;
-      font-weight: 600;
-      background: linear-gradient(90deg, #00ffff, #7f5cff);
-      color: #02040f;
-      box-shadow: 0 0 20px #00ffff88;
-    }
-
-    button:disabled {
-      opacity: 0.6;
-      cursor: not-allowed;
-    }
-
-    #status {
-      margin-top: 16px;
+    .subtitle {
       font-size: 14px;
       opacity: 0.9;
+      margin-bottom: 25px;
+    }
+
+    .btn {
+      width: 100%;
+      border: none;
+      border-radius: 30px;
+      padding: 14px;
+      font-size: 16px;
+      cursor: pointer;
+      background: linear-gradient(90deg, #00ffd5, #6a5cff);
+      color: black;
+      font-weight: bold;
+      transition: transform 0.15s ease;
+    }
+
+    .btn:hover {
+      transform: scale(1.03);
+    }
+
+    .status {
+      margin-top: 15px;
+      font-size: 14px;
+    }
+
+    .ok {
+      color: #3cff3c;
     }
   </style>
 </head>
 
 <body>
   <div class="card">
-    <h1>⚽ AI Football Picks</h1>
-    <p>Live Goal Scanner</p>
+    <div class="title">⚽ AI Football Picks</div>
 
-    <button id="enablePushBtn">
+    <div class="subtitle">
+      Live Goal Scanner<br />
+      <small>(Ζωντανές ειδοποιήσεις για γκολ)</small>
+    </div>
+
+    <button class="btn" onclick="enablePush()">
       🔔 Enable Notifications
     </button>
 
-    <div id="status"></div>
+    <div id="pushStatus" class="status"></div>
   </div>
 
-  <!-- MUST be last -->
+  <!-- Service Worker register -->
+  <script>
+    if ("serviceWorker" in navigator) {
+      navigator.serviceWorker
+        .register("/sw.js")
+        .then(() => console.log("Service Worker registered"))
+        .catch((err) => console.error("SW error", err));
+    }
+  </script>
+
+  <!-- Push logic -->
   <script src="/push.js"></script>
-<script>
-if ("serviceWorker" in navigator) {
-  window.addEventListener("load", () => {
-    navigator.serviceWorker.register("/sw.js")
-      .then(reg => {
-        console.log("✅ Service Worker registered");
-      })
-      .catch(err => {
-        console.error("❌ SW registration failed", err);
-      });
-  });
-}
-</script>
 </body>
 </html>

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="el">
 <head>
   <meta charset="UTF-8" />
   <title>AI Football Picks</title>
@@ -8,85 +8,76 @@
 
   <!-- PWA -->
   <link rel="manifest" href="/manifest.json" />
-  <meta name="theme-color" content="#0ff" />
+  <meta name="theme-color" content="#00f5ff" />
 
-  <!-- Basic styling (inline για να μην μπλέξουμε με CSS αρχεία) -->
   <style>
     body {
       margin: 0;
       font-family: Arial, Helvetica, sans-serif;
+      background: radial-gradient(circle at top, #1a3a4a, #020617);
       height: 100vh;
       display: flex;
-      align-items: center;
       justify-content: center;
-      background: radial-gradient(circle at top, #1ddcff, #0b1020 60%);
-      color: white;
+      align-items: center;
+      color: #fff;
     }
 
     .card {
-      background: rgba(10, 20, 40, 0.9);
-      border-radius: 20px;
-      padding: 30px 35px;
-      width: 340px;
+      background: rgba(10, 20, 35, 0.9);
+      padding: 30px 40px;
+      border-radius: 18px;
+      box-shadow: 0 0 40px rgba(0, 255, 255, 0.2);
       text-align: center;
-      box-shadow: 0 0 40px rgba(0, 255, 255, 0.25);
-    }
-
-    .title {
-      font-size: 28px;
-      font-weight: bold;
-      color: #00ffff;
-      margin-bottom: 6px;
-    }
-
-    .subtitle {
-      font-size: 14px;
-      opacity: 0.9;
-      margin-bottom: 25px;
-    }
-
-    .btn {
+      max-width: 360px;
       width: 100%;
+    }
+
+    h1 {
+      margin: 0 0 10px;
+      font-size: 26px;
+      color: #00f5ff;
+      text-shadow: 0 0 10px rgba(0,255,255,0.6);
+    }
+
+    h2 {
+      margin: 0 0 25px;
+      font-size: 15px;
+      font-weight: normal;
+      color: #cbd5e1;
+    }
+
+    button {
       border: none;
-      border-radius: 30px;
-      padding: 14px;
+      padding: 14px 22px;
       font-size: 16px;
+      border-radius: 999px;
       cursor: pointer;
-      background: linear-gradient(90deg, #00ffd5, #6a5cff);
-      color: black;
+      background: linear-gradient(90deg, #06b6d4, #6366f1);
+      color: #020617;
       font-weight: bold;
-      transition: transform 0.15s ease;
+      box-shadow: 0 0 20px rgba(99,102,241,0.5);
     }
 
-    .btn:hover {
-      transform: scale(1.03);
+    button:hover {
+      opacity: 0.9;
     }
 
-    .status {
-      margin-top: 15px;
+    #push-status {
+      margin-top: 16px;
       font-size: 14px;
-    }
-
-    .ok {
-      color: #3cff3c;
+      color: #22c55e;
     }
   </style>
 </head>
-
 <body>
+
   <div class="card">
-    <div class="title">⚽ AI Football Picks</div>
+    <h1>⚽ AI Football Picks</h1>
+    <h2>Live Goal Scanner</h2>
 
-    <div class="subtitle">
-      Live Goal Scanner<br />
-      <small>(Ζωντανές ειδοποιήσεις για γκολ)</small>
-    </div>
+    <button id="enable-push-btn">🔔 Enable Notifications</button>
 
-    <button class="btn" onclick="enablePush()">
-      🔔 Enable Notifications
-    </button>
-
-    <div id="pushStatus" class="status"></div>
+    <div id="push-status"></div>
   </div>
 
   <!-- Service Worker register -->
@@ -95,11 +86,12 @@
       navigator.serviceWorker
         .register("/sw.js")
         .then(() => console.log("Service Worker registered"))
-        .catch((err) => console.error("SW error", err));
+        .catch(err => console.error("SW error", err));
     }
   </script>
 
   <!-- Push logic -->
   <script src="/push.js"></script>
+
 </body>
 </html>

@@ -34,6 +34,7 @@
       background: rgba(255,255,255,0.05);
       color: #cbd5f5;
       font-weight: 600;
+      user-select: none;
     }
 
     .tab.active {
@@ -99,6 +100,11 @@
 
     .confidence {
       font-weight: bold;
+      margin-top: 4px;
+    }
+
+    .normal {
+      color: #93c5fd;
     }
 
     .high {
@@ -118,6 +124,38 @@
       font-size: 13px;
       cursor: pointer;
     }
+
+    /* ---------- ANIMATIONS ---------- */
+
+    @keyframes glowNormal {
+      0%   { box-shadow: 0 0 0 rgba(147,197,253,0); }
+      50%  { box-shadow: 0 0 10px rgba(147,197,253,0.35); }
+      100% { box-shadow: 0 0 0 rgba(147,197,253,0); }
+    }
+
+    @keyframes glowHigh {
+      0%   { box-shadow: 0 0 0 rgba(250,204,21,0); }
+      50%  { box-shadow: 0 0 18px rgba(250,204,21,0.55); }
+      100% { box-shadow: 0 0 0 rgba(250,204,21,0); }
+    }
+
+    @keyframes glowBomb {
+      0%   { box-shadow: 0 0 0 rgba(244,63,94,0); }
+      50%  { box-shadow: 0 0 28px rgba(244,63,94,0.8); }
+      100% { box-shadow: 0 0 0 rgba(244,63,94,0); }
+    }
+
+    .alert.normal-glow {
+      animation: glowNormal 1.8s ease-in-out 1;
+    }
+
+    .alert.high-glow {
+      animation: glowHigh 1.6s ease-in-out 2;
+    }
+
+    .alert.bomb-glow {
+      animation: glowBomb 1.2s ease-in-out 3;
+    }
   </style>
 </head>
 
@@ -126,8 +164,8 @@
 
     <!-- TABS -->
     <div class="tabs">
-      <div class="tab active" onclick="showTab('search')">🔍 Search</div>
-      <div class="tab" onclick="showTab('alerts')">🔔 Live Alerts</div>
+      <div class="tab active" onclick="showTab('search', this)">🔍 Search</div>
+      <div class="tab" onclick="showTab('alerts', this)">🔔 Live Alerts</div>
     </div>
 
     <!-- SEARCH -->
@@ -152,7 +190,17 @@
 
     <!-- LIVE ALERTS -->
     <div id="alerts" class="section">
-      <div class="card alert goal">
+
+      <div class="card alert goal normal-glow">
+        <div>
+          <strong>⚽ GOAL | Normal</strong>
+          Napoli – Milan · 61’
+          <div class="confidence normal">Confidence: 71%</div>
+        </div>
+        <div class="cta">View</div>
+      </div>
+
+      <div class="card alert goal high-glow">
         <div>
           <strong>🔥 GOAL | High Value</strong>
           Roma – Atalanta · 72’
@@ -161,7 +209,7 @@
         <div class="cta">View</div>
       </div>
 
-      <div class="card alert corner">
+      <div class="card alert corner bomb-glow">
         <div>
           <strong>💣 CORNERS | Value Bomb</strong>
           Arsenal – Spurs · 68’
@@ -169,17 +217,18 @@
         </div>
         <div class="cta">View</div>
       </div>
+
     </div>
 
   </div>
 
   <script>
-    function showTab(id) {
+    function showTab(id, el) {
       document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
       document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
 
+      el.classList.add('active');
       document.getElementById(id).classList.add('active');
-      event.target.classList.add('active');
     }
   </script>
 </body>

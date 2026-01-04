@@ -1,4 +1,5 @@
 import express from "express";
+import fetch from "node-fetch";
 import path from "path";
 import { fileURLToPath } from "url";
 
@@ -8,40 +9,73 @@ app.use(express.json());
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// Serve frontend
 app.use(express.static(path.join(__dirname, "public")));
 
-/**
- * LIVE ALERTS API
- * Active ONLY from 65' until FT
- * Structure is FINAL
- */
-app.get("/api/live-alerts", async (req, res) => {
+const API_KEY = process.env.API_FOOTBALL_KEY;
+const API_HOST = "api-football-v1.p.rapidapi.com";
 
-  // ⛔ προσωρινά mock — εδώ θα μπει ο real scanner
-  const alerts = [
-    {
-      id: "goal_roma",
-      type: "goal", // goal | corner
-      match: "Roma – Atalanta",
-      minute: 67,
-      market: "Over 1.5 Goals",
-      confidence: 76
-    },
-    {
-      id: "corner_arsenal",
-      type: "corner",
-      match: "Arsenal – Spurs",
-      minute: 72,
-      market: "Over 10.5 Corners",
-      confidence: 88
+const headers = {
+  "x-rapidapi-key": API_KEY,
+  "x-rapidapi-host": API_HOST
+};
+
+// ---- LIVE MATCHES WITH ODDS ----
+app.get("/api/live-matches", async (req, res) => {
+  try {
+    // 1️⃣ Live fixtures
+    const fixturesRes = await fetch(
+      "https://api-football-v1.p.rapidapi.com/v3/fixtures?live=all",
+      { headers }
+    );
+    const fixturesData = await fixturesRes.json();
+
+    const fixtures = fixturesData.response || [];
+
+    const results = [];
+
+    for (const f of fixtures) {
+      const minute = f.fixture.status.elapsed;
+      if (minute < 65) continue; // ⛔ μόνο 65+
+
+      const fixtureId = f.fixture.id;
+
+      // 2️⃣ Odds για κάθε fixture
+      const oddsRes = await fetch(
+        `https://api-football-v1.p.rapidapi.com/v3/odds?fixture=${fixtureId}`,
+        { headers }
+      );
+      const oddsData = await oddsRes.json();
+
+      const bookmakers = oddsData.response?.[0]?.bookmakers || [];
+
+      // βρίσκουμε market Over Goals (παράδειγμα)
+      let overMarket = null;
+
+      for (const b of bookmakers) {
+        for (const bet of b.bets) {
+          if (bet.name.includes("Over")) {
+            overMarket = bet;
+            break;
+          }
+        }
+        if (overMarket) break;
+      }
+
+      results.push({
+        fixtureId,
+        match: `${f.teams.home.name} – ${f.teams.away.name}`,
+        minute,
+        score: `${f.goals.home}-${f.goals.away}`,
+        odds: overMarket ? overMarket.values : [],
+      });
     }
-  ];
 
-  // φίλτρο 65' – FT
-  const filtered = alerts.filter(a => a.minute >= 65 && a.minute <= 90);
+    res.json(results);
 
-  res.json(filtered);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Live matches fetch failed" });
+  }
 });
 
 const PORT = process.env.PORT || 3000;

@@ -1,246 +1,154 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>AI Football Picks</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta charset="UTF-8">
+<title>AI Football Picks</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <style>
-    /* ---------- BACKGROUND ---------- */
-    body {
-      margin: 0;
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
-      min-height: 100vh;
-      color: #e5e7eb;
-      background:
-        radial-gradient(circle at 20% 20%, #22d3ee33, transparent 40%),
-        radial-gradient(circle at 80% 30%, #a855f733, transparent 40%),
-        radial-gradient(circle at 50% 80%, #6366f133, transparent 40%),
-        #020617;
-    }
+<style>
+body{
+  margin:0;
+  font-family:system-ui,-apple-system,BlinkMacSystemFont,sans-serif;
+  min-height:100vh;
+  background:
+    radial-gradient(circle at 20% 20%, #22d3ee33, transparent 40%),
+    radial-gradient(circle at 80% 30%, #a855f733, transparent 40%),
+    radial-gradient(circle at 50% 80%, #6366f133, transparent 40%),
+    #020617;
+  color:#e5e7eb;
+}
+.app{max-width:1100px;margin:auto;padding:20px}
+.header{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px}
+.title{font-size:22px;font-weight:700;color:#22d3ee}
+.lang-toggle button{
+  background:rgba(255,255,255,0.08);
+  border:none;color:#e5e7eb;
+  padding:6px 10px;border-radius:8px;
+  cursor:pointer;margin-left:6px
+}
+.lang-toggle button.active{
+  background:linear-gradient(90deg,#22d3ee,#6366f1);
+  color:#020617;font-weight:700
+}
+.tabs{display:flex;gap:10px;margin-bottom:20px}
+.tab{
+  padding:12px 18px;border-radius:12px;
+  cursor:pointer;background:rgba(255,255,255,0.05);
+  color:#cbd5f5;font-weight:600
+}
+.tab.active{
+  background:linear-gradient(90deg,#22d3ee,#6366f1);
+  color:#020617
+}
+.section{display:none}
+.section.active{display:block}
 
-    .app {
-      max-width: 1100px;
-      margin: 0 auto;
-      padding: 20px;
-    }
+.card{
+  background:rgba(15,23,42,0.88);
+  border-radius:18px;padding:20px;
+  margin-bottom:16px;
+  box-shadow:0 0 30px rgba(0,0,0,.4);
+  backdrop-filter:blur(6px)
+}
 
-    /* ---------- HEADER ---------- */
-    .header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 25px;
-    }
+.alert{display:flex;justify-content:space-between;align-items:center;border-left:4px solid}
+.goal{border-color:#22c55e}
+.corner{border-color:#a855f7}
 
-    .title {
-      font-size: 22px;
-      font-weight: 700;
-      color: #22d3ee;
-    }
+.confidence{font-weight:bold;margin-top:4px}
+.normal{color:#93c5fd}
+.high{color:#facc15}
+.bomb{color:#f43f5e}
 
-    .lang-toggle button {
-      background: rgba(255,255,255,0.08);
-      border: none;
-      color: #e5e7eb;
-      padding: 6px 10px;
-      border-radius: 8px;
-      cursor: pointer;
-      margin-left: 6px;
-    }
+.cta{
+  padding:8px 14px;border-radius:999px;
+  background:linear-gradient(90deg,#22d3ee,#6366f1);
+  color:#020617;font-weight:700;font-size:13px;cursor:pointer
+}
 
-    .lang-toggle button.active {
-      background: linear-gradient(90deg, #22d3ee, #6366f1);
-      color: #020617;
-      font-weight: 700;
-    }
-
-    /* ---------- TABS ---------- */
-    .tabs {
-      display: flex;
-      gap: 10px;
-      margin-bottom: 25px;
-    }
-
-    .tab {
-      padding: 12px 18px;
-      border-radius: 12px;
-      cursor: pointer;
-      background: rgba(255,255,255,0.05);
-      color: #cbd5f5;
-      font-weight: 600;
-    }
-
-    .tab.active {
-      background: linear-gradient(90deg, #22d3ee, #6366f1);
-      color: #020617;
-    }
-
-    /* ---------- SECTIONS ---------- */
-    .section {
-      display: none;
-    }
-
-    .section.active {
-      display: block;
-    }
-
-    /* ---------- CARDS ---------- */
-    .card {
-      background: rgba(15, 23, 42, 0.88);
-      border-radius: 18px;
-      padding: 20px;
-      margin-bottom: 16px;
-      box-shadow: 0 0 30px rgba(0,0,0,0.4);
-      backdrop-filter: blur(6px);
-    }
-
-    /* ---------- SEARCH ---------- */
-    .search-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-      gap: 16px;
-    }
-
-    .search-card h3 {
-      margin: 0 0 10px;
-      color: #22d3ee;
-    }
-
-    .search-card p {
-      font-size: 14px;
-      color: #cbd5f5;
-    }
-
-    /* ---------- ALERTS ---------- */
-    .alert {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      border-left: 4px solid;
-    }
-
-    .goal { border-color: #22c55e; }
-    .corner { border-color: #a855f7; }
-
-    .confidence {
-      font-weight: bold;
-      margin-top: 4px;
-    }
-
-    .normal { color: #93c5fd; }
-    .high { color: #facc15; }
-    .bomb { color: #f43f5e; }
-
-    .cta {
-      padding: 8px 14px;
-      border-radius: 999px;
-      background: linear-gradient(90deg, #22d3ee, #6366f1);
-      color: #020617;
-      font-weight: 700;
-      font-size: 13px;
-      cursor: pointer;
-    }
-  </style>
+/* Animations */
+@keyframes glowN{50%{box-shadow:0 0 10px #93c5fd55}}
+@keyframes glowH{50%{box-shadow:0 0 18px #facc1588}}
+@keyframes glowB{50%{box-shadow:0 0 28px #f43f5ecc}}
+.normal-glow{animation:glowN 1.8s 1}
+.high-glow{animation:glowH 1.6s 2}
+.bomb-glow{animation:glowB 1.2s 3}
+</style>
 </head>
 
 <body>
-  <div class="app">
+<div class="app">
 
-    <!-- HEADER -->
-    <div class="header">
-      <div class="title">⚽ AI Football Picks</div>
-      <div class="lang-toggle">
-        <button onclick="setLang('en')" id="btn-en" class="active">EN</button>
-        <button onclick="setLang('gr')" id="btn-gr">GR</button>
-      </div>
-    </div>
-
-    <!-- TABS -->
-    <div class="tabs">
-      <div class="tab active" onclick="showTab('search', this)" data-i18n="search_tab">🔍 Search</div>
-      <div class="tab" onclick="showTab('alerts', this)" data-i18n="alerts_tab">🔔 Live Alerts</div>
-    </div>
-
-    <!-- SEARCH -->
-    <div id="search" class="section active">
-      <div class="search-grid">
-        <div class="card search-card">
-          <h3 data-i18n="search_title">⚽ Match Search</h3>
-          <p data-i18n="search_desc">Search live matches and analyze goals or corners manually.</p>
-        </div>
-
-        <div class="card search-card">
-          <h3 data-i18n="market_title">📊 Market Selection</h3>
-          <p data-i18n="market_desc">Goals / Corners – Half Time or Full Time.</p>
-        </div>
-
-        <div class="card search-card">
-          <h3 data-i18n="ai_title">🧠 AI Analysis</h3>
-          <p data-i18n="ai_desc">Probability-based suggestions with confidence %.</p>
-        </div>
-      </div>
-    </div>
-
-    <!-- LIVE ALERTS -->
-    <div id="alerts" class="section">
-      <div class="card alert goal">
-        <div>
-          <strong data-i18n="goal_high">🔥 GOAL | High Value</strong><br />
-          Roma – Atalanta · 72’
-          <div class="confidence high">Confidence: 78%</div>
-        </div>
-        <div class="cta" data-i18n="view_btn">View</div>
-      </div>
-    </div>
-
+<div class="header">
+  <div class="title">⚽ AI Football Picks</div>
+  <div class="lang-toggle">
+    <button id="btn-en" class="active" onclick="setLang('en')">EN</button>
+    <button id="btn-gr" onclick="setLang('gr')">GR</button>
   </div>
+</div>
 
-  <script>
-    function showTab(id, el) {
-      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-      document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
-      el.classList.add('active');
-      document.getElementById(id).classList.add('active');
-    }
+<div class="tabs">
+  <div class="tab active" onclick="showTab('search',this)" data-i18n="search">🔍 Search</div>
+  <div class="tab" onclick="showTab('alerts',this)" data-i18n="alerts">🔔 Live Alerts</div>
+</div>
 
-    const translations = {
-      en: {
-        search_tab: "🔍 Search",
-        alerts_tab: "🔔 Live Alerts",
-        search_title: "⚽ Match Search",
-        search_desc: "Search live matches and analyze goals or corners manually.",
-        market_title: "📊 Market Selection",
-        market_desc: "Goals / Corners – Half Time or Full Time.",
-        ai_title: "🧠 AI Analysis",
-        ai_desc: "Probability-based suggestions with confidence %.",
-        goal_high: "🔥 GOAL | High Value",
-        view_btn: "View"
-      },
-      gr: {
-        search_tab: "🔍 Αναζήτηση",
-        alerts_tab: "🔔 Live Ειδοποιήσεις",
-        search_title: "⚽ Αναζήτηση Αγώνα",
-        search_desc: "Αναζήτησε live αγώνες και ανέλυσε γκολ ή κόρνερ.",
-        market_title: "📊 Επιλογή Αγοράς",
-        market_desc: "Γκολ / Κόρνερ – Ημίχρονο ή Τελικό.",
-        ai_title: "🧠 Ανάλυση AI",
-        ai_desc: "Προτάσεις βάσει πιθανοτήτων με confidence %.",
-        goal_high: "🔥 ΓΚΟΛ | Δυνατό",
-        view_btn: "Προβολή"
-      }
-    };
+<div id="search" class="section active">
+  <div class="card" data-i18n="searchInfo">
+    Search matches manually and analyze goals or corners.
+  </div>
+</div>
 
-    function setLang(lang) {
-      document.getElementById("btn-en").classList.remove("active");
-      document.getElementById("btn-gr").classList.remove("active");
-      document.getElementById("btn-" + lang).classList.add("active");
+<div id="alerts" class="section"></div>
 
-      document.querySelectorAll("[data-i18n]").forEach(el => {
-        const key = el.getAttribute("data-i18n");
-        el.textContent = translations[lang][key];
-      });
-    }
-  </script>
+</div>
+
+<script>
+function showTab(id,el){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById(id).classList.add('active');
+}
+
+const dict={
+en:{search:"🔍 Search",alerts:"🔔 Live Alerts",searchInfo:"Search matches manually and analyze goals or corners."},
+gr:{search:"🔍 Αναζήτηση",alerts:"🔔 Live Ειδοποιήσεις",searchInfo:"Χειροκίνητη ανάλυση αγώνων για γκολ ή κόρνερ."}
+};
+function setLang(l){
+  document.getElementById("btn-en").classList.toggle("active",l==="en");
+  document.getElementById("btn-gr").classList.toggle("active",l==="gr");
+  document.querySelectorAll("[data-i18n]").forEach(el=>{
+    el.textContent=dict[l][el.dataset.i18n];
+  });
+}
+
+function level(c){return c>=85?"bomb":c>=75?"high":"normal"}
+function glow(l){return l==="bomb"?"bomb-glow":l==="high"?"high-glow":"normal-glow"}
+
+async function loadAlerts(){
+  const res=await fetch("/api/live-alerts");
+  const data=await res.json();
+  const box=document.getElementById("alerts");
+  box.innerHTML="";
+  data.forEach(a=>{
+    const l=level(a.confidence);
+    const card=document.createElement("div");
+    card.className=`card alert ${a.type} ${glow(l)}`;
+    card.innerHTML=`
+      <div>
+        <strong>${a.type==="goal"?"⚽ GOAL":"🚩 CORNERS"} | ${l.toUpperCase()}</strong><br>
+        ${a.match} · ${a.minute}’<br>
+        ${a.market}
+        <div class="confidence ${l}">Confidence: ${a.confidence}%</div>
+      </div>
+      <div class="cta">View</div>`;
+    box.appendChild(card);
+  });
+}
+
+loadAlerts();
+setInterval(loadAlerts,30000);
+</script>
+
 </body>
 </html>

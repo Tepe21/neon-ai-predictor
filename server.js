@@ -1,99 +1,50 @@
 import express from "express";
-import webpush from "web-push";
+import path from "path";
+import { fileURLToPath } from "url";
 
 const app = express();
-
-/* =======================
-   MIDDLEWARE
-======================= */
 app.use(express.json());
-app.use(express.static("public"));
 
-/* =======================
-   PUSH STORAGE (TEMP)
-   (αργότερα DB)
-======================= */
-const subscriptions = [];
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
-/* =======================
-   VAPID CONFIG
-======================= */
-const VAPID_PUBLIC = process.env.VAPID_PUBLIC;
-const VAPID_PRIVATE = process.env.VAPID_PRIVATE;
+// Serve frontend
+app.use(express.static(path.join(__dirname, "public")));
 
-if (!VAPID_PUBLIC || !VAPID_PRIVATE) {
-  console.error("❌ Missing VAPID keys in environment variables");
-  process.exit(1);
-}
+/**
+ * LIVE ALERTS API
+ * Active ONLY from 65' until FT
+ * Structure is FINAL
+ */
+app.get("/api/live-alerts", async (req, res) => {
 
-webpush.setVapidDetails(
-  "mailto:admin@aifootballpicks.com",
-  VAPID_PUBLIC,
-  VAPID_PRIVATE
-);
-
-/* =======================
-   ROUTES
-======================= */
-
-// HEALTH CHECK
-app.get("/health", (req, res) => {
-  res.json({
-    status: "ok",
-    subscriptions: subscriptions.length,
-  });
-});
-
-// SUBSCRIBE
-app.post("/api/subscribe", (req, res) => {
-  const sub = req.body;
-
-  // αποφυγή διπλότυπων
-  const exists = subscriptions.find(
-    (s) => s.endpoint === sub.endpoint
-  );
-
-  if (!exists) {
-    subscriptions.push(sub);
-    console.log("✅ New subscription added");
-  }
-
-  res.json({ success: true });
-});
-
-// TEST PUSH
-app.get("/api/push/test", async (req, res) => {
-  let sent = 0;
-  const errors = [];
-
-  for (const sub of subscriptions) {
-    try {
-      await webpush.sendNotification(
-        sub,
-        JSON.stringify({
-          title: "⚽ AI Football Alert",
-          body: "High probability GOAL opportunity detected!",
-        })
-      );
-      sent++;
-    } catch (err) {
-      console.error("❌ Push error:", err.body || err.message);
-      errors.push(err.body || err.message);
+  // ⛔ προσωρινά mock — εδώ θα μπει ο real scanner
+  const alerts = [
+    {
+      id: "goal_roma",
+      type: "goal", // goal | corner
+      match: "Roma – Atalanta",
+      minute: 67,
+      market: "Over 1.5 Goals",
+      confidence: 76
+    },
+    {
+      id: "corner_arsenal",
+      type: "corner",
+      match: "Arsenal – Spurs",
+      minute: 72,
+      market: "Over 10.5 Corners",
+      confidence: 88
     }
-  }
+  ];
 
-  res.json({
-    sent,
-    subscriptions: subscriptions.length,
-    errors,
-  });
+  // φίλτρο 65' – FT
+  const filtered = alerts.filter(a => a.minute >= 65 && a.minute <= 90);
+
+  res.json(filtered);
 });
 
-/* =======================
-   START SERVER
-======================= */
 const PORT = process.env.PORT || 3000;
-
 app.listen(PORT, () => {
   console.log("🚀 Server running on port", PORT);
 });

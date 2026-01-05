@@ -7,14 +7,11 @@
 
 <style>
 :root{
-  --bg-main:#05040d;
-  --bg-panel:#0b0e2a;
-  --border:#222a5c;
-
   --cyan:#00f0ff;
   --blue:#4da3ff;
   --purple:#7b5cff;
   --white:#eaf2ff;
+  --dark:#05040d;
 
   --normal:#4da3ff;
   --high:#ffd166;
@@ -25,21 +22,20 @@
 
 body{
   font-family:Inter,system-ui,Arial;
-  background:
-    radial-gradient(1200px 600px at 20% -10%, rgba(123,92,255,.25), transparent),
-    radial-gradient(900px 500px at 80% 20%, rgba(0,240,255,.18), transparent),
-    linear-gradient(180deg,#020111,#05062a);
-  color:var(--white);
   min-height:100vh;
+  color:var(--white);
+  background:
+    linear-gradient(180deg,rgba(5,4,13,.85),rgba(5,4,13,.92)),
+    url("/StockCake-Neon_Stadium_Future-1920145-standard.jpg") center/cover no-repeat fixed;
 }
 
 .app{
   max-width:1150px;
   margin:auto;
-  padding:28px 22px 60px;
+  padding:28px 22px 70px;
 }
 
-/* Onboarding marquee */
+/* Onboarding */
 .marquee{
   overflow:hidden;
   white-space:nowrap;
@@ -49,7 +45,7 @@ body{
   display:inline-block;
   padding-left:100%;
   animation:scroll 22s linear infinite;
-  font-weight:700;
+  font-weight:800;
   color:var(--cyan);
 }
 @keyframes scroll{
@@ -67,23 +63,19 @@ body{
   justify-content:center;
   align-items:center;
   gap:12px;
-  flex-wrap:nowrap;
+  white-space:nowrap;
 }
-.logo-icon{
-  font-size:34px;
-}
+.logo-icon{font-size:34px}
 .logo-text{
   font-size:34px;
   font-weight:900;
   background:linear-gradient(90deg,var(--cyan),var(--purple));
   -webkit-background-clip:text;
   color:transparent;
-  white-space:nowrap;
 }
 .subtitle{
   margin-top:6px;
   font-size:14px;
-  letter-spacing:.6px;
   color:#b9d9ff;
 }
 
@@ -97,10 +89,10 @@ body{
 .tab{
   padding:12px 26px;
   border-radius:18px;
-  background:rgba(11,14,42,.85);
-  border:1px solid var(--border);
+  background:rgba(8,10,30,.85);
+  border:1px solid rgba(0,240,255,.25);
   cursor:pointer;
-  font-weight:800;
+  font-weight:900;
   color:var(--cyan);
   transition:.25s;
 }
@@ -108,17 +100,16 @@ body{
   box-shadow:0 0 26px rgba(0,240,255,.35);
 }
 .tab.active{
-  border-color:var(--cyan);
-  box-shadow:0 0 36px rgba(0,240,255,.55);
+  box-shadow:0 0 36px rgba(0,240,255,.6);
 }
 
 /* Panels */
 .panel{
   display:none;
-  background:rgba(11,14,42,.95);
-  border-radius:24px;
+  background:rgba(8,10,30,.9);
+  border-radius:26px;
   padding:26px;
-  border:1px solid var(--border);
+  border:1px solid rgba(0,240,255,.2);
 }
 .panel.active{display:block}
 
@@ -131,7 +122,7 @@ body{
 }
 select,input{
   background:#050824;
-  border:1px solid var(--border);
+  border:1px solid rgba(0,240,255,.25);
   border-radius:14px;
   padding:14px 16px;
   font-size:15px;
@@ -184,72 +175,70 @@ button{
 <body>
 <div class="app">
 
-  <!-- Onboarding -->
-  <div class="marquee">
-    <span>🧪 FREE BETA — Live Alerts Simulation • Push Notifications Enabled • Real AI Logic • No Payment Required</span>
+<!-- Onboarding -->
+<div class="marquee">
+  <span>🧪 FREE BETA — Live Alerts • Manual Analysis • AI Confidence Engine • Premium Preview</span>
+</div>
+
+<!-- Header -->
+<div class="header">
+  <div class="logo">
+    <div class="logo-icon">⚽</div>
+    <div class="logo-text">AI Football Picks</div>
+  </div>
+  <div class="subtitle">Live Match Intelligence Engine</div>
+</div>
+
+<!-- Tabs -->
+<div class="tabs">
+  <div class="tab active" onclick="switchTab('search')">🔍 Search</div>
+  <div class="tab" onclick="switchTab('live')">🚨 Live Alerts</div>
+</div>
+
+<!-- SEARCH -->
+<div id="search" class="panel active">
+  <h3>🔎 Manual Match Analysis</h3>
+
+  <div class="row">
+    <select id="mode">
+      <option>🔴 Live</option>
+      <option>🟢 Upcoming</option>
+    </select>
+
+    <select id="market">
+      <option>⚽ Goals</option>
+      <option>🚩 Corners</option>
+    </select>
+
+    <input id="matchInput" placeholder="ΠΑΟΚ - ΑΤΡΟΜΗΤΟΣ / PAOK vs Atromitos">
+    <button onclick="analyze()">📊 Analyze</button>
   </div>
 
-  <!-- Header -->
-  <div class="header">
-    <div class="logo">
-      <div class="logo-icon">⚽</div>
-      <div class="logo-text">AI Football Picks</div>
-    </div>
-    <div class="subtitle">Live Match Intelligence Engine</div>
+  <div id="result"></div>
+
+  <div class="small-note">
+    Free Beta shows demo results. Real data unlocks in Premium.
+  </div>
+</div>
+
+<!-- LIVE -->
+<div id="live" class="panel">
+  <h3>🚨 AI Live Alerts</h3>
+
+  <button onclick="enablePush()">🔔 Enable Live Alerts</button>
+
+  <div class="alert high">
+    <strong>Flamengo – Palmeiras</strong><br>
+    ⚽ Over 0.5 Goals @ 1.82<br>
+    <span class="badge">HIGH • 79%</span>
   </div>
 
-  <!-- Tabs -->
-  <div class="tabs">
-    <div class="tab active" onclick="switchTab('search')">🔍 Search</div>
-    <div class="tab" onclick="switchTab('live')">🚨 Live Alerts</div>
+  <div class="alert bomb">
+    <strong>Inter – Milan</strong><br>
+    ⚽ Over 0.5 Goal @ 2.40<br>
+    <span class="badge">💣 BOMB • 86%</span>
   </div>
-
-  <!-- Search -->
-  <div id="search" class="panel active">
-    <h3>Manual Match Analysis</h3>
-    <div class="row">
-      <select>
-        <option>Live</option>
-        <option>Upcoming</option>
-      </select>
-      <select>
-        <option>Goals</option>
-        <option>Corners</option>
-      </select>
-      <input placeholder="Chelsea vs Real / Τσέλσι Ρεάλ">
-      <button>Analyze</button>
-    </div>
-    <div class="small-note">
-      Search works for live & upcoming matches (Free Beta – limited results)
-    </div>
-  </div>
-
-  <!-- Live -->
-  <div id="live" class="panel">
-    <h3>AI Live Alerts</h3>
-
-    <button onclick="enablePush()">🔔 Enable Live Alerts</button>
-
-    <div class="small-note">
-      Push notifications are sent only for <b>High</b> & <b>Bomb</b> alerts.
-    </div>
-
-    <div class="alert high">
-      <strong>Flamengo – Palmeiras</strong><br>
-      Over 0.5 Goals @ 1.82<br>
-      <span class="badge">HIGH • 79%</span>
-    </div>
-
-    <div class="alert bomb">
-      <strong>Inter – Milan</strong><br>
-      Over 0.5 Goal @ 2.40<br>
-      <span class="badge">💣 BOMB • 86%</span>
-    </div>
-
-    <div class="small-note">
-      🧪 Live alerts are simulated during Free Beta to demonstrate system behavior.
-    </div>
-  </div>
+</div>
 
 </div>
 
@@ -264,6 +253,17 @@ function switchTab(t){
     document.querySelectorAll('.tab')[1].classList.add('active');
     live.classList.add('active');
   }
+}
+
+function analyze(){
+  const r = document.getElementById("result");
+  r.innerHTML = `
+    <div class="alert normal">
+      <strong>ΠΑΟΚ – ΑΤΡΟΜΗΤΟΣ</strong><br>
+      ⚽ Over 1.5 Goals @ 1.95<br>
+      <span class="badge">NORMAL • 63%</span>
+    </div>
+  `;
 }
 
 async function enablePush(){

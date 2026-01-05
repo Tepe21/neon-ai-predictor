@@ -7,10 +7,10 @@
 
 <style>
 :root{
-  --blue:#3b6cff;
-  --pink:#ff2bd6;
   --green:#00ff9d;
-  --bg:#060913;
+  --blue:#2bdcff;
+  --dark:#05070f;
+  --card:#0a0f22;
 }
 
 /* ---------- BASE ---------- */
@@ -19,10 +19,10 @@ body{
   margin:0;
   font-family:Inter,system-ui,Arial;
   background:
-    radial-gradient(900px 500px at 10% -10%, rgba(59,108,255,.35), transparent),
-    radial-gradient(700px 400px at 90% 10%, rgba(255,43,214,.25), transparent),
-    linear-gradient(180deg,#050816,#060913 65%);
-  color:#eef2ff;
+    radial-gradient(900px 500px at 15% -10%, rgba(0,255,157,.25), transparent),
+    radial-gradient(700px 400px at 85% 10%, rgba(43,220,255,.25), transparent),
+    linear-gradient(180deg,#02040a,#05070f 70%);
+  color:#eafff7;
   min-height:100vh;
 }
 
@@ -38,19 +38,25 @@ body{
   display:flex;
   justify-content:center;
   align-items:center;
-  gap:12px;
+  gap:14px;
+  font-size:40px;
+  font-weight:900;
+  letter-spacing:.6px;
+}
+.ball{
   font-size:38px;
-  font-weight:800;
-  letter-spacing:.5px;
-  background:linear-gradient(90deg,var(--blue),var(--pink));
+  filter:drop-shadow(0 0 10px var(--green));
+}
+.title-text{
+  background:linear-gradient(90deg,var(--green),var(--blue));
   -webkit-background-clip:text;
   color:transparent;
 }
 .subtitle{
   margin-top:6px;
   font-size:14px;
-  opacity:.8;
-  letter-spacing:.4px;
+  opacity:.75;
+  letter-spacing:.5px;
 }
 
 /* ---------- LANG ---------- */
@@ -60,9 +66,9 @@ body{
   right:20px;
 }
 .lang select{
-  background:#0a0f2a;
-  color:#fff;
-  border:1px solid var(--blue);
+  background:#07101a;
+  color:var(--green);
+  border:1px solid var(--green);
   border-radius:10px;
   padding:6px 10px;
 }
@@ -71,34 +77,39 @@ body{
 .tabs{
   display:flex;
   justify-content:center;
-  gap:14px;
-  margin:30px 0 20px;
+  gap:16px;
+  margin:34px 0 22px;
 }
 .tab{
-  padding:12px 20px;
-  border-radius:16px;
+  padding:12px 22px;
+  border-radius:18px;
   cursor:pointer;
-  background:#0a0f2a;
-  border:1px solid #2437aa;
-  font-weight:700;
+  background:#07101a;
+  border:1px solid #1e6f8a;
+  font-weight:800;
+  letter-spacing:.4px;
+  color:var(--blue);
   transition:.25s;
 }
-.tab:hover{box-shadow:0 0 18px rgba(59,108,255,.45)}
+.tab:hover{
+  box-shadow:0 0 20px rgba(43,220,255,.45);
+}
 .tab.active{
-  background:linear-gradient(135deg,var(--blue),var(--pink));
-  box-shadow:0 0 26px rgba(255,43,214,.6);
+  background:linear-gradient(135deg,var(--green),var(--blue));
+  color:#002018;
+  box-shadow:0 0 30px rgba(0,255,157,.6);
 }
 
 /* ---------- CARDS ---------- */
 .card{
   display:none;
-  background:rgba(10,15,42,.85);
+  background:rgba(10,15,34,.9);
   border-radius:22px;
   padding:22px;
-  border:1px solid #2437aa;
+  border:1px solid #1e6f8a;
   box-shadow:
-    inset 0 0 40px rgba(59,108,255,.08),
-    0 0 30px rgba(0,0,0,.6);
+    inset 0 0 40px rgba(0,255,157,.06),
+    0 0 35px rgba(0,0,0,.7);
   text-align:left;
 }
 .card.active{display:block}
@@ -108,69 +119,76 @@ body{
   display:flex;
   gap:12px;
   flex-wrap:wrap;
-  margin-top:14px;
+  margin-top:16px;
 }
-input,select,button{
-  background:#060913;
-  color:#fff;
-  border:1px solid #2e44ff;
+input,select{
+  background:#05070f;
+  color:#eafff7;
+  border:1px solid var(--blue);
   border-radius:14px;
   padding:12px 14px;
   font-size:15px;
 }
 button{
   cursor:pointer;
-  font-weight:800;
-  background:linear-gradient(135deg,var(--green),var(--blue));
+  font-weight:900;
+  letter-spacing:.6px;
+  padding:12px 18px;
+  border-radius:16px;
   border:none;
-  box-shadow:0 0 18px rgba(0,255,157,.45);
+  background:linear-gradient(135deg,var(--green),var(--blue));
+  color:#002018;
+  box-shadow:0 0 22px rgba(0,255,157,.6);
 }
 button:hover{
   transform:translateY(-1px);
-  box-shadow:0 0 28px rgba(0,255,157,.75);
+  box-shadow:0 0 34px rgba(0,255,157,.85);
 }
 
 /* ---------- ALERTS ---------- */
 .alert{
-  margin-top:14px;
-  padding:16px;
+  margin-top:16px;
+  padding:18px;
   border-radius:18px;
-  border:1px solid #2b3cff;
-  background:#050816;
-  box-shadow:0 0 18px rgba(59,108,255,.25);
+  border:1px solid var(--blue);
+  background:#05070f;
+  box-shadow:0 0 22px rgba(43,220,255,.35);
 }
 .badge{
   display:inline-block;
-  margin-top:10px;
-  padding:6px 14px;
+  margin-top:12px;
+  padding:6px 16px;
   border-radius:999px;
-  font-weight:800;
-  letter-spacing:.4px;
+  font-weight:900;
+  letter-spacing:.5px;
 }
 
 /* ---------- PULSE ---------- */
 @keyframes pulse{
   0%{box-shadow:0 0 0 rgba(0,0,0,0)}
-  50%{box-shadow:0 0 22px currentColor}
+  50%{box-shadow:0 0 26px currentColor}
   100%{box-shadow:0 0 0 rgba(0,0,0,0)}
 }
-.normal{color:var(--blue);animation:pulse 3s infinite}
-.high{color:#ff9f00;animation:pulse 2s infinite}
-.bomb{color:#ff2b5c;animation:pulse 1.2s infinite}
+.normal{color:var(--blue);animation:pulse 3.5s infinite}
+.high{color:#ffd000;animation:pulse 2.2s infinite}
+.bomb{color:#ff3b3b;animation:pulse 1.2s infinite}
 </style>
 </head>
 
 <body>
 <div class="lang">
-  <select id="lang" onchange="setLang(this.value)">
-    <option value="el">🇬🇷 EL</option>
-    <option value="en">🇬🇧 EN</option>
+  <select id="lang">
+    <option>🇬🇷 EL</option>
+    <option>🇬🇧 EN</option>
   </select>
 </div>
 
 <div class="wrap">
-  <div class="title">⚽ AI Football Picks</div>
-  <div class="subtitle" id="subtitle">Live Intelligence Engine</div>
+  <div class="title">
+    <span class="ball">⚽</span>
+    <span class="title-text">AI Football Picks</span>
+  </div>
+  <div class="subtitle">Live Intelligence Engine</div>
 
   <div class="tabs">
     <div class="tab active" onclick="switchTab('search')">🔍 Search</div>
@@ -179,7 +197,7 @@ button:hover{
 
   <!-- SEARCH -->
   <div id="search" class="card active">
-    <h3 id="searchTitle">Manual Analysis</h3>
+    <h3>🧠 Manual Analysis</h3>
     <div class="row">
       <select id="mode">
         <option value="live">🔴 Live</option>
@@ -192,13 +210,15 @@ button:hover{
       <input id="query" placeholder="Chelsea vs Real / Τσέλσι Ρεάλ">
       <button onclick="runSearch()">⚡ Analyze</button>
     </div>
-    <div id="searchResult"></div>
+    <div id="searchResult" style="margin-top:14px;opacity:.7">
+      Backend free-text search coming next…
+    </div>
   </div>
 
   <!-- LIVE -->
   <div id="live" class="card">
     <h3>🔥 AI Live Alerts</h3>
-    <div id="alerts">Loading…</div>
+    <div id="alerts">Waiting for value situations…</div>
   </div>
 </div>
 
@@ -217,11 +237,14 @@ function switchTab(t){
 }
 
 async function loadLive(){
-  alerts.innerHTML='Loading…';
+  alerts.innerHTML='Scanning live matches…';
   const r=await fetch('/api/live-alerts');
   const d=await r.json();
   alerts.innerHTML='';
-  if(!d.length){alerts.innerHTML='No live alerts right now.';return;}
+  if(!d.length){
+    alerts.innerHTML='No value alerts at the moment.';
+    return;
+  }
   d.forEach(a=>{
     alerts.innerHTML+=`
       <div class="alert">
@@ -235,17 +258,7 @@ async function loadLive(){
 }
 
 function runSearch(){
-  searchResult.innerHTML='<em>Analysis engine ready… backend coming next.</em>';
-}
-
-/* ---------- LANG ---------- */
-const dict={
-  el:{sub:'Live Intelligence Engine',search:'Manual Analysis'},
-  en:{sub:'Live Intelligence Engine',search:'Manual Analysis'}
-};
-function setLang(l){
-  subtitle.textContent=dict[l].sub;
-  searchTitle.textContent=dict[l].search;
+  searchResult.textContent='Manual analysis engine ready. Backend search is next.';
 }
 </script>
 </body>

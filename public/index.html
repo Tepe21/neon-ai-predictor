@@ -12,9 +12,9 @@
   --panel:#0a0f2e;
   --border:#1c2b6f;
 
-  --neon-blue:#3fa9ff;
-  --neon-cyan:#00f0ff;
-  --neon-white:#eaf6ff;
+  --blue:#3fa9ff;
+  --cyan:#00e6ff;
+  --white:#eaf6ff;
 
   --normal:#3fa9ff;
   --high:#ffd166;
@@ -25,25 +25,46 @@
 *{box-sizing:border-box;margin:0;padding:0}
 body{
   font-family:Inter,system-ui;
-  color:var(--neon-white);
+  color:var(--white);
   background:
-    radial-gradient(1200px 600px at 10% -10%, rgba(63,169,255,.25), transparent),
-    radial-gradient(900px 500px at 90% 20%, rgba(0,240,255,.20), transparent),
+    radial-gradient(1200px 600px at 10% -10%, rgba(63,169,255,.22), transparent),
+    radial-gradient(900px 500px at 90% 20%, rgba(0,230,255,.18), transparent),
     linear-gradient(180deg,var(--bg1),var(--bg2));
   min-height:100vh;
+  overflow-x:hidden;
 }
 
-/* LAYOUT */
+/* APP */
 .app{
   max-width:1150px;
   margin:auto;
-  padding:40px 24px 60px;
+  padding:36px 24px 60px;
+}
+
+/* ONBOARDING MARQUEE */
+.marquee{
+  width:100%;
+  overflow:hidden;
+  white-space:nowrap;
+  margin-bottom:26px;
+}
+.marquee span{
+  display:inline-block;
+  padding-left:100%;
+  animation:scroll 22s linear infinite;
+  font-weight:700;
+  letter-spacing:.5px;
+  color:var(--cyan);
+}
+@keyframes scroll{
+  0%{transform:translateX(0)}
+  100%{transform:translateX(-100%)}
 }
 
 /* HEADER */
 .header{
   text-align:center;
-  margin-bottom:36px;
+  margin-bottom:34px;
 }
 .logo{
   display:flex;
@@ -52,22 +73,23 @@ body{
   gap:14px;
   font-size:42px;
   font-weight:900;
-  letter-spacing:.6px;
 }
 .logo span{
-  color:var(--neon-cyan);
-  filter:drop-shadow(0 0 14px rgba(0,240,255,.8));
+  color:var(--cyan);
+  filter:drop-shadow(0 0 14px rgba(0,230,255,.85));
 }
 .logo-text{
-  background:linear-gradient(90deg,var(--neon-cyan),var(--neon-blue));
+  background:linear-gradient(90deg,var(--cyan),var(--blue));
   -webkit-background-clip:text;
   color:transparent;
 }
 .subtitle{
-  margin-top:6px;
-  font-size:14px;
-  opacity:.75;
-  letter-spacing:.5px;
+  margin-top:8px;
+  font-size:15px;
+  letter-spacing:.6px;
+  background:linear-gradient(90deg,#9fdcff,#c8f3ff);
+  -webkit-background-clip:text;
+  color:transparent;
 }
 
 /* TABS */
@@ -75,7 +97,7 @@ body{
   display:flex;
   justify-content:center;
   gap:18px;
-  margin-bottom:30px;
+  margin-bottom:28px;
 }
 .tab{
   display:flex;
@@ -87,17 +109,17 @@ body{
   border:1px solid var(--border);
   cursor:pointer;
   font-weight:800;
-  color:var(--neon-cyan);
+  color:var(--cyan);
   transition:.25s;
 }
 .tab:hover{
-  box-shadow:0 0 30px rgba(0,240,255,.35);
+  box-shadow:0 0 30px rgba(0,230,255,.35);
 }
 .tab.active{
-  border-color:var(--neon-cyan);
+  border-color:var(--cyan);
   box-shadow:
-    inset 0 0 20px rgba(0,240,255,.25),
-    0 0 40px rgba(0,240,255,.55);
+    inset 0 0 20px rgba(0,230,255,.25),
+    0 0 40px rgba(0,230,255,.55);
 }
 
 /* PANELS */
@@ -124,46 +146,56 @@ select,input{
   border-radius:14px;
   padding:14px 16px;
   font-size:15px;
-  color:var(--neon-cyan);
+  color:var(--cyan);
 }
-input{color:var(--neon-white)}
+input{color:var(--white)}
 button{
   display:flex;
   align-items:center;
   gap:10px;
   padding:14px 24px;
   border-radius:18px;
-  border:1px solid var(--neon-cyan);
+  border:1px solid var(--cyan);
   background:linear-gradient(135deg,#08184a,#0c2b5e);
-  color:var(--neon-cyan);
+  color:var(--cyan);
   font-weight:900;
-  letter-spacing:.5px;
   cursor:pointer;
-  box-shadow:0 0 30px rgba(0,240,255,.4);
+  box-shadow:0 0 30px rgba(0,230,255,.4);
   transition:.25s;
 }
 button:hover{
   transform:translateY(-1px);
-  box-shadow:0 0 45px rgba(0,240,255,.7);
+  box-shadow:0 0 45px rgba(0,230,255,.7);
 }
 
-/* ALERTS */
+/* ALERT CARDS */
 .alert{
-  margin-top:18px;
-  padding:20px;
-  border-radius:20px;
+  margin-top:20px;
+  padding:22px;
+  border-radius:22px;
   background:#030518;
-  border:1px solid var(--border);
+  border:2px solid transparent;
+}
+.alert.normal{
+  border-color:var(--normal);
+  box-shadow:0 0 35px rgba(63,169,255,.55);
+}
+.alert.high{
+  border-color:var(--high);
+  box-shadow:0 0 35px rgba(255,209,102,.55);
+}
+.alert.bomb{
+  border-color:var(--bomb);
+  box-shadow:0 0 45px rgba(255,77,109,.75);
 }
 
-/* BADGES + PULSE (ΔΕΝ ΑΛΛΑΞΕ) */
+/* BADGE + PULSE */
 .badge{
   display:inline-block;
   margin-top:12px;
   padding:8px 18px;
   border-radius:999px;
   font-weight:900;
-  letter-spacing:.4px;
 }
 
 @keyframes pulse{
@@ -179,6 +211,11 @@ button:hover{
 
 <body>
 <div class="app">
+
+  <!-- ONBOARDING -->
+  <div class="marquee">
+    <span>🚧 FREE BETA – AI Live Football Intelligence • Real-time alerts • Early access • No limits for a limited time 🚧</span>
+  </div>
 
   <!-- HEADER -->
   <div class="header">
@@ -216,13 +253,13 @@ button:hover{
   <div id="live" class="panel">
     <h3>🔥 AI Live Alerts</h3>
 
-    <div class="alert">
+    <div class="alert high">
       <strong>Chelsea – Real Madrid</strong><br>
       Over 1.5 Goals @ 1.83<br>
       <span class="badge high">HIGH VALUE • 78%</span>
     </div>
 
-    <div class="alert">
+    <div class="alert bomb">
       <strong>Inter – Milan</strong><br>
       Over 0.5 Goal @ 2.40<br>
       <span class="badge bomb">💣 BOMB • 86%</span>

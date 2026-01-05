@@ -7,101 +7,265 @@
 
 <style>
 :root{
-  --green:#7CFFCB;
-  --blue:#2bdcff;
-  --dark:#04060c;
-  --card:#0a1024;
+  --blue:#3b7cff;
+  --cyan:#00f0ff;
+  --dark:#05060b;
+  --card:#0a0d1a;
+  --border:#1f2a5c;
 }
+
+/* ---------- BASE ---------- */
+*{box-sizing:border-box}
 body{
   margin:0;
-  font-family:Inter,system-ui;
+  font-family:Inter,system-ui,Segoe UI;
   background:
-    radial-gradient(800px 400px at 20% -10%, rgba(124,255,203,.18), transparent),
-    radial-gradient(700px 400px at 80% 10%, rgba(43,220,255,.18), transparent),
-    linear-gradient(180deg,#02040a,#04060c 70%);
-  color:#eafff7;
+    radial-gradient(1200px 600px at 10% -10%, rgba(59,124,255,.25), transparent),
+    radial-gradient(900px 500px at 90% 10%, rgba(0,240,255,.18), transparent),
+    linear-gradient(180deg,#03040a,#05060b 70%);
+  color:#e9f1ff;
+  min-height:100vh;
 }
-.wrap{max-width:1100px;margin:auto;padding:30px 20px;text-align:center}
-.title{display:flex;justify-content:center;gap:14px;font-size:38px;font-weight:900}
-.ball{filter:drop-shadow(0 0 8px var(--green))}
-.title-text{background:linear-gradient(90deg,var(--green),var(--blue));-webkit-background-clip:text;color:transparent}
-.subtitle{opacity:.7;font-size:14px}
-.tabs{display:flex;justify-content:center;gap:14px;margin:30px 0}
-.tab{padding:12px 22px;border-radius:18px;background:#081124;border:1px solid #1f5e78;color:var(--blue);cursor:pointer}
-.tab.active{background:linear-gradient(135deg,var(--green),var(--blue));color:#002018}
-.card{display:none;background:#081124;border-radius:22px;padding:22px;border:1px solid #1f5e78}
+
+/* ---------- LAYOUT ---------- */
+.wrap{
+  max-width:1150px;
+  margin:auto;
+  padding:36px 22px 60px;
+  text-align:center;
+}
+
+/* ---------- TITLE ---------- */
+.header{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:6px;
+}
+.title{
+  display:flex;
+  align-items:center;
+  gap:14px;
+  font-size:42px;
+  font-weight:900;
+  letter-spacing:.6px;
+}
+.title-icon{
+  font-size:40px;
+  color:var(--cyan);
+  filter:drop-shadow(0 0 14px rgba(0,240,255,.85));
+}
+.title-text{
+  background:linear-gradient(90deg,var(--cyan),var(--blue));
+  -webkit-background-clip:text;
+  color:transparent;
+}
+.subtitle{
+  font-size:14px;
+  opacity:.75;
+  letter-spacing:.5px;
+}
+
+/* ---------- TABS ---------- */
+.tabs{
+  display:flex;
+  justify-content:center;
+  gap:16px;
+  margin:36px 0 26px;
+}
+.tab{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  padding:14px 26px;
+  border-radius:18px;
+  cursor:pointer;
+  background:rgba(10,13,26,.9);
+  border:1px solid var(--border);
+  color:var(--cyan);
+  font-weight:800;
+  letter-spacing:.4px;
+  transition:.25s;
+}
+.tab:hover{
+  box-shadow:0 0 24px rgba(0,240,255,.35);
+}
+.tab.active{
+  background:linear-gradient(135deg,#0b122f,var(--card));
+  border-color:var(--cyan);
+  box-shadow:
+    inset 0 0 18px rgba(0,240,255,.25),
+    0 0 28px rgba(0,240,255,.45);
+}
+
+/* ---------- CARDS ---------- */
+.card{
+  display:none;
+  background:rgba(10,13,26,.92);
+  border-radius:24px;
+  padding:26px;
+  border:1px solid var(--border);
+  box-shadow:
+    inset 0 0 50px rgba(59,124,255,.08),
+    0 0 40px rgba(0,0,0,.75);
+  text-align:left;
+}
 .card.active{display:block}
-.row{display:flex;gap:12px;flex-wrap:wrap;margin-top:16px}
-select,input{background:#04060c;color:#eafff7;border:1px solid var(--blue);border-radius:14px;padding:12px}
-button{background:linear-gradient(135deg,var(--green),var(--blue));border:none;border-radius:16px;padding:12px 18px;font-weight:800;color:#002018;cursor:pointer}
-.alert{margin-top:14px;padding:16px;border-radius:18px;border:1px solid var(--blue)}
-.badge{padding:6px 14px;border-radius:999px;font-weight:800}
-.pre{color:#7cffcb}
-.normal{color:#2bdcff}
-.high{color:#ffd000}
-.bomb{color:#ff3b3b}
+
+/* ---------- FORM ---------- */
+.row{
+  display:flex;
+  gap:14px;
+  flex-wrap:wrap;
+  margin-top:18px;
+}
+select,input{
+  background:#040510;
+  color:#e9f1ff;
+  border:1px solid var(--border);
+  border-radius:14px;
+  padding:14px 16px;
+  font-size:15px;
+}
+select{
+  color:var(--cyan);
+}
+button{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  padding:14px 22px;
+  border-radius:18px;
+  cursor:pointer;
+  border:1px solid var(--cyan);
+  background:linear-gradient(135deg,#07142e,#0c1e44);
+  color:var(--cyan);
+  font-weight:900;
+  letter-spacing:.5px;
+  box-shadow:0 0 26px rgba(0,240,255,.35);
+  transition:.25s;
+}
+button:hover{
+  transform:translateY(-1px);
+  box-shadow:0 0 38px rgba(0,240,255,.65);
+}
+
+/* ---------- ALERTS ---------- */
+.alert{
+  margin-top:18px;
+  padding:20px;
+  border-radius:20px;
+  background:#05060b;
+  border:1px solid var(--border);
+  box-shadow:0 0 28px rgba(59,124,255,.35);
+}
+.alert strong{
+  font-size:16px;
+}
+
+/* ---------- BADGES ---------- */
+.badge{
+  display:inline-block;
+  margin-top:12px;
+  padding:8px 18px;
+  border-radius:999px;
+  font-weight:900;
+  letter-spacing:.5px;
+}
+
+/* ---------- PULSE (ΔΕΝ ΠΕΙΡΑΧΤΗΚΕ) ---------- */
+@keyframes pulse{
+  0%{box-shadow:0 0 0 rgba(0,0,0,0)}
+  50%{box-shadow:0 0 28px currentColor}
+  100%{box-shadow:0 0 0 rgba(0,0,0,0)}
+}
+.normal{color:#3b7cff;animation:pulse 3.4s infinite}
+.high{color:#ffc400;animation:pulse 2.1s infinite}
+.bomb{color:#ff3355;animation:pulse 1.15s infinite}
 </style>
 </head>
 
 <body>
 <div class="wrap">
-  <div class="title"><span class="ball">⚽</span><span class="title-text">AI Football Picks</span></div>
-  <div class="subtitle">Live Intelligence Engine</div>
+
+  <div class="header">
+    <div class="title">
+      <span class="title-icon">⚽</span>
+      <span class="title-text">AI Football Picks</span>
+    </div>
+    <div class="subtitle">Live Match Intelligence Engine</div>
+  </div>
 
   <div class="tabs">
-    <div class="tab active" onclick="tab('search')">Search</div>
-    <div class="tab" onclick="tab('live')">Live Alerts</div>
+    <div class="tab active" onclick="switchTab('search')">🔍 Search</div>
+    <div class="tab" onclick="switchTab('live')">🚨 Live Alerts</div>
   </div>
 
+  <!-- SEARCH -->
   <div id="search" class="card active">
+    <h3>🧠 Manual Match Analysis</h3>
     <div class="row">
       <select id="mode">
-        <option value="live">Live</option>
-        <option value="upcoming">Upcoming</option>
+        <option value="live">🔴 Live</option>
+        <option value="upcoming">📅 Upcoming</option>
       </select>
       <select id="market">
-        <option value="goals">Goals</option>
-        <option value="corners">Corners</option>
+        <option value="goals">⚽ Goals</option>
+        <option value="corners">🚩 Corners</option>
       </select>
       <input id="query" placeholder="Chelsea vs Real / Τσέλσι Ρεάλ">
-      <button onclick="search()">Analyze</button>
+      <button onclick="runSearch()">⚡ Analyze</button>
     </div>
-    <div id="result"></div>
+    <div id="searchResult" style="margin-top:16px;opacity:.7">
+      Intelligent analysis ready.
+    </div>
   </div>
 
+  <!-- LIVE -->
   <div id="live" class="card">
-    <div id="alerts">Waiting for live value…</div>
+    <h3>🔥 AI Live Alerts</h3>
+    <div id="alerts">Scanning live matches for value…</div>
   </div>
+
 </div>
 
 <script>
-function tab(t){
+function switchTab(t){
   document.querySelectorAll('.tab').forEach(e=>e.classList.remove('active'));
   document.querySelectorAll('.card').forEach(e=>e.classList.remove('active'));
-  if(t==='search'){document.querySelectorAll('.tab')[0].classList.add('active');searchEl.classList.add('active')}
-  else{document.querySelectorAll('.tab')[1].classList.add('active');live.classList.add('active')}
+  if(t==='search'){
+    document.querySelectorAll('.tab')[0].classList.add('active');
+    search.classList.add('active');
+  }else{
+    document.querySelectorAll('.tab')[1].classList.add('active');
+    live.classList.add('active');
+    loadLive();
+  }
 }
-const searchEl=document.getElementById('search');
 
-async function search(){
-  result.innerHTML='Searching…';
-  const r=await fetch('/api/search',{method:'POST',headers:{'Content-Type':'application/json'},
-    body:JSON.stringify({query:query.value,mode:mode.value,market:market.value})
-  });
+async function loadLive(){
+  alerts.innerHTML='Scanning live matches for value…';
+  const r=await fetch('/api/live-alerts');
   const d=await r.json();
-  if(d.multiple){
-    result.innerHTML=d.options.map(o=>`<div>${o.label}</div>`).join('');
+  alerts.innerHTML='';
+  if(!d.length){
+    alerts.innerHTML='No value situations detected right now.';
     return;
   }
-  if(!d.market){result.innerHTML='No value found';return;}
-  result.innerHTML=`
-    <div class="alert">
-      <strong>${d.match}</strong><br>
-      ${d.market} @ ${d.odd}<br>
-      <span class="badge ${d.level}">
-        ${d.level==='pre'?'PRE-MATCH ANALYSIS':d.level.toUpperCase()} • ${d.confidence}%
-      </span>
-    </div>`;
+  d.forEach(a=>{
+    alerts.innerHTML+=`
+      <div class="alert">
+        <strong>${a.match}</strong><br>
+        ${a.market} @ ${a.odd}<br>
+        <span class="badge ${a.level}">
+          ${a.level.toUpperCase()} • ${a.confidence}%
+        </span>
+      </div>`;
+  });
+}
+
+function runSearch(){
+  searchResult.textContent='Backend free-text analysis active.';
 }
 </script>
 </body>

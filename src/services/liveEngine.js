@@ -21,7 +21,7 @@ export async function getLiveAlerts() {
       f.goals.home + f.goals.away;
 
     // βασικό φίλτρο (θα βελτιωθεί)
-    if (minute >= 65 && minute <= 85 && goals < 3) {
+    if (minute >=1) {
       alerts.push({
         match: `${f.teams.home.name} – ${f.teams.away.name}`,
         minute,

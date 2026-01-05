@@ -16,6 +16,17 @@ app.use(express.static(path.join(__dirname, "public")));
 const API_KEY = process.env.API_FOOTBALL_KEY;
 const BASE_URL = "https://v3.football.api-sports.io";
 
+/* ---------- HELPERS ---------- */
+const normalize = (s="") =>
+  s.toLowerCase()
+   .replace(/[άα]/g,"α").replace(/[έε]/g,"ε")
+   .replace(/[ήη]/g,"η").replace(/[ίι]/g,"ι")
+   .replace(/[όο]/g,"ο").replace(/[ύυ]/g,"υ")
+   .replace(/[ώω]/g,"ω")
+   .replace(/vs|-/g," ")
+   .replace(/\s+/g," ")
+   .trim();
+
 /* ---------- PUSH SUBSCRIBE ---------- */
 app.post("/api/subscribe", (req, res) => {
   addSubscription(req.body);
@@ -25,23 +36,22 @@ app.post("/api/subscribe", (req, res) => {
 /* ---------- LIVE ALERTS (AUTO) ---------- */
 app.get("/api/live-alerts", async (req, res) => {
   try {
-    const fxRes = await fetch(`${BASE_URL}/fixtures?live=all`, {
+    const r = await fetch(`${BASE_URL}/fixtures?live=all`, {
       headers: { "x-apisports-key": API_KEY }
     });
-    const fxData = await fxRes.json();
-    const fixtures = fxData.response || [];
-
+    const data = await r.json();
+    const fixtures = data.response || [];
     const alerts = [];
 
     for (const f of fixtures) {
       const minute = f.fixture.status.elapsed;
       if (!minute || minute < 65) continue;
 
-      const oddsRes = await fetch(`${BASE_URL}/odds?fixture=${f.fixture.id}`, {
+      const oddsR = await fetch(`${BASE_URL}/odds?fixture=${f.fixture.id}`, {
         headers: { "x-apisports-key": API_KEY }
       });
-      const oddsData = await oddsRes.json();
-      const books = oddsData.response?.[0]?.bookmakers || [];
+      const oddsD = await oddsR.json();
+      const books = oddsD.response?.[0]?.bookmakers || [];
 
       let goalOdds = [], cornerOdds = [];
       for (const b of books) {
@@ -57,10 +67,9 @@ app.get("/api/live-alerts", async (req, res) => {
         const r = calculateGoalProbability({ minute, score, odds: goalOdds });
         if (r) {
           const a = {
-            type: "goal",
-            match: `${f.teams.home.name} – ${f.teams.away.name}`,
-            minute, score, market: r.market, odd: r.odd,
-            confidence: r.confidence, level: r.level
+            type:"goal", match:`${f.teams.home.name} – ${f.teams.away.name}`,
+            minute, score, market:r.market, odd:r.odd,
+            confidence:r.confidence, level:r.level
           };
           alerts.push(a);
           await sendAlertOnce(a);
@@ -70,18 +79,14 @@ app.get("/api/live-alerts", async (req, res) => {
       if (cornerOdds.length) {
         const r = calculateCornerProbability({
           minute,
-          corners: {
-            home: f.statistics?.[0]?.statistics?.find(s => s.type === "Corner Kicks")?.value || 0,
-            away: f.statistics?.[1]?.statistics?.find(s => s.type === "Corner Kicks")?.value || 0
-          },
-          odds: cornerOdds
+          corners:{home:0,away:0},
+          odds:cornerOdds
         });
         if (r) {
           const a = {
-            type: "corner",
-            match: `${f.teams.home.name} – ${f.teams.away.name}`,
-            minute, score, market: r.market, odd: r.odd,
-            confidence: r.confidence, level: r.level
+            type:"corner", match:`${f.teams.home.name} – ${f.teams.away.name}`,
+            minute, score, market:r.market, odd:r.odd,
+            confidence:r.confidence, level:r.level
           };
           alerts.push(a);
           await sendAlertOnce(a);
@@ -89,79 +94,87 @@ app.get("/api/live-alerts", async (req, res) => {
       }
     }
     res.json(alerts);
-  } catch (e) {
-    console.error(e);
-    res.status(500).json({ error: "Live alerts failed" });
+  } catch {
+    res.status(500).json({ error:"Live alerts failed" });
   }
 });
 
-/* ---------- SEARCH (LIVE + UPCOMING) ---------- */
+/* ---------- SEARCH (FREE TEXT + DROPDOWN) ---------- */
 app.post("/api/search", async (req, res) => {
   try {
-    const { mode, market, fixtureId } = req.body;
-    if (!mode || !market || !fixtureId) {
-      return res.status(400).json({ error: "Invalid search payload" });
+    const { query, mode, market } = req.body;
+    if (!query) return res.json({ matches: [] });
+
+    const days = mode === "upcoming" ? 2 : 0;
+    const url = days
+      ? `${BASE_URL}/fixtures?next=50`
+      : `${BASE_URL}/fixtures?live=all`;
+
+    const r = await fetch(url, {
+      headers: { "x-apisports-key": API_KEY }
+    });
+    const data = await r.json();
+    const fixtures = data.response || [];
+
+    const q = normalize(query);
+
+    const matches = fixtures.filter(f => {
+      const name = normalize(`${f.teams.home.name} ${f.teams.away.name}`);
+      return q.split(" ").every(w => name.includes(w));
+    });
+
+    if (matches.length > 1) {
+      return res.json({
+        multiple: true,
+        options: matches.map(f => ({
+          id: f.fixture.id,
+          label: `${f.teams.home.name} – ${f.teams.away.name}`
+        }))
+      });
     }
 
-    // fixture
-    const fxRes = await fetch(`${BASE_URL}/fixtures?id=${fixtureId}`, {
-      headers: { "x-apisports-key": API_KEY }
-    });
-    const fxData = await fxRes.json();
-    const f = fxData.response?.[0];
-    if (!f) return res.json(null);
+    if (!matches.length) return res.json({ matches: [] });
 
-    // odds
-    const oddsRes = await fetch(`${BASE_URL}/odds?fixture=${fixtureId}`, {
+    const f = matches[0];
+
+    const oddsR = await fetch(`${BASE_URL}/odds?fixture=${f.fixture.id}`, {
       headers: { "x-apisports-key": API_KEY }
     });
-    const oddsData = await oddsRes.json();
-    const books = oddsData.response?.[0]?.bookmakers || [];
+    const oddsD = await oddsR.json();
+    const books = oddsD.response?.[0]?.bookmakers || [];
 
     let odds = [];
     for (const b of books) {
       for (const bet of b.bets) {
-        if (market === "goals" && bet.name.toLowerCase().includes("goal")) odds = bet.values;
-        if (market === "corners" && bet.name.toLowerCase().includes("corner")) odds = bet.values;
+        if (market==="goals" && bet.name.toLowerCase().includes("goal")) odds=bet.values;
+        if (market==="corners" && bet.name.toLowerCase().includes("corner")) odds=bet.values;
       }
     }
-    if (!odds.length) return res.json(null);
 
-    const minute = mode === "live" ? f.fixture.status.elapsed : null;
+    if (!odds.length) return res.json({ matches: [] });
+
+    const minute = mode==="live" ? f.fixture.status.elapsed : 70;
     const score = `${f.goals.home}-${f.goals.away}`;
 
-    let result = null;
+    const r2 = market==="goals"
+      ? calculateGoalProbability({ minute, score, odds })
+      : calculateCornerProbability({ minute, corners:{home:0,away:0}, odds });
 
-    if (market === "goals") {
-      result = calculateGoalProbability({
-        minute: mode === "live" ? minute : 70, // pre-match neutral
-        score,
-        odds
-      });
-    } else {
-      result = calculateCornerProbability({
-        minute: mode === "live" ? minute : 70,
-        corners: { home: 0, away: 0 },
-        odds
-      });
-    }
+    if (!r2) return res.json({ matches: [] });
 
-    if (!result) return res.json(null);
+    if (mode==="upcoming") r2.level="pre";
 
     res.json({
-      type: market,
-      match: `${f.teams.home.name} – ${f.teams.away.name}`,
+      match:`${f.teams.home.name} – ${f.teams.away.name}`,
       mode,
-      market: result.market,
-      odd: result.odd,
-      confidence: result.confidence,
-      level: result.level
+      market:r2.market,
+      odd:r2.odd,
+      confidence:r2.confidence,
+      level:r2.level
     });
-  } catch (e) {
-    console.error(e);
-    res.status(500).json({ error: "Search failed" });
+  } catch {
+    res.status(500).json({ error:"Search failed" });
   }
 });
 
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log("🚀 Server running on", PORT));
+app.listen(process.env.PORT || 3000);

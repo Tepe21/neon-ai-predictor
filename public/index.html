@@ -2,50 +2,45 @@
 <html lang="el">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>AI Football Picks</title>
 
 <style>
 :root{
-  --bg1:#02030a;
-  --bg2:#05082a;
-  --panel:#0b1036;
-  --border:#1e2f7a;
+  --bg-main:#05040d;
+  --bg-panel:#0b0e2a;
+  --border:#222a5c;
 
-  --blue:#4aa3ff;
-  --cyan:#00e6ff;
-  --purple:#7a6cff;
-  --white:#eaf6ff;
+  --cyan:#00f0ff;
+  --blue:#4da3ff;
+  --purple:#7b5cff;
+  --white:#eaf2ff;
 
-  --normal:#4aa3ff;
+  --normal:#4da3ff;
   --high:#ffd166;
   --bomb:#ff4d6d;
 }
 
-/* RESET */
 *{box-sizing:border-box;margin:0;padding:0}
+
 body{
-  font-family:Inter,system-ui;
-  color:var(--white);
+  font-family:Inter,system-ui,Arial;
   background:
-    radial-gradient(1200px 600px at 10% -10%, rgba(74,163,255,.20), transparent),
-    radial-gradient(900px 500px at 90% 20%, rgba(122,108,255,.15), transparent),
-    radial-gradient(800px 400px at 50% 100%, rgba(0,230,255,.12), transparent),
-    linear-gradient(180deg,var(--bg1),var(--bg2));
+    radial-gradient(1200px 600px at 20% -10%, rgba(123,92,255,.25), transparent),
+    radial-gradient(900px 500px at 80% 20%, rgba(0,240,255,.18), transparent),
+    linear-gradient(180deg,#020111,#05062a);
+  color:var(--white);
   min-height:100vh;
-  overflow-x:hidden;
 }
 
-/* APP */
 .app{
   max-width:1150px;
   margin:auto;
-  padding:32px 22px 60px;
+  padding:28px 22px 60px;
 }
 
-/* MARQUEE */
+/* Onboarding marquee */
 .marquee{
-  width:100%;
   overflow:hidden;
   white-space:nowrap;
   margin-bottom:22px;
@@ -53,9 +48,8 @@ body{
 .marquee span{
   display:inline-block;
   padding-left:100%;
-  animation:scroll 26s linear infinite;
+  animation:scroll 22s linear infinite;
   font-weight:700;
-  letter-spacing:.5px;
   color:var(--cyan);
 }
 @keyframes scroll{
@@ -63,52 +57,47 @@ body{
   100%{transform:translateX(-100%)}
 }
 
-/* HEADER */
+/* Header */
 .header{
   text-align:center;
-  margin-bottom:32px;
+  margin-bottom:26px;
 }
 .logo{
   display:flex;
   justify-content:center;
   align-items:center;
   gap:12px;
-  font-size:38px;
-  font-weight:900;
-  white-space:nowrap;
+  flex-wrap:nowrap;
 }
-.logo span{
-  color:var(--cyan);
-  filter:drop-shadow(0 0 12px rgba(0,230,255,.8));
+.logo-icon{
+  font-size:34px;
 }
 .logo-text{
-  background:linear-gradient(90deg,var(--cyan),var(--blue));
+  font-size:34px;
+  font-weight:900;
+  background:linear-gradient(90deg,var(--cyan),var(--purple));
   -webkit-background-clip:text;
   color:transparent;
+  white-space:nowrap;
 }
 .subtitle{
   margin-top:6px;
   font-size:14px;
   letter-spacing:.6px;
-  background:linear-gradient(90deg,#b8cfff,#e0e6ff);
-  -webkit-background-clip:text;
-  color:transparent;
+  color:#b9d9ff;
 }
 
-/* TABS */
+/* Tabs */
 .tabs{
   display:flex;
   justify-content:center;
-  gap:16px;
+  gap:14px;
   margin-bottom:26px;
 }
 .tab{
-  display:flex;
-  align-items:center;
-  gap:8px;
-  padding:13px 26px;
+  padding:12px 26px;
   border-radius:18px;
-  background:rgba(11,16,54,.9);
+  background:rgba(11,14,42,.85);
   border:1px solid var(--border);
   cursor:pointer;
   font-weight:800;
@@ -116,27 +105,24 @@ body{
   transition:.25s;
 }
 .tab:hover{
-  box-shadow:0 0 26px rgba(122,108,255,.35);
+  box-shadow:0 0 26px rgba(0,240,255,.35);
 }
 .tab.active{
   border-color:var(--cyan);
-  box-shadow:
-    inset 0 0 18px rgba(0,230,255,.22),
-    0 0 36px rgba(122,108,255,.45);
+  box-shadow:0 0 36px rgba(0,240,255,.55);
 }
 
-/* PANELS */
+/* Panels */
 .panel{
   display:none;
-  background:rgba(11,16,54,.95);
-  border-radius:26px;
+  background:rgba(11,14,42,.95);
+  border-radius:24px;
   padding:26px;
   border:1px solid var(--border);
-  box-shadow:0 0 60px rgba(0,0,0,.7);
 }
 .panel.active{display:block}
 
-/* FORM */
+/* Controls */
 .row{
   display:flex;
   flex-wrap:wrap;
@@ -144,7 +130,7 @@ body{
   margin-top:18px;
 }
 select,input{
-  background:#04061d;
+  background:#050824;
   border:1px solid var(--border);
   border-radius:14px;
   padding:14px 16px;
@@ -153,48 +139,44 @@ select,input{
 }
 input{color:var(--white)}
 button{
-  display:flex;
-  align-items:center;
-  gap:10px;
   padding:14px 22px;
   border-radius:18px;
   border:1px solid var(--cyan);
-  background:linear-gradient(135deg,#0a1b4d,#123a6b);
+  background:linear-gradient(135deg,#08184a,#0c2b5e);
   color:var(--cyan);
   font-weight:900;
   cursor:pointer;
-  box-shadow:0 0 26px rgba(0,230,255,.35);
-  transition:.25s;
-}
-button:hover{
-  transform:translateY(-1px);
-  box-shadow:0 0 40px rgba(122,108,255,.6);
+  box-shadow:0 0 28px rgba(0,240,255,.4);
 }
 
-/* ALERTS */
+/* Alerts */
 .alert{
   margin-top:20px;
-  padding:22px;
+  padding:20px;
   border-radius:22px;
-  background:#04061d;
+  background:#050824;
   border:2px solid transparent;
 }
-
-/* BREATHING GLOW */
-@keyframes breathe{
-  0%,40%,100%{box-shadow:none}
-  20%{box-shadow:0 0 28px currentColor}
-}
-.alert.normal{border-color:var(--normal);color:var(--normal);animation:breathe 8s infinite}
-.alert.high{border-color:var(--high);color:var(--high);animation:breathe 6s infinite}
-.alert.bomb{border-color:var(--bomb);color:var(--bomb);animation:breathe 4s infinite}
+.alert.normal{border-color:var(--normal)}
+.alert.high{border-color:var(--high)}
+.alert.bomb{border-color:var(--bomb)}
 
 .badge{
   display:inline-block;
-  margin-top:12px;
-  padding:8px 18px;
+  margin-top:10px;
+  padding:7px 16px;
   border-radius:999px;
   font-weight:900;
+}
+
+.normal .badge{color:var(--normal)}
+.high .badge{color:var(--high)}
+.bomb .badge{color:var(--bomb)}
+
+.small-note{
+  margin-top:12px;
+  font-size:12px;
+  color:#8fa6ff;
 }
 </style>
 </head>
@@ -202,49 +184,70 @@ button:hover{
 <body>
 <div class="app">
 
+  <!-- Onboarding -->
   <div class="marquee">
-    <span>🚧 FREE BETA – AI Live Football Intelligence • Real-time alerts • Early access • No limits for a limited time 🚧</span>
+    <span>🧪 FREE BETA — Live Alerts Simulation • Push Notifications Enabled • Real AI Logic • No Payment Required</span>
   </div>
 
+  <!-- Header -->
   <div class="header">
     <div class="logo">
-      <span>⚽</span>
+      <div class="logo-icon">⚽</div>
       <div class="logo-text">AI Football Picks</div>
     </div>
     <div class="subtitle">Live Match Intelligence Engine</div>
   </div>
 
+  <!-- Tabs -->
   <div class="tabs">
     <div class="tab active" onclick="switchTab('search')">🔍 Search</div>
     <div class="tab" onclick="switchTab('live')">🚨 Live Alerts</div>
   </div>
 
+  <!-- Search -->
   <div id="search" class="panel active">
-    <h3>🧠 Manual Match Analysis</h3>
+    <h3>Manual Match Analysis</h3>
     <div class="row">
-      <select><option>🔴 Live</option><option>📅 Upcoming</option></select>
-      <select><option>⚽ Goals</option><option>🚩 Corners</option></select>
+      <select>
+        <option>Live</option>
+        <option>Upcoming</option>
+      </select>
+      <select>
+        <option>Goals</option>
+        <option>Corners</option>
+      </select>
       <input placeholder="Chelsea vs Real / Τσέλσι Ρεάλ">
-      <button>⚡ Analyze</button>
+      <button>Analyze</button>
     </div>
-    <p style="opacity:.6;margin-top:14px;font-size:14px">
-      Search results will appear here when analysis engine is connected.
-    </p>
+    <div class="small-note">
+      Search works for live & upcoming matches (Free Beta – limited results)
+    </div>
   </div>
 
+  <!-- Live -->
   <div id="live" class="panel">
-    <h3>🔥 AI Live Alerts</h3>
+    <h3>AI Live Alerts</h3>
+
+    <button onclick="enablePush()">🔔 Enable Live Alerts</button>
+
+    <div class="small-note">
+      Push notifications are sent only for <b>High</b> & <b>Bomb</b> alerts.
+    </div>
 
     <div class="alert high">
-      <strong>Chelsea – Real Madrid</strong><br>
-      Over 1.5 Goals @ 1.83<br>
-      <span class="badge">HIGH VALUE • 78%</span>
+      <strong>Flamengo – Palmeiras</strong><br>
+      Over 0.5 Goals @ 1.82<br>
+      <span class="badge">HIGH • 79%</span>
     </div>
 
     <div class="alert bomb">
       <strong>Inter – Milan</strong><br>
       Over 0.5 Goal @ 2.40<br>
       <span class="badge">💣 BOMB • 86%</span>
+    </div>
+
+    <div class="small-note">
+      🧪 Live alerts are simulated during Free Beta to demonstrate system behavior.
     </div>
   </div>
 
@@ -261,6 +264,22 @@ function switchTab(t){
     document.querySelectorAll('.tab')[1].classList.add('active');
     live.classList.add('active');
   }
+}
+
+async function enablePush(){
+  const reg = await navigator.serviceWorker.register("/sw.js");
+  const sub = await reg.pushManager.subscribe({
+    userVisibleOnly:true,
+    applicationServerKey:"BGI6hcqOvNTtAth3gopsUuQnaqXb_bHBNnUwDhVE-FblyV8a0wX6mGhiu-xVWvWwfK04ZiGqxzGZiZshMdYYI78"
+  });
+
+  await fetch("/api/subscribe",{
+    method:"POST",
+    headers:{ "Content-Type":"application/json" },
+    body:JSON.stringify(sub)
+  });
+
+  alert("Live alerts enabled!");
 }
 </script>
 

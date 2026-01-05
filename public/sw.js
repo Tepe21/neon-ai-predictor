@@ -1,30 +1,12 @@
-self.addEventListener("install", event => {
-  self.skipWaiting();
-});
-
-self.addEventListener("activate", event => {
-  event.waitUntil(self.clients.claim());
-});
-
 self.addEventListener("push", event => {
-  const data = event.data ? event.data.json() : {};
-
-  const title = data.title || "AI Football Picks";
-  const options = {
-    body: data.body || "Live goal opportunity detected ⚽",
-    icon: "/icon-192.png",
-    badge: "/icon-192.png",
-    data: data.url || "/"
-  };
+  const data = event.data.json();
 
   event.waitUntil(
-    self.registration.showNotification(title, options)
-  );
-});
-
-self.addEventListener("notificationclick", event => {
-  event.notification.close();
-  event.waitUntil(
-    clients.openWindow(event.notification.data)
+    self.registration.showNotification(data.title, {
+      body: data.body,
+      icon: "/icon.png",
+      badge: "/icon.png",
+      vibrate: [100, 50, 100]
+    })
   );
 });

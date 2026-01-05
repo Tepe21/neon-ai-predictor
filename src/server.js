@@ -1,36 +1,29 @@
 import express from "express";
-import mongoose from "mongoose";
 import cors from "cors";
-import { getLiveAlerts } from "./services/liveEngine.js";
-import authRoutes from "./routes/auth.js";
+import { generateMockAlerts } from "./services/mockLiveEngine.js";
 
 const app = express();
 app.use(cors());
 app.use(express.json());
 
-// DB
-mongoose.connect(process.env.MONGO_URL);
+let currentAlerts = [];
 
-// AUTH
-app.use("/api/auth", authRoutes);
-
-// HEALTH
+// health
 app.get("/health", (req, res) => {
-  res.json({ status: "ok" });
+  res.json({ status: "ok", mode: "mock-beta" });
 });
 
-// LIVE ALERTS
-app.get("/api/live-alerts", async (req, res) => {
-  try {
-    const alerts = await getLiveAlerts();
-    res.json(alerts);
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: "Live engine failed" });
+// mock live alerts
+app.get("/api/live-alerts", (req, res) => {
+  const newAlerts = generateMockAlerts();
+
+  if (newAlerts.length) {
+    currentAlerts = [...newAlerts, ...currentAlerts].slice(0, 5);
   }
+
+  res.json(currentAlerts);
 });
 
-// SERVER
 app.listen(3000, () => {
-  console.log("🚀 Server running on port 3000");
+  console.log("🚀 Mock Live Engine running on port 3000");
 });

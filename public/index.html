@@ -113,7 +113,6 @@
       text-shadow: 0 0 6px rgba(255,255,255,.3);
     }
 
-    /* Neon buttons */
     .btn-live {
       background: linear-gradient(135deg, #00f0ff, #00aaff);
       color: #001;
@@ -179,9 +178,9 @@
       50% { box-shadow: 0 0 30px rgba(184,75,255,1); }
       100% { box-shadow: 0 0 14px rgba(184,75,255,.4); }
     }
-
   </style>
 </head>
+
 <body>
 
 <div class="beta-banner">
@@ -194,8 +193,8 @@
 </header>
 
 <div class="tabs">
-  <div class="tab active" onclick="showTab('search')">🔍 Search</div>
-  <div class="tab" onclick="showTab('alerts')">🔔 Live Alerts</div>
+  <div class="tab active" data-tab="search">🔍 Search</div>
+  <div class="tab" data-tab="alerts">🔔 Live Alerts</div>
 </div>
 
 <!-- SEARCH PANEL -->
@@ -213,7 +212,7 @@
 
     <input id="query" placeholder="Εισαγωγή αγώνα (π.χ. PAOK - Atromitos)" />
 
-    <button class="analyze">🧠 Analyze</button>
+    <button class="analyze" id="analyzeBtn">🧠 Analyze</button>
   </div>
 
   <div id="results"></div>
@@ -230,41 +229,60 @@
 </div>
 
 <script>
-  function showTab(id) {
-    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
-    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-    document.getElementById(id).classList.add('active');
-    event.target.classList.add('active');
-  }
+  // Tabs
+  document.querySelectorAll(".tab").forEach(tab => {
+    tab.addEventListener("click", () => {
+      document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
+      document.querySelectorAll(".panel").forEach(p => p.classList.remove("active"));
+      tab.classList.add("active");
+      document.getElementById(tab.dataset.tab).classList.add("active");
+    });
+  });
+
+  // Analyze button FIX
+  document.getElementById("analyzeBtn").addEventListener("click", analyze);
 
   async function analyze() {
-    const res = await fetch("/api/analyze", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        query: document.getElementById("query").value,
-        mode: document.getElementById("mode").value,
-        market: document.getElementById("market").value
-      })
-    });
+    const query = document.getElementById("query").value.trim();
+    const mode = document.getElementById("mode").value;
+    const market = document.getElementById("market").value;
+    const resultsBox = document.getElementById("results");
 
-    const data = await res.json();
-    const box = document.getElementById("results");
-    box.innerHTML = "";
-
-    if (!data.results || data.results.length === 0) {
-      box.innerHTML = "<div class='result'>❌ Δεν βρέθηκαν αποτελέσματα</div>";
+    if (!query) {
+      resultsBox.innerHTML = "<div class='result'>❌ Βάλε αγώνα πρώτα</div>";
       return;
     }
 
-    data.results.forEach(r => {
-      box.innerHTML += `
-        <div class="result">
-          ⚽ <b>${r.match}</b><br>
-          ${r.tip} · Odd ${r.odd}<br>
-          Confidence: <b>${r.confidence}%</b>
-        </div>`;
-    });
+    resultsBox.innerHTML = "<div class='result'>⏳ Analyzing...</div>";
+
+    try {
+      const res = await fetch("/api/analyze", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ query, mode, market })
+      });
+
+      const data = await res.json();
+      resultsBox.innerHTML = "";
+
+      if (!data.results || data.results.length === 0) {
+        resultsBox.innerHTML = "<div class='result'>❌ Δεν βρέθηκαν αποτελέσματα</div>";
+        return;
+      }
+
+      data.results.forEach(r => {
+        resultsBox.innerHTML += `
+          <div class="result">
+            ⚽ <b>${r.match}</b><br>
+            ${r.tip} · Odd ${r.odd}<br>
+            Confidence: <b>${r.confidence}%</b>
+          </div>`;
+      });
+
+    } catch (err) {
+      console.error(err);
+      resultsBox.innerHTML = "<div class='result'>❌ Backend error</div>";
+    }
   }
 </script>
 

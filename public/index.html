@@ -5,175 +5,186 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>AI Football Picks – Free Beta</title>
 
-  <!-- Google Font -->
+  <!-- Fonts & Icons -->
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;800&display=swap" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
 
   <style>
-    * {
-      box-sizing: border-box;
-      font-family: "Orbitron", sans-serif;
-    }
+    * { box-sizing: border-box; font-family: "Orbitron", sans-serif; }
 
     body {
       margin: 0;
       min-height: 100vh;
       background:
-        linear-gradient(
-          rgba(8, 10, 25, 0.88),
-          rgba(8, 10, 25, 0.88)
-        ),
-        url("/bg-neon-stadium.jpg") center / cover no-repeat fixed;
-      color: #e8faff;
+        linear-gradient(rgba(10,12,30,.88), rgba(10,12,30,.88)),
+        radial-gradient(circle at top, #6b00ff33, transparent 60%),
+        radial-gradient(circle at bottom, #00eaff22, transparent 60%);
+      color: #eaffff;
       display: flex;
-      align-items: center;
       justify-content: center;
+      align-items: center;
     }
 
     .app {
       width: 100%;
-      max-width: 420px;
-      background: rgba(10, 15, 35, 0.88);
-      border-radius: 18px;
-      padding: 22px;
-      box-shadow: 0 0 40px rgba(0, 255, 255, 0.15);
-      backdrop-filter: blur(8px);
+      max-width: 430px;
+      background: rgba(15,18,45,.85);
+      border-radius: 22px;
+      padding: 20px;
+      box-shadow: 0 0 45px rgba(120,0,255,.25);
+      backdrop-filter: blur(10px);
     }
 
     .title {
       text-align: center;
       font-size: 1.6rem;
       font-weight: 800;
-      color: #00f6ff;
-      text-shadow: 0 0 12px rgba(0, 246, 255, 0.6);
-      margin-bottom: 4px;
+      color: #c9b7ff;
+      text-shadow: 0 0 15px #7f5bff;
     }
 
     .subtitle {
       text-align: center;
-      font-size: 0.85rem;
-      color: #b7eaff;
-      opacity: 0.9;
-      margin-bottom: 18px;
-    }
-
-    .section {
+      font-size: .85rem;
+      opacity: .85;
       margin-bottom: 16px;
     }
 
-    .section-title {
-      font-size: 0.85rem;
-      margin-bottom: 6px;
-      color: #8ffaff;
-      text-transform: uppercase;
-      letter-spacing: 1px;
+    /* TABS */
+    .tabs {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 12px;
     }
 
+    .tab {
+      flex: 1;
+      margin: 0 4px;
+      padding: 10px;
+      text-align: center;
+      border-radius: 12px;
+      background: #12163a;
+      cursor: pointer;
+      font-size: .75rem;
+      color: #9bdcff;
+    }
+
+    .tab.active {
+      background: linear-gradient(135deg, #6b00ff, #00eaff);
+      color: #fff;
+      box-shadow: 0 0 18px #6b00ff99;
+    }
+
+    /* INPUT */
     input {
       width: 100%;
       padding: 12px;
       border-radius: 12px;
       border: none;
       outline: none;
-      background: #0e1538;
-      color: #eaffff;
-      box-shadow: inset 0 0 10px rgba(0,255,255,0.12);
-      font-size: 0.9rem;
+      background: #0f1440;
+      color: #fff;
+      margin-bottom: 10px;
+      box-shadow: inset 0 0 12px #00eaff33;
     }
 
-    #searchResults {
-      margin-top: 10px;
+    /* CATEGORY */
+    .categories {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 12px;
     }
 
-    select {
-      width: 100%;
+    .cat {
+      flex: 1;
+      margin: 0 4px;
       padding: 10px;
-      border-radius: 10px;
-      background: #0e1538;
-      color: #eaffff;
-      border: none;
-      margin-top: 8px;
-    }
-
-    .match-card {
-      background: rgba(0, 255, 255, 0.06);
-      border-radius: 12px;
-      padding: 12px;
-      margin-top: 10px;
-      border: 1px solid rgba(0,255,255,0.25);
-    }
-
-    .match-card h3 {
-      margin: 0 0 6px 0;
-      font-size: 0.95rem;
-      color: #00f6ff;
-    }
-
-    .live-alert {
-      margin-top: 14px;
-      padding: 14px;
-      border-radius: 14px;
       text-align: center;
-      font-weight: 600;
-      color: #eaffff;
-      background: rgba(0, 255, 255, 0.08);
-      border: 1px solid rgba(0,255,255,0.35);
-      box-shadow: 0 0 0 rgba(0,255,255,0);
-      animation: pulse 3.5s ease-in-out infinite;
+      border-radius: 12px;
+      background: #12163a;
+      font-size: .75rem;
+      cursor: pointer;
+      color: #bdefff;
+    }
+
+    .cat.active {
+      background: linear-gradient(135deg, #00eaff, #6b00ff);
+      color: #fff;
+    }
+
+    .analyze {
+      width: 100%;
+      padding: 12px;
+      border-radius: 14px;
+      border: none;
+      background: linear-gradient(135deg, #6b00ff, #00eaff);
+      color: #fff;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 0 0 20px #6b00ff99;
+      margin-bottom: 14px;
+    }
+
+    /* LIVE ALERTS */
+    .alerts {
+      border-radius: 16px;
+      padding: 14px;
+      background: rgba(0,234,255,.08);
+      border: 1px solid rgba(0,234,255,.4);
+      box-shadow: 0 0 22px rgba(0,234,255,.6);
+      text-align: center;
+      animation: pulse 4s ease-in-out infinite;
     }
 
     @keyframes pulse {
-      0% {
-        box-shadow: 0 0 0 rgba(0,255,255,0);
-      }
-      50% {
-        box-shadow: 0 0 22px rgba(0,255,255,0.55);
-      }
-      100% {
-        box-shadow: 0 0 0 rgba(0,255,255,0);
-      }
+      0%,100% { box-shadow: 0 0 14px rgba(0,234,255,.4); }
+      50% { box-shadow: 0 0 30px rgba(107,0,255,.8); }
     }
 
     .beta {
-      margin-top: 14px;
       text-align: center;
-      font-size: 0.7rem;
-      opacity: 0.65;
+      font-size: .7rem;
+      opacity: .6;
+      margin-top: 12px;
     }
   </style>
 </head>
 
 <body>
 
-  <div class="app">
-    <div class="title">AI Football Picks</div>
-    <div class="subtitle">Live Match Intelligence Engine</div>
+<div class="app">
+  <div class="title">AI Football Picks</div>
+  <div class="subtitle">Live Match Intelligence Engine</div>
 
-    <!-- MANUAL SEARCH -->
-    <div class="section">
-      <div class="section-title">Manual Match Search</div>
-      <input
-        id="searchInput"
-        placeholder="Εισαγωγή αγώνα (π.χ. ΠΑΟΚ – Ατρόμητος)"
-        oninput="manualSearch()"
-      />
-      <div id="searchResults"></div>
-    </div>
-
-    <!-- LIVE ALERTS -->
-    <div class="section">
-      <div class="section-title">Live Alerts</div>
-      <div class="live-alert">
-        ⚡ Live Goal Scanner Active
-      </div>
-    </div>
-
-    <div class="beta">
-      Free Beta – Real-time testing in progress
-    </div>
+  <!-- TABS -->
+  <div class="tabs">
+    <div class="tab active"><i class="fa-solid fa-bolt"></i><br>Live</div>
+    <div class="tab"><i class="fa-solid fa-calendar"></i><br>Upcoming</div>
   </div>
 
-  <!-- SCRIPTS -->
-  <script src="/search.js"></script>
+  <!-- SEARCH -->
+  <input id="searchInput" placeholder="Εισαγωγή αγώνα (π.χ. ΠΑΟΚ – Ατρόμητος)" />
+
+  <!-- CATEGORIES -->
+  <div class="categories">
+    <div class="cat active"><i class="fa-solid fa-futbol"></i><br>Goals</div>
+    <div class="cat"><i class="fa-solid fa-flag"></i><br>Corners</div>
+  </div>
+
+  <!-- ANALYZE -->
+  <button class="analyze">
+    <i class="fa-solid fa-microchip"></i> Analyze
+  </button>
+
+  <!-- LIVE ALERTS -->
+  <div class="alerts">
+    ⚡ Live Alerts Active
+  </div>
+
+  <div class="beta">
+    Free Beta – Real-time testing
+  </div>
+</div>
 
 </body>
 </html>

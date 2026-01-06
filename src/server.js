@@ -15,12 +15,9 @@ const PORT = process.env.PORT || 3000;
 /* ------------------ MIDDLEWARE ------------------ */
 app.use(cors());
 app.use(express.json());
-app.use(express.static("public"));
 
 /* ------------------ VAPID SETUP ------------------ */
-if (!process.env.VAPID_PUBLIC || !process.env.VAPID_PRIVATE) {
-  console.error("❌ Missing VAPID keys in environment variables");
-} else {
+if (process.env.VAPID_PUBLIC && process.env.VAPID_PRIVATE) {
   webPush.setVapidDetails(
     "mailto:admin@aifootballpicks.com",
     process.env.VAPID_PUBLIC,
@@ -31,8 +28,8 @@ if (!process.env.VAPID_PUBLIC || !process.env.VAPID_PRIVATE) {
 /* ------------------ MEMORY STORE ------------------ */
 const subscriptions = [];
 
-/* ------------------ HEALTH CHECK ------------------ */
-app.get("/health", (req, res) => {
+/* ------------------ API HEALTH ------------------ */
+app.get("/api/health", (req, res) => {
   res.json({
     status: "ok",
     subscriptions: subscriptions.length,
@@ -48,9 +45,7 @@ app.post("/api/subscribe", (req, res) => {
   }
 
   const exists = subscriptions.find((s) => s.endpoint === sub.endpoint);
-  if (!exists) {
-    subscriptions.push(sub);
-  }
+  if (!exists) subscriptions.push(sub);
 
   res.json({ success: true });
 });
@@ -82,11 +77,13 @@ app.post("/api/push/test", async (req, res) => {
   });
 });
 
-/* ------------------ REAL MANUAL SEARCH ------------------ */
+/* ------------------ SEARCH ------------------ */
 app.use("/api/search", searchRoutes);
 
-/* ------------------ ROOT ------------------ */
-app.get("/", (req, res) => {
+/* ------------------ STATIC FRONTEND ------------------ */
+app.use(express.static("public"));
+
+app.get("*", (req, res) => {
   res.sendFile(process.cwd() + "/public/index.html");
 });
 

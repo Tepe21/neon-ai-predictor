@@ -1,48 +1,96 @@
 import express from "express";
 import cors from "cors";
-import { generateMockAlerts } from "./services/mockLiveEngine.js";
-import { addSubscription, sendPush } from "./services/pushService.js";
+import dotenv from "dotenv";
+import fetch from "node-fetch";
+import webPush from "web-push";
+
+// ROUTES
+import searchRoutes from "./routes/search.js";
+
+dotenv.config();
 
 const app = express();
+const PORT = process.env.PORT || 3000;
+
+/* ------------------ MIDDLEWARE ------------------ */
 app.use(cors());
 app.use(express.json());
+app.use(express.static("public"));
 
-let currentAlerts = [];
-let lastPushedId = null;
+/* ------------------ VAPID SETUP ------------------ */
+if (!process.env.VAPID_PUBLIC || !process.env.VAPID_PRIVATE) {
+  console.error("❌ Missing VAPID keys in environment variables");
+} else {
+  webPush.setVapidDetails(
+    "mailto:admin@aifootballpicks.com",
+    process.env.VAPID_PUBLIC,
+    process.env.VAPID_PRIVATE
+  );
+}
 
-// health
+/* ------------------ MEMORY STORE ------------------ */
+const subscriptions = [];
+
+/* ------------------ HEALTH CHECK ------------------ */
 app.get("/health", (req, res) => {
-  res.json({ status: "ok", mode: "mock-beta-push" });
+  res.json({
+    status: "ok",
+    subscriptions: subscriptions.length,
+  });
 });
 
-// subscribe endpoint
+/* ------------------ PUSH SUBSCRIBE ------------------ */
 app.post("/api/subscribe", (req, res) => {
-  addSubscription(req.body);
+  const sub = req.body;
+
+  if (!sub || !sub.endpoint) {
+    return res.status(400).json({ success: false });
+  }
+
+  const exists = subscriptions.find((s) => s.endpoint === sub.endpoint);
+  if (!exists) {
+    subscriptions.push(sub);
+  }
+
   res.json({ success: true });
 });
 
-// live alerts
-app.get("/api/live-alerts", async (req, res) => {
-  const newAlerts = generateMockAlerts();
+/* ------------------ PUSH TEST ------------------ */
+app.post("/api/push/test", async (req, res) => {
+  let sent = 0;
+  const errors = [];
 
-  if (newAlerts.length) {
-    const alert = newAlerts[0];
-
-    currentAlerts = [alert, ...currentAlerts].slice(0, 5);
-
-    if (
-      alert.id !== lastPushedId &&
-      (alert.level === "high" || alert.level === "bomb")
-    ) {
-      lastPushedId = alert.id;
-      await sendPush(alert);
-      console.log("🔔 Push sent:", alert.match);
+  for (const sub of subscriptions) {
+    try {
+      await webPush.sendNotification(
+        sub,
+        JSON.stringify({
+          title: "⚽ AI Football Picks",
+          body: "Live Goal Alert test notification",
+        })
+      );
+      sent++;
+    } catch (err) {
+      errors.push(err.message);
     }
   }
 
-  res.json(currentAlerts);
+  res.json({
+    sent,
+    subscriptions: subscriptions.length,
+    errors,
+  });
 });
 
-app.listen(3000, () => {
-  console.log("🚀 Server with Push running on port 3000");
+/* ------------------ REAL MANUAL SEARCH ------------------ */
+app.use("/api/search", searchRoutes);
+
+/* ------------------ ROOT ------------------ */
+app.get("/", (req, res) => {
+  res.sendFile(process.cwd() + "/public/index.html");
+});
+
+/* ------------------ START SERVER ------------------ */
+app.listen(PORT, () => {
+  console.log(`🚀 Server running on port ${PORT}`);
 });

@@ -1,292 +1,179 @@
 <!DOCTYPE html>
 <html lang="el">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>AI Football Picks</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>AI Football Picks – Free Beta</title>
 
-<style>
-:root{
-  --cyan:#00f0ff;
-  --blue:#4da3ff;
-  --purple:#7b5cff;
-  --white:#eaf2ff;
-  --dark:#05040d;
+  <!-- Google Font -->
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;800&display=swap" rel="stylesheet">
 
-  --normal:#4da3ff;
-  --high:#ffd166;
-  --bomb:#ff4d6d;
-}
+  <style>
+    * {
+      box-sizing: border-box;
+      font-family: "Orbitron", sans-serif;
+    }
 
-*{box-sizing:border-box;margin:0;padding:0}
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background:
+        linear-gradient(
+          rgba(8, 10, 25, 0.88),
+          rgba(8, 10, 25, 0.88)
+        ),
+        url("/bg-neon-stadium.jpg") center / cover no-repeat fixed;
+      color: #e8faff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
 
-body{
-  font-family:Inter,system-ui,Arial;
-  min-height:100vh;
-  color:var(--white);
-  background:
-    linear-gradient(180deg,rgba(5,4,13,.85),rgba(5,4,13,.92)),
-    url("/StockCake-Neon_Stadium_Future-1920145-standard.jpg") center/cover no-repeat fixed;
-}
+    .app {
+      width: 100%;
+      max-width: 420px;
+      background: rgba(10, 15, 35, 0.88);
+      border-radius: 18px;
+      padding: 22px;
+      box-shadow: 0 0 40px rgba(0, 255, 255, 0.15);
+      backdrop-filter: blur(8px);
+    }
 
-.app{
-  max-width:1150px;
-  margin:auto;
-  padding:28px 22px 70px;
-}
+    .title {
+      text-align: center;
+      font-size: 1.6rem;
+      font-weight: 800;
+      color: #00f6ff;
+      text-shadow: 0 0 12px rgba(0, 246, 255, 0.6);
+      margin-bottom: 4px;
+    }
 
-/* Onboarding */
-.marquee{
-  overflow:hidden;
-  white-space:nowrap;
-  margin-bottom:22px;
-}
-.marquee span{
-  display:inline-block;
-  padding-left:100%;
-  animation:scroll 22s linear infinite;
-  font-weight:800;
-  color:var(--cyan);
-}
-@keyframes scroll{
-  0%{transform:translateX(0)}
-  100%{transform:translateX(-100%)}
-}
+    .subtitle {
+      text-align: center;
+      font-size: 0.85rem;
+      color: #b7eaff;
+      opacity: 0.9;
+      margin-bottom: 18px;
+    }
 
-/* Header */
-.header{
-  text-align:center;
-  margin-bottom:26px;
-}
-.logo{
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  gap:12px;
-  white-space:nowrap;
-}
-.logo-icon{font-size:34px}
-.logo-text{
-  font-size:34px;
-  font-weight:900;
-  background:linear-gradient(90deg,var(--cyan),var(--purple));
-  -webkit-background-clip:text;
-  color:transparent;
-}
-.subtitle{
-  margin-top:6px;
-  font-size:14px;
-  color:#b9d9ff;
-}
+    .section {
+      margin-bottom: 16px;
+    }
 
-/* Tabs */
-.tabs{
-  display:flex;
-  justify-content:center;
-  gap:14px;
-  margin-bottom:26px;
-}
-.tab{
-  padding:12px 26px;
-  border-radius:18px;
-  background:rgba(8,10,30,.85);
-  border:1px solid rgba(0,240,255,.25);
-  cursor:pointer;
-  font-weight:900;
-  color:var(--cyan);
-  transition:.25s;
-}
-.tab:hover{
-  box-shadow:0 0 26px rgba(0,240,255,.35);
-}
-.tab.active{
-  box-shadow:0 0 36px rgba(0,240,255,.6);
-}
+    .section-title {
+      font-size: 0.85rem;
+      margin-bottom: 6px;
+      color: #8ffaff;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
 
-/* Panels */
-.panel{
-  display:none;
-  background:rgba(8,10,30,.9);
-  border-radius:26px;
-  padding:26px;
-  border:1px solid rgba(0,240,255,.2);
-}
-.panel.active{display:block}
+    input {
+      width: 100%;
+      padding: 12px;
+      border-radius: 12px;
+      border: none;
+      outline: none;
+      background: #0e1538;
+      color: #eaffff;
+      box-shadow: inset 0 0 10px rgba(0,255,255,0.12);
+      font-size: 0.9rem;
+    }
 
-/* Controls */
-.row{
-  display:flex;
-  flex-wrap:wrap;
-  gap:14px;
-  margin-top:18px;
-}
-select,input{
-  background:#050824;
-  border:1px solid rgba(0,240,255,.25);
-  border-radius:14px;
-  padding:14px 16px;
-  font-size:15px;
-  color:var(--cyan);
-}
-input{color:var(--white)}
-button{
-  padding:14px 22px;
-  border-radius:18px;
-  border:1px solid var(--cyan);
-  background:linear-gradient(135deg,#08184a,#0c2b5e);
-  color:var(--cyan);
-  font-weight:900;
-  cursor:pointer;
-  box-shadow:0 0 28px rgba(0,240,255,.4);
-}
-<input
-  id="searchInput"
-  placeholder="Εισαγωγή αγώνα (π.χ. ΠΑΟΚ – Ατρόμητος)"
-  oninput="manualSearch()"
-/>
+    #searchResults {
+      margin-top: 10px;
+    }
 
-/* Alerts */
-.alert{
-  margin-top:20px;
-  padding:20px;
-  border-radius:22px;
-  background:#050824;
-  border:2px solid transparent;
-}
-.alert.normal{border-color:var(--normal)}
-.alert.high{border-color:var(--high)}
-.alert.bomb{border-color:var(--bomb)}
+    select {
+      width: 100%;
+      padding: 10px;
+      border-radius: 10px;
+      background: #0e1538;
+      color: #eaffff;
+      border: none;
+      margin-top: 8px;
+    }
 
-.badge{
-  display:inline-block;
-  margin-top:10px;
-  padding:7px 16px;
-  border-radius:999px;
-  font-weight:900;
-}
+    .match-card {
+      background: rgba(0, 255, 255, 0.06);
+      border-radius: 12px;
+      padding: 12px;
+      margin-top: 10px;
+      border: 1px solid rgba(0,255,255,0.25);
+    }
 
-.normal .badge{color:var(--normal)}
-.high .badge{color:var(--high)}
-.bomb .badge{color:var(--bomb)}
+    .match-card h3 {
+      margin: 0 0 6px 0;
+      font-size: 0.95rem;
+      color: #00f6ff;
+    }
 
-.small-note{
-  margin-top:12px;
-  font-size:12px;
-  color:#8fa6ff;
-}
-</style>
+    .live-alert {
+      margin-top: 14px;
+      padding: 14px;
+      border-radius: 14px;
+      text-align: center;
+      font-weight: 600;
+      color: #eaffff;
+      background: rgba(0, 255, 255, 0.08);
+      border: 1px solid rgba(0,255,255,0.35);
+      box-shadow: 0 0 0 rgba(0,255,255,0);
+      animation: pulse 3.5s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0% {
+        box-shadow: 0 0 0 rgba(0,255,255,0);
+      }
+      50% {
+        box-shadow: 0 0 22px rgba(0,255,255,0.55);
+      }
+      100% {
+        box-shadow: 0 0 0 rgba(0,255,255,0);
+      }
+    }
+
+    .beta {
+      margin-top: 14px;
+      text-align: center;
+      font-size: 0.7rem;
+      opacity: 0.65;
+    }
+  </style>
 </head>
 
 <body>
-<div class="app">
 
-<!-- Onboarding -->
-<div class="marquee">
-  <span>🧪 FREE BETA — Live Alerts • Manual Analysis • AI Confidence Engine • Premium Preview</span>
-</div>
+  <div class="app">
+    <div class="title">AI Football Picks</div>
+    <div class="subtitle">Live Match Intelligence Engine</div>
 
-<!-- Header -->
-<div class="header">
-  <div class="logo">
-    <div class="logo-icon">⚽</div>
-    <div class="logo-text">AI Football Picks</div>
-  </div>
-  <div class="subtitle">Live Match Intelligence Engine</div>
-</div>
-
-<!-- Tabs -->
-<div class="tabs">
-  <div class="tab active" onclick="switchTab('search')">🔍 Search</div>
-  <div class="tab" onclick="switchTab('live')">🚨 Live Alerts</div>
-</div>
-
-<!-- SEARCH -->
-<div id="search" class="panel active">
-  <h3>🔎 Manual Match Analysis</h3>
-
-  <div class="row">
-    <select id="mode">
-      <option>🔴 Live</option>
-      <option>🟢 Upcoming</option>
-    </select>
-
-    <select id="market">
-      <option>⚽ Goals</option>
-      <option>🚩 Corners</option>
-    </select>
-
-    <input id="matchInput" placeholder="ΠΑΟΚ - ΑΤΡΟΜΗΤΟΣ / PAOK vs Atromitos">
-    <button onclick="analyze()">📊 Analyze</button>
-  </div>
-
-  <div id="result"></div>
-
-  <div class="small-note">
-    Free Beta shows demo results. Real data unlocks in Premium.
-  </div>
-</div>
-
-<!-- LIVE -->
-<div id="live" class="panel">
-  <h3>🚨 AI Live Alerts</h3>
-
-  <button onclick="enablePush()">🔔 Enable Live Alerts</button>
-
-  <div class="alert high">
-    <strong>Flamengo – Palmeiras</strong><br>
-    ⚽ Over 0.5 Goals @ 1.82<br>
-    <span class="badge">HIGH • 79%</span>
-  </div>
-
-  <div class="alert bomb">
-    <strong>Inter – Milan</strong><br>
-    ⚽ Over 0.5 Goal @ 2.40<br>
-    <span class="badge">💣 BOMB • 86%</span>
-  </div>
-</div>
-
-</div>
-
-<script>
-function switchTab(t){
-  document.querySelectorAll('.tab').forEach(e=>e.classList.remove('active'));
-  document.querySelectorAll('.panel').forEach(e=>e.classList.remove('active'));
-  if(t==='search'){
-    document.querySelectorAll('.tab')[0].classList.add('active');
-    search.classList.add('active');
-  }else{
-    document.querySelectorAll('.tab')[1].classList.add('active');
-    live.classList.add('active');
-  }
-}
-
-function analyze(){
-  const r = document.getElementById("result");
-  r.innerHTML = `
-    <div class="alert normal">
-      <strong>ΠΑΟΚ – ΑΤΡΟΜΗΤΟΣ</strong><br>
-      ⚽ Over 1.5 Goals @ 1.95<br>
-      <span class="badge">NORMAL • 63%</span>
+    <!-- MANUAL SEARCH -->
+    <div class="section">
+      <div class="section-title">Manual Match Search</div>
+      <input
+        id="searchInput"
+        placeholder="Εισαγωγή αγώνα (π.χ. ΠΑΟΚ – Ατρόμητος)"
+        oninput="manualSearch()"
+      />
+      <div id="searchResults"></div>
     </div>
-  `;
-}
 
-async function enablePush(){
-  const reg = await navigator.serviceWorker.register("/sw.js");
-  const sub = await reg.pushManager.subscribe({
-    userVisibleOnly:true,
-    applicationServerKey:"BGI6hcqOvNTtAth3gopsUuQnaqXb_bHBNnUwDhVE-FblyV8a0wX6mGhiu-xVWvWwfK04ZiGqxzGZiZshMdYYI78"
-  });
+    <!-- LIVE ALERTS -->
+    <div class="section">
+      <div class="section-title">Live Alerts</div>
+      <div class="live-alert">
+        ⚡ Live Goal Scanner Active
+      </div>
+    </div>
 
-  await fetch("/api/subscribe",{
-    method:"POST",
-    headers:{ "Content-Type":"application/json" },
-    body:JSON.stringify(sub)
-  });
+    <div class="beta">
+      Free Beta – Real-time testing in progress
+    </div>
+  </div>
 
-  alert("Live alerts enabled!");
-}
-</script>
+  <!-- SCRIPTS -->
+  <script src="/search.js"></script>
 
 </body>
 </html>

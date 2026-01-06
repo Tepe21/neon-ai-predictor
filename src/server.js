@@ -1,33 +1,36 @@
 import express from "express";
+import path from "path";
+import { fileURLToPath } from "url";
 import cors from "cors";
-import dotenv from "dotenv";
-
-// Routes
-import searchRoutes from "./routes/search.js";
-
-dotenv.config();
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 10000;
+
+/* ------------------ FIX PATHS ------------------ */
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+// ⬅️ ΠΡΟΣΟΧΗ ΕΔΩ: ../public
+const publicPath = path.join(__dirname, "..", "public");
 
 /* ------------------ MIDDLEWARE ------------------ */
 app.use(cors());
 app.use(express.json());
 
-/* ------------------ HEALTH CHECK ------------------ */
+/* ------------------ STATIC FILES ------------------ */
+app.use(express.static(publicPath));
+
+/* ------------------ API HEALTH ------------------ */
 app.get("/api/health", (req, res) => {
   res.json({
     status: "ok",
-    service: "AI Football Picks API",
+    message: "AI Football Picks backend is running",
   });
 });
 
-/* ------------------ MANUAL SEARCH ------------------ */
-app.use("/api/search", searchRoutes);
-
-/* ------------------ ROOT ------------------ */
+/* ------------------ ROOT → FRONTEND ------------------ */
 app.get("/", (req, res) => {
-  res.send("AI Football Picks backend is running");
+  res.sendFile(path.join(publicPath, "index.html"));
 });
 
 /* ------------------ START SERVER ------------------ */

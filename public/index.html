@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="el">
 <head>
-<meta charset="UTF-8" />
+<meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>AI Football Picks</title>
 
@@ -22,21 +22,35 @@ justify-content:center;
 
 .app{
 width:100%;
-max-width:480px;
-padding:16px;
+max-width:900px;
+padding:20px;
+}
+
+/* ===== HEADER ===== */
+.header{
+display:flex;
+justify-content:space-between;
+align-items:center;
+margin-bottom:16px;
+}
+
+.lang{
+cursor:pointer;
+font-size:.8rem;
+opacity:.8;
 }
 
 /* ===== TOP TABS ===== */
 .tabs{
 display:flex;
-gap:10px;
-margin-bottom:16px;
+gap:12px;
+margin-bottom:20px;
 }
 
 .tab{
 flex:1;
-padding:12px;
-border-radius:14px;
+padding:14px;
+border-radius:16px;
 background:#0f1535;
 text-align:center;
 cursor:pointer;
@@ -54,27 +68,52 @@ color:#fff;
 box-shadow:0 0 20px #00c6ff66;
 }
 
-/* ===== SEARCH AREA ===== */
+/* ===== SEARCH CONTROLS ===== */
+.controls{
+display:flex;
+gap:10px;
+margin-bottom:14px;
+flex-wrap:wrap;
+}
+
+.ctrl{
+padding:12px 16px;
+border-radius:14px;
+background:#0b1233;
+cursor:pointer;
+display:flex;
+align-items:center;
+gap:8px;
+font-weight:600;
+color:#cfe2ff;
+}
+
+.ctrl.active{
+background:linear-gradient(135deg,#4facfe,#00f2fe);
+color:#001;
+}
+
+/* ===== SEARCH BOX ===== */
 .search-box{
 margin-bottom:18px;
 }
 
 .search-box input{
 width:100%;
-padding:14px;
-border-radius:14px;
+padding:16px;
+border-radius:16px;
 border:none;
 background:#0b1233;
 color:#fff;
-font-size:.9rem;
+font-size:.95rem;
 }
 
-/* ===== CARDS ===== */
+/* ===== ALERT CARDS ===== */
 .card{
 background:linear-gradient(180deg,#0d1438,#080d24);
 border-radius:18px;
-padding:14px;
-margin-bottom:12px;
+padding:16px;
+margin-bottom:14px;
 display:flex;
 justify-content:space-between;
 align-items:center;
@@ -98,15 +137,15 @@ border-radius:4px;
 
 .card h4{
 margin:0;
-font-size:.85rem;
+font-size:.9rem;
 display:flex;
 align-items:center;
 gap:6px;
 }
 
 .card p{
-margin:4px 0 0;
-font-size:.8rem;
+margin:6px 0 0;
+font-size:.85rem;
 opacity:.85;
 }
 
@@ -121,29 +160,29 @@ font-weight:700;
 .view{
 background:linear-gradient(135deg,#4facfe,#00f2fe);
 border:none;
-padding:8px 14px;
-border-radius:14px;
+padding:10px 18px;
+border-radius:16px;
 color:#002;
 font-weight:700;
 cursor:pointer;
 }
 
-/* ===== LIVE ALERTS GLOW ===== */
+/* ===== LIVE GLOW ===== */
 .live-glow{
 animation:pulse 4s ease-in-out infinite;
 }
 
 @keyframes pulse{
-0%,100%{box-shadow:0 0 12px #00f2fe55}
+0%,100%{box-shadow:0 0 14px #00f2fe55}
 50%{box-shadow:0 0 26px #6a5cffaa}
 }
 
-/* ===== BETA BAR ===== */
+/* ===== BETA ===== */
 .beta{
-margin-top:14px;
-font-size:.7rem;
 text-align:center;
-opacity:.6;
+font-size:.75rem;
+opacity:.55;
+margin-top:18px;
 }
 </style>
 </head>
@@ -152,25 +191,42 @@ opacity:.6;
 
 <div class="app">
 
+<!-- HEADER -->
+<div class="header">
+<div><strong>AI Football Picks</strong></div>
+<div class="lang" onclick="toggleLang()">🌐 <span id="langTxt">GR</span></div>
+</div>
+
 <!-- TABS -->
 <div class="tabs">
 <div class="tab active" id="tabSearch" onclick="showSearch()">
-<i class="fa-solid fa-magnifying-glass"></i> Search
+<i class="fa-solid fa-magnifying-glass"></i> <span data-i18n="search">Search</span>
 </div>
 <div class="tab" id="tabAlerts" onclick="showAlerts()">
-<i class="fa-solid fa-bell"></i> Live Alerts
+<i class="fa-solid fa-bell"></i> <span data-i18n="alerts">Live Alerts</span>
 </div>
 </div>
 
-<!-- SEARCH -->
+<!-- SEARCH VIEW -->
 <div id="searchView">
-<div class="search-box">
-<input placeholder="Εισαγωγή αγώνα (π.χ. ΠΑΟΚ – Ατρόμητος)">
-</div>
-<p style="opacity:.5;font-size:.8rem">Manual analysis coming from real data</p>
+
+<div class="controls">
+<div class="ctrl active" id="liveBtn" onclick="toggleLive(true)">⏱️ <span data-i18n="live">Live</span></div>
+<div class="ctrl" onclick="toggleLive(false)">📅 <span data-i18n="upcoming">Upcoming</span></div>
+
+<div class="ctrl active" id="goalBtn" onclick="toggleMarket(true)">⚽ <span data-i18n="goals">Goals</span></div>
+<div class="ctrl" onclick="toggleMarket(false)">🚩 <span data-i18n="corners">Corners</span></div>
+
+<div class="ctrl">🔍 <span data-i18n="analyze">Analyze</span></div>
 </div>
 
-<!-- LIVE ALERTS -->
+<div class="search-box">
+<input id="searchInput" placeholder="Εισαγωγή αγώνα (π.χ. ΠΑΟΚ – Ατρόμητος)">
+</div>
+
+</div>
+
+<!-- ALERTS VIEW -->
 <div id="alertsView" style="display:none">
 
 <div class="card normal live-glow">
@@ -202,23 +258,40 @@ opacity:.6;
 
 </div>
 
-<div class="beta">Free Beta · Live Alerts Preview</div>
+<div class="beta">Free Beta · Live Intelligence Preview</div>
 
 </div>
 
 <script>
+let lang="gr";
+
 function showSearch(){
-document.getElementById("searchView").style.display="block";
-document.getElementById("alertsView").style.display="none";
-document.getElementById("tabSearch").classList.add("active");
-document.getElementById("tabAlerts").classList.remove("active");
+searchView.style.display="block";
+alertsView.style.display="none";
+tabSearch.classList.add("active");
+tabAlerts.classList.remove("active");
 }
 
 function showAlerts(){
-document.getElementById("searchView").style.display="none";
-document.getElementById("alertsView").style.display="block";
-document.getElementById("tabSearch").classList.remove("active");
-document.getElementById("tabAlerts").classList.add("active");
+searchView.style.display="none";
+alertsView.style.display="block";
+tabSearch.classList.remove("active");
+tabAlerts.classList.add("active");
+}
+
+function toggleLive(live){
+document.getElementById("liveBtn").classList.toggle("active",live);
+}
+
+function toggleMarket(goals){
+document.getElementById("goalBtn").classList.toggle("active",goals);
+}
+
+function toggleLang(){
+lang = lang==="gr" ? "en" : "gr";
+document.getElementById("langTxt").innerText = lang.toUpperCase();
+document.getElementById("searchInput").placeholder =
+lang==="gr" ? "Εισαγωγή αγώνα (π.χ. ΠΑΟΚ – Ατρόμητος)" : "Enter match (e.g. PAOK – Atromitos)";
 }
 </script>
 

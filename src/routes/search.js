@@ -6,11 +6,11 @@ const router = express.Router();
 const API_URL = "https://v3.football.api-sports.io";
 const API_KEY = process.env.API_FOOTBALL_KEY;
 
-/* ------------------ helpers ------------------ */
+/* ---------------- HELPERS ---------------- */
 
-// remove accents + uppercase
-function normalize(str) {
-  return str
+// Normalize greek / english input
+function normalize(text) {
+  return text
     .toUpperCase()
     .normalize("NFD")
     .replace(/[\u0300-\u036f]/g, "")
@@ -19,31 +19,29 @@ function normalize(str) {
     .trim();
 }
 
-// simple fuzzy score
+// Fuzzy score
 function scoreMatch(query, home, away) {
   const q = normalize(query);
   const h = normalize(home);
   const a = normalize(away);
 
   let score = 0;
-  if (q.includes(h)) score += 1;
-  if (q.includes(a)) score += 1;
-  if (h.includes(q)) score += 1;
-  if (a.includes(q)) score += 1;
+  if (q.includes(h)) score++;
+  if (q.includes(a)) score++;
+  if (h.includes(q)) score++;
+  if (a.includes(q)) score++;
 
   return score;
 }
 
-/* ------------------ route ------------------ */
+/* ---------------- ROUTE ---------------- */
 
 router.get("/", async (req, res) => {
   try {
     const q = req.query.q;
-    const type = req.query.type || "upcoming"; // upcoming | live
+    const type = req.query.type || "upcoming";
 
-    if (!q) {
-      return res.json([]);
-    }
+    if (!q) return res.json([]);
 
     const today = new Date();
     const from = today.toISOString().split("T")[0];
@@ -52,12 +50,12 @@ router.get("/", async (req, res) => {
     toDate.setDate(today.getDate() + 7);
     const to = toDate.toISOString().split("T")[0];
 
-    const url =
+    const endpoint =
       type === "live"
         ? `${API_URL}/fixtures?live=all`
         : `${API_URL}/fixtures?from=${from}&to=${to}`;
 
-    const response = await fetch(url, {
+    const response = await fetch(endpoint, {
       headers: {
         "x-apisports-key": API_KEY,
       },
@@ -65,11 +63,9 @@ router.get("/", async (req, res) => {
 
     const data = await response.json();
 
-    if (!data.response) {
-      return res.json([]);
-    }
+    if (!data.response) return res.json([]);
 
-    const results = data.response
+    const matches = data.response
       .map((f) => {
         const home = f.teams.home.name;
         const away = f.teams.away.name;
@@ -77,13 +73,13 @@ router.get("/", async (req, res) => {
 
         return {
           fixtureId: f.fixture.id,
+          home,
+          away,
           league: f.league.name,
           country: f.league.country,
           date: f.fixture.date,
           status: f.fixture.status.short,
           minute: f.fixture.status.elapsed,
-          home,
-          away,
           score: `${f.goals.home ?? 0}-${f.goals.away ?? 0}`,
           matchScore,
         };
@@ -91,7 +87,7 @@ router.get("/", async (req, res) => {
       .filter((m) => m.matchScore > 0)
       .sort((a, b) => b.matchScore - a.matchScore);
 
-    res.json(results);
+    res.json(matches);
   } catch (err) {
     console.error("SEARCH ERROR:", err);
     res.status(500).json([]);

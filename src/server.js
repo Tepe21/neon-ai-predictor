@@ -14,114 +14,132 @@ if (!API_KEY) {
   console.error("❌ API_FOOTBALL_KEY missing");
 }
 
-/* ================= HEALTH ================= */
+/* ================== HEALTH ================== */
 app.get("/api/health", (req, res) => {
-  res.json({ status: "ok", engine: "AI Football Picks" });
+  res.json({ status: "ok" });
 });
 
-/* ================= ANALYZE ENGINE ================= */
-app.post("/api/analyze", async (req, res) => {
-  const { query, mode, market } = req.body;
+/* ================== UTIL ================== */
+function normalize(str) {
+  return str
+    .toLowerCase()
+    .replace(/[^a-zα-ω0-9\s]/gi, "")
+    .trim();
+}
 
+function confidenceTag(conf, isUpcoming) {
+  if (isUpcoming) {
+    if (conf >= 65) return "High Value";
+    return "Normal";
+  }
+  if (conf >= 80) return "Bomb";
+  if (conf >= 65) return "High Value";
+  return "Normal";
+}
+
+/* ================== ANALYZE ================== */
+app.post("/api/analyze", async (req, res) => {
+  const { query, mode, market, time } = req.body;
   if (!query) return res.json({ results: [] });
 
   try {
-    // 1️⃣ Fetch fixtures (live or upcoming)
-    const endpoint =
-      mode === "live"
-        ? `${BASE}/fixtures?live=all`
-        : `${BASE}/fixtures?next=50`;
+    let fixtures = [];
 
-    const fixturesRes = await fetch(endpoint, {
-      headers: { "x-apisports-key": API_KEY }
+    /* ===== UPCOMING: NEXT 4 DAYS ===== */
+    if (mode === "upcoming") {
+      const today = new Date();
+      const to = new Date();
+      to.setDate(today.getDate() + 4);
+
+      const fromStr = today.toISOString().split("T")[0];
+      const toStr = to.toISOString().split("T")[0];
+
+      const r = await fetch(
+        `${BASE}/fixtures?from=${fromStr}&to=${toStr}`,
+        { headers: { "x-apisports-key": API_KEY } }
+      );
+      const d = await r.json();
+      fixtures = d.response || [];
+    }
+
+    /* ===== LIVE ===== */
+    if (mode === "live") {
+      const r = await fetch(`${BASE}/fixtures?live=all`, {
+        headers: { "x-apisports-key": API_KEY }
+      });
+      const d = await r.json();
+      fixtures = d.response || [];
+    }
+
+    /* ===== FILTER MATCH ===== */
+    const q = normalize(query);
+    const matches = fixtures.filter(f => {
+      const name = normalize(
+        `${f.teams.home.name} ${f.teams.away.name}`
+      );
+      return name.includes(q);
     });
-
-    const fixturesData = await fixturesRes.json();
-    const fixtures = fixturesData.response || [];
-
-    // 2️⃣ Fuzzy match teams
-    const matches = fixtures.filter(f =>
-      `${f.teams.home.name} ${f.teams.away.name}`
-        .toLowerCase()
-        .includes(query.toLowerCase())
-    );
 
     if (matches.length === 0) {
       return res.json({ results: [] });
     }
 
-    // 3️⃣ Pick first match (dropdown later handled in UI)
-    const match = matches[0];
+    const selected = matches.slice(0, 2); // 🔒 always 2
 
-    const minute = match.fixture.status.elapsed || 0;
+    /* ===== BUILD RESULTS ===== */
+    const results = [];
 
-    // 4️⃣ Fetch odds
-    const oddsRes = await fetch(
-      `${BASE}/odds?fixture=${match.fixture.id}`,
-      { headers: { "x-apisports-key": API_KEY } }
-    );
-    const oddsData = await oddsRes.json();
+    for (const m of selected) {
+      const minute = m.fixture.status.elapsed || 0;
 
-    const odds =
-      oddsData.response?.[0]?.bookmakers?.[0]?.bets || [];
+      let confidence = 50;
 
-    // 5️⃣ Simple confidence logic (beta)
-    let confidence = 65;
-    if (mode === "live" && minute >= 65) confidence += 8;
-    if (market === "goals") confidence += 4;
-    if (confidence > 85) confidence = 85;
+      if (mode === "live") {
+        if (minute >= 45) confidence += 5;
+        if (minute >= 60) confidence += 5;
+      }
 
-    return res.json({
-      results: [
-        {
-          match: `${match.teams.home.name} – ${match.teams.away.name}`,
-          minute,
-          tip:
-            market === "goals"
-              ? "Over 1.5 Goals"
-              : "Over 8.5 Corners",
-          odd:
-            market === "goals"
-              ? "1.70"
-              : "1.85",
-          confidence
-        }
-      ]
-    });
+      if (market === "goals") confidence += 5;
+      if (time === "full") confidence += 3;
+
+      if (confidence > 85) confidence = 85;
+      if (mode === "upcoming" && confidence > 80) confidence = 80;
+
+      results.push({
+        match: `${m.teams.home.name} – ${m.teams.away.name}`,
+        minute: mode === "live" ? minute : null,
+        market: market,
+        time: time === "half" ? "Half Time" : "Full Time",
+        tip:
+          market === "goals"
+            ? time === "half"
+              ? "Over 0.5"
+              : "Over 2.5"
+            : time === "half"
+            ? "Over 4.5"
+            : "Over 8.5",
+        odd:
+          market === "goals"
+            ? time === "half"
+              ? "1.55"
+              : "1.95"
+            : time === "half"
+            ? "1.65"
+            : "1.85",
+        confidence,
+        tag: confidenceTag(confidence, mode === "upcoming")
+      });
+    }
+
+    res.json({ results });
+
   } catch (err) {
     console.error(err);
-    res.status(500).json({ error: "Analyze engine failed" });
+    res.status(500).json({ error: "Analyze failed" });
   }
 });
 
-/* ================= LIVE ALERTS ENGINE (BASE) ================= */
-app.get("/api/live-alerts", async (req, res) => {
-  try {
-    const liveRes = await fetch(`${BASE}/fixtures?live=all`, {
-      headers: { "x-apisports-key": API_KEY }
-    });
-
-    const data = await liveRes.json();
-    const fixtures = data.response || [];
-
-    const alerts = fixtures
-      .filter(f => f.fixture.status.elapsed >= 65)
-      .slice(0, 5)
-      .map(f => ({
-        match: `${f.teams.home.name} – ${f.teams.away.name}`,
-        minute: f.fixture.status.elapsed,
-        market: "GOAL",
-        tag: "High Value",
-        confidence: 72
-      }));
-
-    res.json(alerts);
-  } catch (e) {
-    res.status(500).json({ error: "Live alerts failed" });
-  }
-});
-
-/* ================= START ================= */
+/* ================== START ================== */
 const PORT = process.env.PORT || 10000;
 app.listen(PORT, () => {
   console.log("✅ AI Football Picks backend running on port", PORT);

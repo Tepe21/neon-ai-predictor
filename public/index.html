@@ -4,54 +4,42 @@
   <meta charset="UTF-8" />
   <title>AI Football Picks</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
-  <!-- Font -->
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
-
-  <!-- Icons -->
-  <link rel="stylesheet"
-        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"/>
-
   <link rel="stylesheet" href="styles.css" />
 </head>
-
 <body>
 
 <!-- BETA BANNER -->
 <div class="beta-banner">
-  <div class="beta-track">
+  <div class="banner-track">
     🚀 FREE BETA LIVE • AI Football Picks • Goals • Corners • Live Alerts •
     🚀 FREE BETA LIVE • AI Football Picks • Goals • Corners • Live Alerts •
   </div>
 </div>
 
-<div class="app">
+<!-- HEADER -->
+<header class="header">
+  <div class="title">
+    ⚽ <h1>AI Football Picks</h1>
+  </div>
+  <p class="subtitle">Live Match Intelligence Engine</p>
 
-  <!-- HEADER -->
-  <header class="header">
-    <h1>
-      <i class="fa-solid fa-futbol"></i>
-      AI Football Picks
-    </h1>
-    <p class="subtitle">Live Match Intelligence Engine</p>
-  </header>
+  <!-- LANGUAGE -->
+  <div class="lang">
+    🌍 EN ▼
+    <div class="lang-menu">
+      <div>EN</div>
+      <div>EL</div>
+    </div>
+  </div>
+</header>
+
+<!-- MAIN -->
+<main class="app">
 
   <!-- TABS -->
   <div class="tabs">
-    <button class="tab active">
-      <i class="fa-solid fa-magnifying-glass"></i> Manual Search
-    </button>
-    <button class="tab">
-      <i class="fa-regular fa-bell"></i> Live Alerts
-    </button>
-
-    <div class="lang-switch">
-      <i class="fa-solid fa-language"></i>
-      <select>
-        <option>EN</option>
-        <option>EL</option>
-      </select>
-    </div>
+    <button class="tab active">🔍 Manual Search</button>
+    <button class="tab">🔔 Live Alerts</button>
   </div>
 
   <!-- CONTROLS -->
@@ -59,58 +47,30 @@
 
     <!-- LIVE / UPCOMING -->
     <div class="dropdown">
-      <input type="checkbox" id="mode-toggle" hidden>
-      <label for="mode-toggle" class="dropdown-btn">
-        <i class="fa-regular fa-clock"></i>
-        <span>Live</span>
-        <i class="fa-solid fa-chevron-down arrow"></i>
-      </label>
-
-      <div class="dropdown-menu">
-        <div class="dropdown-item">
-          <i class="fa-regular fa-clock"></i> Live
-        </div>
-        <div class="dropdown-item">
-          <i class="fa-regular fa-calendar"></i> Upcoming
-        </div>
+      <button class="drop-btn">⏱ Live</button>
+      <div class="drop-menu">
+        <div>Live</div>
+        <div>📅 Upcoming</div>
       </div>
     </div>
 
     <!-- GOALS / CORNERS -->
     <div class="dropdown">
-      <input type="checkbox" id="market-toggle" hidden>
-      <label for="market-toggle" class="dropdown-btn">
-        <i class="fa-solid fa-futbol"></i>
-        <span>Goals</span>
-        <i class="fa-solid fa-chevron-down arrow"></i>
-      </label>
-
-      <div class="dropdown-menu">
-        <div class="dropdown-item">
-          <i class="fa-solid fa-futbol"></i> Goals
-        </div>
-        <div class="dropdown-item">
-          <i class="fa-solid fa-flag"></i> Corners
-        </div>
+      <button class="drop-btn">⚽ Goals</button>
+      <div class="drop-menu">
+        <div>Goals</div>
+        <div>🚩 Corners</div>
       </div>
     </div>
 
-    <!-- MATCH INPUT -->
-    <input
-      type="text"
-      class="match-input"
-      placeholder="Εισαγωγή αγώνα"
-    />
+    <!-- INPUT -->
+    <input class="match-input" placeholder="Εισαγωγή αγώνα" />
 
     <!-- ANALYZE -->
-    <button class="analyze-btn">
-      <i class="fa-solid fa-magnifying-glass-chart"></i>
-      Analyze
-    </button>
-
+    <button class="analyze-btn">🔎 Analyze</button>
   </div>
 
-</div>
+</main>
 
 </body>
 </html>

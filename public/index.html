@@ -2,69 +2,109 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>AI Football Picks</title>
 
+  <!-- Mobile friendly -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+
+  <!-- Styles -->
   <link rel="stylesheet" href="/styles.css" />
   <link rel="icon" href="/favicon.ico" />
 </head>
 
 <body>
 
-  <!-- BETA BANNER (όπως ήταν) -->
+  <!-- 🔴 BETA SCROLLING BANNER -->
   <div class="beta-banner">
-    🚀 FREE BETA – Live Match Intelligence Engine
+    🚀 FREE BETA — LIVE MATCH INTELLIGENCE ENGINE 🚀 FREE BETA — LIVE MATCH INTELLIGENCE ENGINE
   </div>
 
+  <!-- APP WRAPPER -->
   <div id="app">
 
     <!-- HEADER -->
     <header class="app-header">
       <div class="title-wrap">
-        <img src="/ball-icon.png" class="title-icon" />
-        <div>
+        <img src="/ball-icon.png" class="title-icon" alt="ball" />
+        <div class="title-text">
           <h1>AI Football Picks</h1>
           <h2>Live Match Intelligence Engine</h2>
         </div>
       </div>
 
-      <button id="langToggle">EN / GR</button>
+      <!-- Language toggle -->
+      <button id="langToggle" class="lang-btn">EN / GR</button>
     </header>
 
-    <!-- TABS -->
-    <div class="top-tabs">
-      <button class="tab active" id="searchTab">🔍 Search</button>
-      <button class="tab" id="alertsTab">🔔 Live Alerts</button>
-    </div>
+    <!-- MAIN TABS -->
+    <nav class="top-tabs">
+      <button id="tab-search" class="tab active">🔍 Manual Search</button>
+      <button id="tab-alerts" class="tab pulse">🔔 Live Alerts</button>
+    </nav>
 
-    <!-- SEARCH VIEW -->
-    <section id="searchView">
-      <!-- ΔΕΝ ΠΕΙΡΑΖΕΤΑΙ -->
+    <!-- ================= SEARCH VIEW ================= -->
+    <section id="searchView" class="view active">
+
+      <div class="search-card">
+
+        <!-- ROW 1: MODE -->
+        <div class="control-group">
+          <div class="dropdown">
+            <button class="dropdown-btn">Live / Upcoming</button>
+            <div class="dropdown-menu">
+              <div data-value="live">Live</div>
+              <div data-value="upcoming">Upcoming</div>
+            </div>
+          </div>
+
+          <div class="dropdown">
+            <button class="dropdown-btn">Goals / Corners</button>
+            <div class="dropdown-menu">
+              <div data-value="goals">Goals</div>
+              <div data-value="corners">Corners</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ROW 2: INPUT -->
+        <div class="control-group">
+          <input
+            type="text"
+            id="matchInput"
+            placeholder="Enter match (e.g. PAOK - Atromitos)"
+            autocomplete="off"
+          />
+          <button id="analyzeBtn" class="analyze-btn">Analyze</button>
+        </div>
+
+      </div>
+
+      <!-- RESULTS -->
+      <div id="analysisResults" class="results-box"></div>
+
     </section>
 
-    <!-- LIVE ALERTS VIEW -->
-    <section id="alertsView" style="display:none">
+    <!-- ================= LIVE ALERTS VIEW ================= -->
+    <section id="alertsView" class="view">
 
-      <!-- ✅ ΜΟΝΟ ΑΥΤΟ ΠΡΟΣΤΕΘΗΚΕ -->
-      <div class="enable-push-wrapper">
-        <button
-          id="enablePushBtn"
-          class="enable-push-btn"
-          onclick="enablePush()"
-        >
+      <!-- ENABLE PUSH -->
+      <div class="push-box">
+        <button id="enablePushBtn" class="enable-push-btn" onclick="enablePush()">
           🔔 Enable Notifications
         </button>
       </div>
 
-      <div id="liveAlertsList"></div>
+      <!-- ALERTS LIST -->
+      <div id="liveAlertsList" class="alerts-list"></div>
+
     </section>
 
   </div>
 
-  <!-- ΥΠΑΡΧΟΝ JS -->
+  <!-- CORE JS -->
   <script src="/main.js"></script>
 
-  <!-- ✅ FRONTEND PUSH -->
+  <!-- PUSH FRONTEND -->
   <script src="/push.js"></script>
 
 </body>

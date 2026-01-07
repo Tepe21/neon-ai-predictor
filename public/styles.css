@@ -3,13 +3,14 @@
   --bg-2: #0C1235;
   --panel: #0E163A;
 
-  --primary: #2FD2FF;
-  --secondary: #7A5CFF;
+  --blue: #2FD2FF;
+  --purple: #7A5CFF;
 
   --text-main: #EAF7FF;
   --text-muted: #9FB3C8;
 
-  --grad: linear-gradient(135deg, var(--primary), var(--secondary));
+  --btn-grad: linear-gradient(135deg, var(--blue), var(--purple));
+  --btn-grad-hover: linear-gradient(135deg, #5fe8ff, #9a84ff);
 }
 
 * {
@@ -23,199 +24,181 @@ body {
   color: var(--text-main);
 }
 
-/* MARQUEE */
-.beta-wrapper {
-  overflow: hidden;
-  background: var(--grad);
-}
+/* =========================
+   HEADER / BASE
+========================= */
 
-.beta-marquee {
-  white-space: nowrap;
-  padding: 10px 0;
-  color: #001018;
-  font-weight: 600;
-  animation: marquee 18s linear infinite;
-}
-
-@keyframes marquee {
-  from { transform: translateX(100%); }
-  to { transform: translateX(-100%); }
-}
-
-/* APP */
 .app {
   max-width: 1100px;
   margin: auto;
   padding: 40px 20px;
 }
 
-/* ICON BUBBLES */
+/* =========================
+   ICON BUBBLES (ΔΕΝ ΤΑ ΑΓΓΙΖΟΥΜΕ)
+========================= */
 .icon-bubble {
-  width: 40px;
-  height: 40px;
+  width: 42px;
+  height: 42px;
   background: #ffffff;
   border-radius: 50%;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  margin-right: 10px;
-}
-
-.icon-bubble i {
-  color: #001018;
-  font-size: 16px;
 }
 
 .icon-bubble.sm {
-  width: 28px;
-  height: 28px;
-  margin-right: 8px;
+  width: 30px;
+  height: 30px;
 }
 
-.icon-bubble.dark {
-  background: #0E163A;
+.icon-bubble i {
+  color: #0C1235;
+  font-size: 16px;
 }
 
-.icon-bubble.dark i {
-  color: #ffffff;
-}
-
-/* HEADER */
-.header {
-  text-align: center;
-  margin-bottom: 28px;
-}
-
-.header h1 {
-  font-size: 2.6rem;
-  margin: 0;
-}
-
-.header p {
-  margin-top: 6px;
-  color: var(--text-muted);
-}
-
-/* TABS */
+/* =========================
+   TABS (ΔΙΟΡΘΩΜΕΝΑ)
+========================= */
 .tabs {
   display: flex;
   justify-content: center;
-  gap: 14px;
-  margin-bottom: 28px;
+  gap: 18px;
+  margin: 28px 0 34px;
 }
 
 .tab {
-  background: #0A1130;
-  color: var(--text-main);
-  border: 1px solid rgba(255,255,255,0.14);
-  padding: 14px 22px;
-  border-radius: 22px;
-  font-weight: 600;
-  cursor: pointer;
   display: flex;
   align-items: center;
+  gap: 10px;
+  padding: 18px 32px;
+  border-radius: 22px;
+  font-size: 1.05rem;
+  font-weight: 600;
+  cursor: pointer;
+
+  background: #111944;
+  color: var(--text-main);
+  border: 1px solid rgba(122,92,255,0.35);
 }
 
 .tab.active {
-  background: var(--grad);
+  background: var(--btn-grad);
   color: #001018;
 }
 
-/* CARD */
-.card {
-  background: rgba(14, 22, 58, 0.9);
-  border-radius: 28px;
-  padding: 28px;
+.tab:hover {
+  background: var(--btn-grad-hover);
+  color: #001018;
 }
 
-/* CONTROLS */
+/* =========================
+   CARD
+========================= */
+.card {
+  background: rgba(14, 22, 58, 0.9);
+  border-radius: 30px;
+  padding: 32px;
+  border: 1px solid rgba(122,92,255,0.25);
+}
+
+/* =========================
+   CONTROLS ROW
+========================= */
 .controls {
   display: flex;
-  gap: 14px;
+  gap: 18px;
   justify-content: center;
   flex-wrap: wrap;
 }
 
-/* BUTTONS */
+/* =========================
+   BUTTONS (ΟΛΑ ΔΙΟΡΘΩΜΕΝΑ)
+========================= */
 .pill-btn,
 .analyze-btn {
   display: flex;
   align-items: center;
-  background: #0A1130;
-  border: 1px solid rgba(255,255,255,0.14);
-  color: var(--text-main);
-  padding: 14px 18px;
-  border-radius: 22px;
+  gap: 12px;
+
+  padding: 18px 26px;
+  min-height: 64px;
+
+  border-radius: 24px;
+  font-size: 1.05rem;
   font-weight: 600;
   cursor: pointer;
-}
 
-.analyze-btn {
-  background: var(--grad);
+  background: var(--btn-grad);
   color: #001018;
   border: none;
 }
 
-/* DROPDOWN */
-.dropdown { position: relative; }
+.pill-btn:hover,
+.analyze-btn:hover {
+  background: var(--btn-grad-hover);
+}
+
+/* =========================
+   DROPDOWN MENU
+========================= */
+.dropdown {
+  position: relative;
+}
 
 .drop-menu {
   display: none;
   position: absolute;
-  top: 110%;
-  background: #0A1130;
-  border-radius: 18px;
-  border: 1px solid rgba(255,255,255,0.14);
-  min-width: 180px;
-  z-index: 10;
+  top: 115%;
+  background: #0E163A;
+  border-radius: 20px;
+  border: 1px solid rgba(122,92,255,0.35);
+  min-width: 200px;
+  z-index: 20;
 }
 
-.drop-menu.show { display: block; }
+.drop-menu.show {
+  display: block;
+}
 
 .drop-menu div {
-  padding: 10px 14px;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  cursor: pointer;
-}
-
-.drop-menu div:hover {
-  background: rgba(255,255,255,0.08);
-}
-
-/* INPUT */
-.match-input {
-  background: rgba(0,0,0,0.35);
-  border: 1px solid rgba(255,255,255,0.14);
-  padding: 14px 16px;
-  border-radius: 22px;
-  color: var(--text-main);
-  min-width: 220px;
-}
-
-/* STATUS WIDGET */
-.status-widget {
-  margin-top: 28px;
-  background: rgba(14, 22, 58, 0.8);
-  border-radius: 20px;
   padding: 14px 18px;
   display: flex;
   align-items: center;
   gap: 10px;
+  cursor: pointer;
+}
+
+.drop-menu div:hover {
+  background: rgba(122,92,255,0.15);
+}
+
+/* =========================
+   INPUT
+========================= */
+.match-input {
+  min-height: 64px;
+  padding: 18px 22px;
+  border-radius: 24px;
+  font-size: 1rem;
+
+  background: rgba(0,0,0,0.35);
+  border: 1px solid rgba(122,92,255,0.35);
+  color: var(--text-main);
+  min-width: 240px;
+}
+
+/* =========================
+   STATUS WIDGET
+========================= */
+.status-widget {
+  margin-top: 32px;
+  background: rgba(14, 22, 58, 0.8);
+  border-radius: 22px;
+  padding: 18px 22px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
   color: var(--text-muted);
-}
-
-.status-widget .dot {
-  width: 10px;
-  height: 10px;
-  background: #2FD2FF;
-  border-radius: 50%;
-  animation: pulse 1.8s infinite;
-}
-
-@keyframes pulse {
-  0% { opacity: .3; }
-  50% { opacity: 1; }
-  100% { opacity: .3; }
+  border: 1px solid rgba(122,92,255,0.25);
 }

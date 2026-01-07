@@ -5,40 +5,32 @@
   <title>AI Football Picks</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-  <!-- Icons -->
+  <!-- Icons (regular / outline) -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"/>
 
   <!-- Font -->
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
 
   <link rel="stylesheet" href="/styles.css" />
 </head>
 
 <body>
 
-<!-- MOVING BETA BANNER -->
+<!-- MARQUEE -->
 <div class="beta-wrapper">
   <div class="beta-marquee">
-    🚀 FREE BETA LIVE — AI Football Intelligence Engine — LIVE • GOALS • CORNERS • ALERTS
+    🚀 FREE BETA — AI Football Picks — Live Match Intelligence Engine — Real-time scanning
   </div>
 </div>
 
-<!-- APP -->
 <div class="app">
-
-  <!-- LANGUAGE -->
-  <div class="lang-switch">
-    <button id="langBtn">🌐 EN</button>
-    <div class="lang-menu">
-      <div data-lang="el">Ελληνικά</div>
-      <div data-lang="en">English</div>
-    </div>
-  </div>
 
   <!-- HEADER -->
   <header class="header">
     <h1>
-      <i class="fa-solid fa-futbol football-icon"></i>
+      <span class="icon-bubble">
+        <i class="fa-regular fa-futbol"></i>
+      </span>
       AI Football Picks
     </h1>
     <p>Live Match Intelligence Engine</p>
@@ -47,96 +39,98 @@
   <!-- TABS -->
   <div class="tabs">
     <button class="tab active">
-      <i class="fa-solid fa-magnifying-glass"></i> Search
+      <span class="icon-bubble sm">
+        <i class="fa-regular fa-magnifying-glass"></i>
+      </span>
+      Search
     </button>
+
     <button class="tab">
-      <i class="fa-solid fa-bell"></i> Live Alerts
+      <span class="icon-bubble sm">
+        <i class="fa-regular fa-bell"></i>
+      </span>
+      Live Alerts
     </button>
   </div>
 
-  <!-- CARD -->
-  <div class="card">
+  <!-- MAIN CARD -->
+  <section class="card">
 
-    <div class="row">
+    <div class="controls">
 
       <!-- LIVE / UPCOMING -->
       <div class="dropdown">
-        <button class="drop-btn">
-          <i class="fa-solid fa-clock"></i>
+        <button class="pill-btn">
+          <span class="icon-bubble sm">
+            <i class="fa-regular fa-clock"></i>
+          </span>
           Live
         </button>
         <div class="drop-menu">
-          <div>Live</div>
-          <div>Upcoming</div>
+          <div>
+            <i class="fa-regular fa-clock"></i> Live
+          </div>
+          <div>
+            <i class="fa-regular fa-calendar"></i> Upcoming
+          </div>
         </div>
       </div>
 
       <!-- GOALS / CORNERS -->
       <div class="dropdown">
-        <button class="drop-btn">
-          <i class="fa-solid fa-futbol"></i>
+        <button class="pill-btn">
+          <span class="icon-bubble sm">
+            <i class="fa-regular fa-futbol"></i>
+          </span>
           Goals
         </button>
         <div class="drop-menu">
-          <div>Goals</div>
-          <div>Corners</div>
+          <div>
+            <i class="fa-regular fa-futbol"></i> Goals
+          </div>
+          <div>
+            <i class="fa-regular fa-flag"></i> Corners
+          </div>
         </div>
       </div>
 
       <!-- INPUT -->
-      <input
-        class="match-input"
-        placeholder="Εισαγωγή αγώνα"
-      />
+      <input class="match-input" placeholder="Εισαγωγή αγώνα" />
 
       <!-- ANALYZE -->
       <button class="analyze-btn">
-        <i class="fa-solid fa-chart-line"></i>
+        <span class="icon-bubble sm dark">
+          <i class="fa-regular fa-brain"></i>
+        </span>
         Analyze
       </button>
 
     </div>
-  </div>
+
+  </section>
+
+  <!-- LIVE SCAN STATUS -->
+  <section class="status-widget">
+    <span class="dot"></span>
+    Live engine scanning matches every 60 seconds…
+  </section>
 
 </div>
 
 <script>
-/* Dropdowns */
+/* dropdown behavior */
 document.querySelectorAll(".dropdown").forEach(d => {
-  const btn = d.querySelector(".drop-btn");
+  const btn = d.querySelector("button");
   const menu = d.querySelector(".drop-menu");
 
-  btn.addEventListener("click", () => {
-    document.querySelectorAll(".drop-menu").forEach(m => {
-      if (m !== menu) m.classList.remove("show");
-    });
-    menu.classList.toggle("show");
-  });
+  btn.onclick = () => menu.classList.toggle("show");
 
   menu.querySelectorAll("div").forEach(opt => {
-    opt.addEventListener("click", () => {
-      btn.innerHTML = btn.querySelector("i").outerHTML + " " + opt.textContent;
+    opt.onclick = () => {
+      btn.innerHTML = btn.innerHTML.replace(/>.*</, `>${opt.innerText}<`);
       menu.classList.remove("show");
-    });
+    };
   });
-});
-
-/* Language */
-const langBtn = document.getElementById("langBtn");
-const langMenu = document.querySelector(".lang-menu");
-
-langBtn.onclick = () => langMenu.classList.toggle("show");
-langMenu.querySelectorAll("div").forEach(l => {
-  l.onclick = () => {
-    langBtn.innerText = l.dataset.lang.toUpperCase();
-    langMenu.classList.remove("show");
-  };
-});
-
-document.addEventListener("click", e => {
-  if (!e.target.closest(".dropdown") && !e.target.closest(".lang-switch")) {
-    document.querySelectorAll(".drop-menu, .lang-menu").forEach(m => m.classList.remove("show"));
-  }
 });
 </script>
 

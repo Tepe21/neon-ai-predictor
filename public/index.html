@@ -24,82 +24,92 @@
 
 <div class="app">
 
-  <!-- LEFT SIDEBAR -->
-  <aside class="sidebar">
-    <button class="tab active" id="tab-manual">
+  <!-- TITLE -->
+  <header class="title">
+    <h1>
+      <i class="fa-solid fa-futbol"></i>
+      AI Football Picks
+    </h1>
+    <h2>Live Match Intelligence Engine</h2>
+  </header>
+
+  <!-- TABS -->
+  <div class="tabs">
+    <button class="tab active">
       <i class="fa-solid fa-magnifying-glass"></i> Manual Search
     </button>
-
-    <button class="tab pulse" id="tab-alerts">
+    <button class="tab pulse">
       <i class="fa-solid fa-bolt"></i> Live Alerts
     </button>
-  </aside>
+  </div>
 
-  <!-- MAIN -->
-  <main class="main">
+  <!-- MANUAL SEARCH -->
+  <section class="card">
 
-    <!-- TITLE -->
-    <header class="title">
-      <h1>AI Football Picks</h1>
-      <h2>Live Match Intelligence Engine</h2>
-    </header>
+    <div class="controls">
 
-    <!-- MANUAL SEARCH -->
-    <section class="card">
-
-      <div class="controls">
-
-        <!-- LIVE / UPCOMING -->
-        <div class="dropdown">
-          <button class="drop-btn">
-            <i class="fa-solid fa-tower-broadcast"></i> Live / Upcoming
-          </button>
-          <div class="drop-menu">
-            <div class="drop-item">Live</div>
-            <div class="drop-item">Upcoming</div>
-          </div>
-        </div>
-
-        <!-- GOALS / CORNERS -->
-        <div class="dropdown">
-          <button class="drop-btn">
-            <i class="fa-solid fa-futbol"></i> Goals / Corners
-          </button>
-          <div class="drop-menu">
-            <div class="drop-item">Goals</div>
-            <div class="drop-item">Corners</div>
-          </div>
-        </div>
-
-        <!-- MATCH INPUT -->
-        <input
-          type="text"
-          class="match-input"
-          placeholder="Εισαγωγή αγώνα"
-        />
-
-        <!-- ANALYZE -->
-        <button class="analyze-btn">
-          <i class="fa-solid fa-brain"></i> Analyze
+      <!-- LIVE / UPCOMING -->
+      <div class="dropdown" data-type="mode">
+        <button class="drop-btn">
+          <i class="fa-solid fa-tower-broadcast"></i>
+          <span class="label">Live</span>
         </button>
-
+        <div class="drop-menu">
+          <div class="drop-item">Live</div>
+          <div class="drop-item">Upcoming</div>
+        </div>
       </div>
 
-      <div class="results">
-        <span>Analysis results will appear here</span>
+      <!-- GOALS / CORNERS -->
+      <div class="dropdown" data-type="market">
+        <button class="drop-btn">
+          <i class="fa-solid fa-futbol"></i>
+          <span class="label">Goals</span>
+        </button>
+        <div class="drop-menu">
+          <div class="drop-item">Goals</div>
+          <div class="drop-item">Corners</div>
+        </div>
       </div>
 
-    </section>
+      <!-- MATCH INPUT -->
+      <input
+        type="text"
+        class="match-input"
+        placeholder="Εισαγωγή αγώνα"
+      />
 
-  </main>
+      <!-- ANALYZE -->
+      <button class="analyze-btn">
+        <i class="fa-solid fa-brain"></i> Analyze
+      </button>
+
+    </div>
+
+    <div class="results">
+      <span>Analysis results will appear here</span>
+    </div>
+
+  </section>
 
 </div>
 
 <script>
-  // UI ONLY – dropdowns clickable
-  document.querySelectorAll(".drop-btn").forEach(btn => {
+  // Dropdown logic (UI only)
+  document.querySelectorAll(".dropdown").forEach(drop => {
+    const btn = drop.querySelector(".drop-btn");
+    const label = btn.querySelector(".label");
+    const menu = drop.querySelector(".drop-menu");
+
     btn.addEventListener("click", () => {
-      btn.parentElement.classList.toggle("open");
+      drop.classList.toggle("open");
+    });
+
+    menu.querySelectorAll(".drop-item").forEach(item => {
+      item.addEventListener("click", () => {
+        label.textContent = item.textContent;
+        drop.classList.remove("open");
+      });
     });
   });
 </script>

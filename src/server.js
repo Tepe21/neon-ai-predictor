@@ -118,25 +118,29 @@ async function scanLiveForAlerts() {
       const id = f.fixture.id;
       if (alertedFixtures.has(id)) return;
 
-      if (shouldAlert(f)) {
-        const alert = {
-          fixtureId: id,
-          match: `${f.teams.home.name} - ${f.teams.away.name}`,
-          minute: f.fixture.status.elapsed,
-          score: `${f.goals.home}-${f.goals.away}`,
-          tag: "LIVE VALUE",
-          confidence: 70,
-          createdAt: Date.now(),
-        };
+     if (shouldAlert(f)) {
+  const alertObj = {
+    fixtureId: f.fixture.id,
+    match: `${f.teams.home.name} - ${f.teams.away.name}`,
+    minute: f.fixture.status.elapsed,
+    score: `${f.goals.home}-${f.goals.away}`,
+    tag: "LIVE VALUE",
+    confidence: 70,
+    createdAt: Date.now()
+  };
 
-        liveAlerts.unshift(alert);
-        alertedFixtures.add(id);
+  liveAlerts.unshift(alertObj);
+  alertedFixtures.add(f.fixture.id);
+  liveAlerts = liveAlerts.slice(0, 20);
 
-        // κρατάμε max 20 alerts
-        liveAlerts = liveAlerts.slice(0, 20);
-      }
-    });
-  } catch (e) {
+  // 🔔 SEND PUSH — ΕΔΩ, ΟΧΙ ΑΛΛΟΥ
+  await sendPushToAll({
+    title: "🔥 Live Alert",
+    body: `${alertObj.match} • ${alertObj.tag} • ${alertObj.confidence}%`
+  });
+}
+
+   catch (e) {
     console.error("Live alert scan error:", e.message);
   }
 }

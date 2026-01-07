@@ -143,7 +143,7 @@ async function scanLiveForAlerts() {
 
 await sendPushToAll({
   title: "🔥 Live Alert",
-  body: `${alert.match} • ${alert.tag} • ${alert.confidence}%`
+  body: `${newAlert.match} • ${newAlert.tag} • ${newAlert.confidence}%`
 });
 
 // scan κάθε 60''
@@ -163,7 +163,7 @@ app.post("/api/push/subscribe", (req, res) => {
 
 // debug endpoint για να δεις UI να ανάβει
 app.get("/api/live-alerts/test", (req, res) => {
-  const alert = {
+  const newAlert = {
     fixtureId: "TEST",
     match: "Test United - Demo FC",
     minute: 72,

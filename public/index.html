@@ -3,109 +3,67 @@
 <head>
   <meta charset="UTF-8" />
   <title>AI Football Picks</title>
-
-  <!-- Mobile friendly -->
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-
-  <!-- Styles -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="stylesheet" href="/styles.css" />
-  <link rel="icon" href="/favicon.ico" />
 </head>
-
 <body>
 
-  <!-- 🔴 BETA SCROLLING BANNER -->
-  <div class="beta-banner">
-    🚀 FREE BETA — LIVE MATCH INTELLIGENCE ENGINE 🚀 FREE BETA — LIVE MATCH INTELLIGENCE ENGINE
+<!-- 🔁 FREE BETA BANNER -->
+<div class="beta-marquee">
+  <div class="marquee-track">
+    🚀 FREE BETA — AI FOOTBALL PICKS — LIVE MATCH INTELLIGENCE ENGINE 🚀
   </div>
+</div>
 
-  <!-- APP WRAPPER -->
-  <div id="app">
+<div class="app">
 
-    <!-- HEADER -->
-    <header class="app-header">
-      <div class="title-wrap">
-        <img src="/ball-icon.png" class="title-icon" alt="ball" />
-        <div class="title-text">
-          <h1>AI Football Picks</h1>
-          <h2>Live Match Intelligence Engine</h2>
-        </div>
+  <!-- HEADER -->
+  <header class="header">
+    <div class="title-block">
+      <h1>AI Football Picks</h1>
+      <h2>Live Match Intelligence Engine</h2>
+    </div>
+
+    <div class="top-actions">
+      <button class="lang-btn">EN / GR</button>
+      <div class="tabs">
+        <button class="tab active">Manual Search</button>
+        <button class="tab pulse">Live Alerts</button>
       </div>
+    </div>
+  </header>
 
-      <!-- Language toggle -->
-      <button id="langToggle" class="lang-btn">EN / GR</button>
-    </header>
+  <!-- MANUAL SEARCH -->
+  <section class="card">
+    <div class="controls">
 
-    <!-- MAIN TABS -->
-    <nav class="top-tabs">
-      <button id="tab-search" class="tab active">🔍 Manual Search</button>
-      <button id="tab-alerts" class="tab pulse">🔔 Live Alerts</button>
-    </nav>
+      <button class="neon-btn">Live / Upcoming</button>
+      <button class="neon-btn">Goals / Corners</button>
 
-    <!-- ================= SEARCH VIEW ================= -->
-    <section id="searchView" class="view active">
+      <input
+        type="text"
+        class="match-input"
+        placeholder="Εισαγωγή αγώνα (π.χ. PAOK - Atromitos)"
+      />
 
-      <div class="search-card">
+      <button class="analyze-btn">Analyze</button>
 
-        <!-- ROW 1: MODE -->
-        <div class="control-group">
-          <div class="dropdown">
-            <button class="dropdown-btn">Live / Upcoming</button>
-            <div class="dropdown-menu">
-              <div data-value="live">Live</div>
-              <div data-value="upcoming">Upcoming</div>
-            </div>
-          </div>
+    </div>
 
-          <div class="dropdown">
-            <button class="dropdown-btn">Goals / Corners</button>
-            <div class="dropdown-menu">
-              <div data-value="goals">Goals</div>
-              <div data-value="corners">Corners</div>
-            </div>
-          </div>
-        </div>
+    <div class="results-placeholder">
+      <span>Analysis results will appear here</span>
+    </div>
+  </section>
 
-        <!-- ROW 2: INPUT -->
-        <div class="control-group">
-          <input
-            type="text"
-            id="matchInput"
-            placeholder="Enter match (e.g. PAOK - Atromitos)"
-            autocomplete="off"
-          />
-          <button id="analyzeBtn" class="analyze-btn">Analyze</button>
-        </div>
+  <!-- LIVE ALERTS -->
+  <section class="card alerts">
+    <div class="alert glow">
+      <strong>LIVE ALERT</strong>
+      <span>Waiting for live opportunities…</span>
+    </div>
+  </section>
 
-      </div>
-
-      <!-- RESULTS -->
-      <div id="analysisResults" class="results-box"></div>
-
-    </section>
-
-    <!-- ================= LIVE ALERTS VIEW ================= -->
-    <section id="alertsView" class="view">
-
-      <!-- ENABLE PUSH -->
-      <div class="push-box">
-        <button id="enablePushBtn" class="enable-push-btn" onclick="enablePush()">
-          🔔 Enable Notifications
-        </button>
-      </div>
-
-      <!-- ALERTS LIST -->
-      <div id="liveAlertsList" class="alerts-list"></div>
-
-    </section>
-
-  </div>
-
-  <!-- CORE JS -->
-  <script src="/main.js"></script>
-
-  <!-- PUSH FRONTEND -->
-  <script src="/push.js"></script>
+</div>
 
 </body>
 </html>

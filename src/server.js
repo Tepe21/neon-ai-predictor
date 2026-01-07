@@ -1,3 +1,4 @@
+import { addSubscription, sendPushToAll } from "./push.js";
 import express from "express";
 import cors from "cors";
 import axios from "axios";
@@ -140,6 +141,11 @@ async function scanLiveForAlerts() {
   }
 }
 
+await sendPushToAll({
+  title: "🔥 Live Alert",
+  body: `${alert.match} • ${alert.tag} • ${alert.confidence}%`
+});
+
 // scan κάθε 60''
 setInterval(scanLiveForAlerts, 60 * 1000);
 
@@ -148,6 +154,11 @@ setInterval(scanLiveForAlerts, 60 * 1000);
 ========================= */
 app.get("/api/live-alerts", (req, res) => {
   res.json({ alerts: liveAlerts });
+});
+
+app.post("/api/push/subscribe", (req, res) => {
+  addSubscription(req.body);
+  res.json({ success: true });
 });
 
 // debug endpoint για να δεις UI να ανάβει

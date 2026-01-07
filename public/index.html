@@ -4,11 +4,18 @@
   <meta charset="UTF-8" />
   <title>AI Football Picks</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- FONT -->
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600&display=swap" rel="stylesheet">
+
+  <!-- ICONS -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
   <link rel="stylesheet" href="/styles.css" />
 </head>
 <body>
 
-<!-- 🔁 FREE BETA BANNER -->
+<!-- BETA BANNER -->
 <div class="beta-marquee">
   <div class="marquee-track">
     🚀 FREE BETA — AI FOOTBALL PICKS — LIVE MATCH INTELLIGENCE ENGINE 🚀
@@ -17,53 +24,85 @@
 
 <div class="app">
 
-  <!-- HEADER -->
-  <header class="header">
-    <div class="title-block">
+  <!-- LEFT SIDEBAR -->
+  <aside class="sidebar">
+    <button class="tab active" id="tab-manual">
+      <i class="fa-solid fa-magnifying-glass"></i> Manual Search
+    </button>
+
+    <button class="tab pulse" id="tab-alerts">
+      <i class="fa-solid fa-bolt"></i> Live Alerts
+    </button>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+
+    <!-- TITLE -->
+    <header class="title">
       <h1>AI Football Picks</h1>
       <h2>Live Match Intelligence Engine</h2>
-    </div>
+    </header>
 
-    <div class="top-actions">
-      <button class="lang-btn">EN / GR</button>
-      <div class="tabs">
-        <button class="tab active">Manual Search</button>
-        <button class="tab pulse">Live Alerts</button>
+    <!-- MANUAL SEARCH -->
+    <section class="card">
+
+      <div class="controls">
+
+        <!-- LIVE / UPCOMING -->
+        <div class="dropdown">
+          <button class="drop-btn">
+            <i class="fa-solid fa-tower-broadcast"></i> Live / Upcoming
+          </button>
+          <div class="drop-menu">
+            <div class="drop-item">Live</div>
+            <div class="drop-item">Upcoming</div>
+          </div>
+        </div>
+
+        <!-- GOALS / CORNERS -->
+        <div class="dropdown">
+          <button class="drop-btn">
+            <i class="fa-solid fa-futbol"></i> Goals / Corners
+          </button>
+          <div class="drop-menu">
+            <div class="drop-item">Goals</div>
+            <div class="drop-item">Corners</div>
+          </div>
+        </div>
+
+        <!-- MATCH INPUT -->
+        <input
+          type="text"
+          class="match-input"
+          placeholder="Εισαγωγή αγώνα"
+        />
+
+        <!-- ANALYZE -->
+        <button class="analyze-btn">
+          <i class="fa-solid fa-brain"></i> Analyze
+        </button>
+
       </div>
-    </div>
-  </header>
 
-  <!-- MANUAL SEARCH -->
-  <section class="card">
-    <div class="controls">
+      <div class="results">
+        <span>Analysis results will appear here</span>
+      </div>
 
-      <button class="neon-btn">Live / Upcoming</button>
-      <button class="neon-btn">Goals / Corners</button>
+    </section>
 
-      <input
-        type="text"
-        class="match-input"
-        placeholder="Εισαγωγή αγώνα (π.χ. PAOK - Atromitos)"
-      />
-
-      <button class="analyze-btn">Analyze</button>
-
-    </div>
-
-    <div class="results-placeholder">
-      <span>Analysis results will appear here</span>
-    </div>
-  </section>
-
-  <!-- LIVE ALERTS -->
-  <section class="card alerts">
-    <div class="alert glow">
-      <strong>LIVE ALERT</strong>
-      <span>Waiting for live opportunities…</span>
-    </div>
-  </section>
+  </main>
 
 </div>
+
+<script>
+  // UI ONLY – dropdowns clickable
+  document.querySelectorAll(".drop-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+      btn.parentElement.classList.toggle("open");
+    });
+  });
+</script>
 
 </body>
 </html>

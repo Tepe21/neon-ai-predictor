@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="el">
 <head>
   <meta charset="UTF-8" />
   <title>AI Football Picks</title>
@@ -16,17 +16,31 @@
 
 <body>
 
-<!-- BETA BANNER -->
-<div class="beta-banner">
-  🚀 FREE BETA LIVE — AI Football Intelligence Engine
+<!-- MOVING BETA BANNER -->
+<div class="beta-wrapper">
+  <div class="beta-marquee">
+    🚀 FREE BETA LIVE — AI Football Intelligence Engine — LIVE • GOALS • CORNERS • ALERTS
+  </div>
 </div>
 
-<!-- APP CONTAINER -->
+<!-- APP -->
 <div class="app">
+
+  <!-- LANGUAGE -->
+  <div class="lang-switch">
+    <button id="langBtn">🌐 EN</button>
+    <div class="lang-menu">
+      <div data-lang="el">Ελληνικά</div>
+      <div data-lang="en">English</div>
+    </div>
+  </div>
 
   <!-- HEADER -->
   <header class="header">
-    <h1><i class="fa-solid fa-futbol"></i> AI Football Picks</h1>
+    <h1>
+      <i class="fa-solid fa-futbol football-icon"></i>
+      AI Football Picks
+    </h1>
     <p>Live Match Intelligence Engine</p>
   </header>
 
@@ -43,18 +57,17 @@
   <!-- CARD -->
   <div class="card">
 
-    <!-- DROPDOWNS -->
     <div class="row">
 
       <!-- LIVE / UPCOMING -->
       <div class="dropdown">
         <button class="drop-btn">
           <i class="fa-solid fa-clock"></i>
-          Live / Upcoming
+          Live
         </button>
         <div class="drop-menu">
-          <div data-value="live">Live</div>
-          <div data-value="upcoming">Upcoming</div>
+          <div>Live</div>
+          <div>Upcoming</div>
         </div>
       </div>
 
@@ -62,18 +75,18 @@
       <div class="dropdown">
         <button class="drop-btn">
           <i class="fa-solid fa-futbol"></i>
-          Goals / Corners
+          Goals
         </button>
         <div class="drop-menu">
-          <div data-value="goals">Goals</div>
-          <div data-value="corners">Corners</div>
+          <div>Goals</div>
+          <div>Corners</div>
         </div>
       </div>
 
       <!-- INPUT -->
       <input
         class="match-input"
-        placeholder="Εισαγωγή αγώνα (π.χ. ΠΑΟΚ)"
+        placeholder="Εισαγωγή αγώνα"
       />
 
       <!-- ANALYZE -->
@@ -87,9 +100,8 @@
 
 </div>
 
-<script src="/push.js"></script>
 <script>
-/* Dropdown logic */
+/* Dropdowns */
 document.querySelectorAll(".dropdown").forEach(d => {
   const btn = d.querySelector(".drop-btn");
   const menu = d.querySelector(".drop-menu");
@@ -103,15 +115,27 @@ document.querySelectorAll(".dropdown").forEach(d => {
 
   menu.querySelectorAll("div").forEach(opt => {
     opt.addEventListener("click", () => {
-      btn.innerHTML = `<i class="${btn.querySelector("i").className}"></i> ${opt.textContent}`;
+      btn.innerHTML = btn.querySelector("i").outerHTML + " " + opt.textContent;
       menu.classList.remove("show");
     });
   });
 });
 
+/* Language */
+const langBtn = document.getElementById("langBtn");
+const langMenu = document.querySelector(".lang-menu");
+
+langBtn.onclick = () => langMenu.classList.toggle("show");
+langMenu.querySelectorAll("div").forEach(l => {
+  l.onclick = () => {
+    langBtn.innerText = l.dataset.lang.toUpperCase();
+    langMenu.classList.remove("show");
+  };
+});
+
 document.addEventListener("click", e => {
-  if (!e.target.closest(".dropdown")) {
-    document.querySelectorAll(".drop-menu").forEach(m => m.classList.remove("show"));
+  if (!e.target.closest(".dropdown") && !e.target.closest(".lang-switch")) {
+    document.querySelectorAll(".drop-menu, .lang-menu").forEach(m => m.classList.remove("show"));
   }
 });
 </script>

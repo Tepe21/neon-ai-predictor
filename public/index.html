@@ -5,113 +5,115 @@
   <title>AI Football Picks</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-  <!-- FONT -->
-  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600&display=swap" rel="stylesheet">
+  <!-- Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"/>
 
-  <!-- ICONS -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <!-- Font -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
 
   <link rel="stylesheet" href="/styles.css" />
 </head>
+
 <body>
 
 <!-- BETA BANNER -->
-<div class="beta-marquee">
-  <div class="marquee-track">
-    🚀 FREE BETA — AI FOOTBALL PICKS — LIVE MATCH INTELLIGENCE ENGINE 🚀
-  </div>
+<div class="beta-banner">
+  🚀 FREE BETA LIVE — AI Football Intelligence Engine
 </div>
 
+<!-- APP CONTAINER -->
 <div class="app">
 
-  <!-- TITLE -->
-  <header class="title">
-    <h1>
-      <i class="fa-solid fa-futbol"></i>
-      AI Football Picks
-    </h1>
-    <h2>Live Match Intelligence Engine</h2>
+  <!-- HEADER -->
+  <header class="header">
+    <h1><i class="fa-solid fa-futbol"></i> AI Football Picks</h1>
+    <p>Live Match Intelligence Engine</p>
   </header>
 
   <!-- TABS -->
   <div class="tabs">
     <button class="tab active">
-      <i class="fa-solid fa-magnifying-glass"></i> Manual Search
+      <i class="fa-solid fa-magnifying-glass"></i> Search
     </button>
-    <button class="tab pulse">
-      <i class="fa-solid fa-bolt"></i> Live Alerts
+    <button class="tab">
+      <i class="fa-solid fa-bell"></i> Live Alerts
     </button>
   </div>
 
-  <!-- MANUAL SEARCH -->
-  <section class="card">
+  <!-- CARD -->
+  <div class="card">
 
-    <div class="controls">
+    <!-- DROPDOWNS -->
+    <div class="row">
 
       <!-- LIVE / UPCOMING -->
-      <div class="dropdown" data-type="mode">
+      <div class="dropdown">
         <button class="drop-btn">
-          <i class="fa-solid fa-tower-broadcast"></i>
-          <span class="label">Live</span>
+          <i class="fa-solid fa-clock"></i>
+          Live / Upcoming
         </button>
         <div class="drop-menu">
-          <div class="drop-item">Live</div>
-          <div class="drop-item">Upcoming</div>
+          <div data-value="live">Live</div>
+          <div data-value="upcoming">Upcoming</div>
         </div>
       </div>
 
       <!-- GOALS / CORNERS -->
-      <div class="dropdown" data-type="market">
+      <div class="dropdown">
         <button class="drop-btn">
           <i class="fa-solid fa-futbol"></i>
-          <span class="label">Goals</span>
+          Goals / Corners
         </button>
         <div class="drop-menu">
-          <div class="drop-item">Goals</div>
-          <div class="drop-item">Corners</div>
+          <div data-value="goals">Goals</div>
+          <div data-value="corners">Corners</div>
         </div>
       </div>
 
-      <!-- MATCH INPUT -->
+      <!-- INPUT -->
       <input
-        type="text"
         class="match-input"
-        placeholder="Εισαγωγή αγώνα"
+        placeholder="Εισαγωγή αγώνα (π.χ. ΠΑΟΚ)"
       />
 
       <!-- ANALYZE -->
       <button class="analyze-btn">
-        <i class="fa-solid fa-brain"></i> Analyze
+        <i class="fa-solid fa-chart-line"></i>
+        Analyze
       </button>
 
     </div>
-
-    <div class="results">
-      <span>Analysis results will appear here</span>
-    </div>
-
-  </section>
+  </div>
 
 </div>
 
+<script src="/push.js"></script>
 <script>
-  // Dropdown logic (UI only)
-  document.querySelectorAll(".dropdown").forEach(drop => {
-    const btn = drop.querySelector(".drop-btn");
-    const label = btn.querySelector(".label");
-    const menu = drop.querySelector(".drop-menu");
+/* Dropdown logic */
+document.querySelectorAll(".dropdown").forEach(d => {
+  const btn = d.querySelector(".drop-btn");
+  const menu = d.querySelector(".drop-menu");
 
-    btn.addEventListener("click", () => {
-      drop.classList.toggle("open");
+  btn.addEventListener("click", () => {
+    document.querySelectorAll(".drop-menu").forEach(m => {
+      if (m !== menu) m.classList.remove("show");
     });
+    menu.classList.toggle("show");
+  });
 
-    menu.querySelectorAll(".drop-item").forEach(item => {
-      item.addEventListener("click", () => {
-        label.textContent = item.textContent;
-        drop.classList.remove("open");
-      });
+  menu.querySelectorAll("div").forEach(opt => {
+    opt.addEventListener("click", () => {
+      btn.innerHTML = `<i class="${btn.querySelector("i").className}"></i> ${opt.textContent}`;
+      menu.classList.remove("show");
     });
   });
+});
+
+document.addEventListener("click", e => {
+  if (!e.target.closest(".dropdown")) {
+    document.querySelectorAll(".drop-menu").forEach(m => m.classList.remove("show"));
+  }
+});
 </script>
 
 </body>

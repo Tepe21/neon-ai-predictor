@@ -5,21 +5,23 @@
   <title>AI Football Picks</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-  <!-- Icons (regular / outline) -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"/>
-
   <!-- Font -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
 
-  <link rel="stylesheet" href="/styles.css" />
+  <!-- Icons -->
+  <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"/>
+
+  <link rel="stylesheet" href="styles.css" />
 </head>
 
 <body>
 
-<!-- MARQUEE -->
-<div class="beta-wrapper">
-  <div class="beta-marquee">
-    🚀 FREE BETA — AI Football Picks — Live Match Intelligence Engine — Real-time scanning
+<!-- BETA BANNER -->
+<div class="beta-banner">
+  <div class="beta-track">
+    🚀 FREE BETA LIVE • AI Football Picks • Goals • Corners • Live Alerts •
+    🚀 FREE BETA LIVE • AI Football Picks • Goals • Corners • Live Alerts •
   </div>
 </div>
 
@@ -28,111 +30,87 @@
   <!-- HEADER -->
   <header class="header">
     <h1>
-      <span class="icon-bubble">
-        <i class="fa-regular fa-futbol"></i>
-      </span>
+      <i class="fa-solid fa-futbol"></i>
       AI Football Picks
     </h1>
-    <p>Live Match Intelligence Engine</p>
+    <p class="subtitle">Live Match Intelligence Engine</p>
   </header>
 
   <!-- TABS -->
   <div class="tabs">
     <button class="tab active">
-      <span class="icon-bubble sm">
-        <i class="fa-regular fa-magnifying-glass"></i>
-      </span>
-      Search
+      <i class="fa-solid fa-magnifying-glass"></i> Manual Search
+    </button>
+    <button class="tab">
+      <i class="fa-regular fa-bell"></i> Live Alerts
     </button>
 
-    <button class="tab">
-      <span class="icon-bubble sm">
-        <i class="fa-regular fa-bell"></i>
-      </span>
-      Live Alerts
-    </button>
+    <div class="lang-switch">
+      <i class="fa-solid fa-language"></i>
+      <select>
+        <option>EN</option>
+        <option>EL</option>
+      </select>
+    </div>
   </div>
 
-  <!-- MAIN CARD -->
-  <section class="card">
+  <!-- CONTROLS -->
+  <div class="controls">
 
-    <div class="controls">
+    <!-- LIVE / UPCOMING -->
+    <div class="dropdown">
+      <input type="checkbox" id="mode-toggle" hidden>
+      <label for="mode-toggle" class="dropdown-btn">
+        <i class="fa-regular fa-clock"></i>
+        <span>Live</span>
+        <i class="fa-solid fa-chevron-down arrow"></i>
+      </label>
 
-      <!-- LIVE / UPCOMING -->
-      <div class="dropdown">
-        <button class="pill-btn">
-          <span class="icon-bubble sm">
-            <i class="fa-regular fa-clock"></i>
-          </span>
-          Live
-        </button>
-        <div class="drop-menu">
-          <div>
-            <i class="fa-regular fa-clock"></i> Live
-          </div>
-          <div>
-            <i class="fa-regular fa-calendar"></i> Upcoming
-          </div>
+      <div class="dropdown-menu">
+        <div class="dropdown-item">
+          <i class="fa-regular fa-clock"></i> Live
+        </div>
+        <div class="dropdown-item">
+          <i class="fa-regular fa-calendar"></i> Upcoming
         </div>
       </div>
-
-      <!-- GOALS / CORNERS -->
-      <div class="dropdown">
-        <button class="pill-btn">
-          <span class="icon-bubble sm">
-            <i class="fa-regular fa-futbol"></i>
-          </span>
-          Goals
-        </button>
-        <div class="drop-menu">
-          <div>
-            <i class="fa-regular fa-futbol"></i> Goals
-          </div>
-          <div>
-            <i class="fa-regular fa-flag"></i> Corners
-          </div>
-        </div>
-      </div>
-
-      <!-- INPUT -->
-      <input class="match-input" placeholder="Εισαγωγή αγώνα" />
-
-      <!-- ANALYZE -->
-      <button class="analyze-btn">
-        <span class="icon-bubble sm dark">
-          <i class="fa-regular fa-brain"></i>
-        </span>
-        Analyze
-      </button>
-
     </div>
 
-  </section>
+    <!-- GOALS / CORNERS -->
+    <div class="dropdown">
+      <input type="checkbox" id="market-toggle" hidden>
+      <label for="market-toggle" class="dropdown-btn">
+        <i class="fa-solid fa-futbol"></i>
+        <span>Goals</span>
+        <i class="fa-solid fa-chevron-down arrow"></i>
+      </label>
 
-  <!-- LIVE SCAN STATUS -->
-  <section class="status-widget">
-    <span class="dot"></span>
-    Live engine scanning matches every 60 seconds…
-  </section>
+      <div class="dropdown-menu">
+        <div class="dropdown-item">
+          <i class="fa-solid fa-futbol"></i> Goals
+        </div>
+        <div class="dropdown-item">
+          <i class="fa-solid fa-flag"></i> Corners
+        </div>
+      </div>
+    </div>
+
+    <!-- MATCH INPUT -->
+    <input
+      type="text"
+      class="match-input"
+      placeholder="Εισαγωγή αγώνα"
+    />
+
+    <!-- ANALYZE -->
+    <button class="analyze-btn">
+      <i class="fa-solid fa-magnifying-glass-chart"></i>
+      Analyze
+    </button>
+
+  </div>
 
 </div>
-
-<script>
-/* dropdown behavior */
-document.querySelectorAll(".dropdown").forEach(d => {
-  const btn = d.querySelector("button");
-  const menu = d.querySelector(".drop-menu");
-
-  btn.onclick = () => menu.classList.toggle("show");
-
-  menu.querySelectorAll("div").forEach(opt => {
-    opt.onclick = () => {
-      btn.innerHTML = btn.innerHTML.replace(/>.*</, `>${opt.innerText}<`);
-      menu.classList.remove("show");
-    };
-  });
-});
-</script>
 
 </body>
 </html>

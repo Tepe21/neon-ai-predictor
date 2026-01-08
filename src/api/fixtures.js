@@ -3,18 +3,24 @@ import { apiFootballGet } from "../utils/apiFootball.js";
 
 const router = express.Router();
 
+// helper: YYYY-MM-DD
+function formatDate(date) {
+  return date.toISOString().split("T")[0];
+}
+
+// GET /api/fixtures/upcoming
 router.get("/upcoming", async (req, res) => {
   try {
     const today = new Date();
-    const from = today.toISOString().split("T")[0];
+    const to = new Date();
+    to.setDate(today.getDate() + 4); // επόμενες 4 μέρες
 
-    const toDate = new Date();
-    toDate.setDate(today.getDate() + 7);
-    const to = toDate.toISOString().split("T")[0];
+    const fromDate = formatDate(today);
+    const toDate = formatDate(to);
 
     const data = await apiFootballGet("/fixtures", {
-      from,
-      to,
+      from: fromDate,
+      to: toDate,
       timezone: "Europe/Athens"
     });
 
@@ -26,8 +32,10 @@ router.get("/upcoming", async (req, res) => {
     });
 
   } catch (err) {
-    console.error("❌ Upcoming fixtures error:", err.message);
-    res.status(500).json({ error: "Failed to fetch upcoming fixtures" });
+    console.error("Upcoming fixtures error:", err.message);
+    res.status(500).json({
+      error: "Failed to fetch upcoming fixtures"
+    });
   }
 });
 

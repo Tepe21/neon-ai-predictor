@@ -1,21 +1,20 @@
-// src/utils/apiFootball.js
 import fetch from "node-fetch";
 
-const API_BASE = "https://v3.football.api-sports.io";
+const API_URL = "https://v3.football.api-sports.io";
 
-export async function apiGet(endpoint, params = {}) {
-  const url = new URL(API_BASE + endpoint);
+export async function apiFootball(endpoint, params = {}) {
+  const url = new URL(API_URL + endpoint);
 
-  Object.entries(params).forEach(([key, value]) => {
-    if (value !== undefined && value !== null) {
-      url.searchParams.append(key, value);
+  Object.entries(params).forEach(([k, v]) => {
+    if (v !== undefined && v !== null) {
+      url.searchParams.append(k, v);
     }
   });
 
-  const res = await fetch(url.toString(), {
+  const res = await fetch(url, {
     headers: {
-      "x-apisports-key": process.env.API_FOOTBALL_KEY
-    }
+      "x-apisports-key": process.env.API_FOOTBALL_KEY,
+    },
   });
 
   if (!res.ok) {
@@ -23,6 +22,5 @@ export async function apiGet(endpoint, params = {}) {
     throw new Error(`API error ${res.status}: ${text}`);
   }
 
-  const data = await res.json();
-  return data.response || [];
+  return res.json();
 }

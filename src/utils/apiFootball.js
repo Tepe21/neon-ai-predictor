@@ -1,26 +1,14 @@
-import fetch from "node-fetch";
+import axios from "axios";
 
-const API_URL = "https://v3.football.api-sports.io";
+const API_BASE = "https://v3.football.api-sports.io";
 
-export async function apiFootball(endpoint, params = {}) {
-  const url = new URL(API_URL + endpoint);
-
-  Object.entries(params).forEach(([k, v]) => {
-    if (v !== undefined && v !== null) {
-      url.searchParams.append(k, v);
-    }
-  });
-
-  const res = await fetch(url, {
+export async function apiFootballGet(endpoint, params = {}) {
+  const res = await axios.get(`${API_BASE}${endpoint}`, {
     headers: {
-      "x-apisports-key": process.env.API_FOOTBALL_KEY,
+      "x-apisports-key": process.env.API_FOOTBALL_KEY
     },
+    params
   });
 
-  if (!res.ok) {
-    const text = await res.text();
-    throw new Error(`API error ${res.status}: ${text}`);
-  }
-
-  return res.json();
+  return res.data;
 }

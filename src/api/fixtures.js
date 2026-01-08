@@ -1,46 +1,33 @@
+// src/api/fixtures.js
 import express from "express";
 import { apiGet } from "../utils/apiFootball.js";
 
 const router = express.Router();
 
 /**
- * LIVE fixtures
- */
-router.get("/live", async (req, res) => {
-  try {
-    const fixtures = await apiGet("/fixtures", {
-      live: "all",
-      timezone: "Europe/Athens"
-    });
-
-    res.json({
-      count: fixtures.length,
-      fixtures
-    });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
-
-/**
- * UPCOMING fixtures (ΣΤΑΘΕΡΟ – GLOBAL)
- * Χρησιμοποιούμε status=NS
+ * GET /api/fixtures/upcoming
+ * Επιστρέφει upcoming αγώνες (NS)
  */
 router.get("/upcoming", async (req, res) => {
   try {
     const fixtures = await apiGet("/fixtures", {
       status: "NS",
-      season: 2025,
-      timezone: "Europe/Athens",
-      limit: 500
+      next: 50
     });
 
     res.json({
       count: fixtures.length,
-      fixtures
+      fixtures: fixtures.map(f => ({
+        id: f.fixture.id,
+        date: f.fixture.date,
+        league: f.league.name,
+        home: f.teams.home.name,
+        away: f.teams.away.name
+      }))
     });
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    console.error("Upcoming fixtures error:", err.message);
+    res.status(500).json({ error: "Failed to load upcoming fixtures" });
   }
 });
 

@@ -1,37 +1,60 @@
+// src/api/analyze.js
 import express from "express";
-import fetch from "node-fetch";
+import { getUpcomingFixtures } from "./fixtures.js";
 
 const router = express.Router();
 
-// test
-router.get("/", (req, res) => {
-  res.json({ status: "analyze route alive" });
-});
-
+/**
+ * POST /api/analyze
+ * body: { mode: "upcoming" | "live", market: "goals" | "corners" }
+ */
 router.post("/", async (req, res) => {
   try {
-    const { mode = "upcoming", market = "goals" } = req.body;
+    const { mode, market } = req.body || {};
 
-    const baseUrl = "https://neon-ai-predictor.onrender.com";
+    if (!mode || !market) {
+      return res.status(400).json({
+        ok: false,
+        error: "mode and market are required"
+      });
+    }
 
-    const endpoint =
-      mode === "live"
-        ? "/api/fixtures/live"
-        : "/api/fixtures/upcoming";
+    // ---- UPCOMING ----
+    if (mode === "upcoming") {
+      const { fixtures } = await getUpcomingFixtures({
+        daysAhead: 4 // όπως συμφωνήσαμε
+      });
 
-    const response = await fetch(baseUrl + endpoint);
-    const data = await response.json();
+      return res.json({
+        ok: true,
+        mode,
+        market,
+        fixturesCount: fixtures.length,
+        fixtures
+      });
+    }
 
-    res.json({
-      ok: true,
-      mode,
-      market,
-      fixturesCount: data.fixtures?.length || 0,
-      fixtures: data.fixtures || []
+    // ---- LIVE (placeholder – ΔΕΝ το σπάμε τώρα) ----
+    if (mode === "live") {
+      return res.json({
+        ok: true,
+        mode,
+        market,
+        fixturesCount: 0,
+        fixtures: []
+      });
+    }
+
+    return res.status(400).json({
+      ok: false,
+      error: "Invalid mode"
     });
   } catch (err) {
     console.error("Analyze error:", err);
-    res.status(500).json({ error: "Analyze failed" });
+    res.status(500).json({
+      ok: false,
+      error: "Analyze failed"
+    });
   }
 });
 

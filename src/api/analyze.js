@@ -1,3 +1,7 @@
+router.get("/", (req, res) => {
+  res.json({ status: "analyze route alive" });
+});
+
 import express from "express";
 import { apiFootball } from "../utils/apiFootball.js";
 

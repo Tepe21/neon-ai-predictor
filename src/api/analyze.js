@@ -1,27 +1,33 @@
 import express from "express";
+import fetch from "node-fetch";
 
 const router = express.Router();
 
-/**
- * DEBUG – για να ξέρουμε ότι το route φορτώνεται
- */
+// test
 router.get("/", (req, res) => {
   res.json({ status: "analyze route alive" });
 });
 
-/**
- * POST /api/analyze
- */
 router.post("/", async (req, res) => {
   try {
     const { mode = "upcoming", market = "goals" } = req.body;
 
-    // προσωρινό dummy response για να σταθεροποιήσουμε το endpoint
+    const baseUrl = "https://neon-ai-predictor.onrender.com";
+
+    const endpoint =
+      mode === "live"
+        ? "/api/fixtures/live"
+        : "/api/fixtures/upcoming";
+
+    const response = await fetch(baseUrl + endpoint);
+    const data = await response.json();
+
     res.json({
       ok: true,
       mode,
       market,
-      results: [],
+      fixturesCount: data.fixtures?.length || 0,
+      fixtures: data.fixtures || []
     });
   } catch (err) {
     console.error("Analyze error:", err);

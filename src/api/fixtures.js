@@ -1,22 +1,45 @@
 import express from "express";
-import { apiFootball } from "../utils/apiFootball.js";
+import fetch from "node-fetch";
 
 const router = express.Router();
 
-router.get("/upcoming", async (req, res) => {
+const API_KEY = process.env.API_FOOTBALL_KEY;
+const API_URL = "https://v3.football.api-sports.io";
+
+const headers = {
+  "x-apisports-key": API_KEY
+};
+
+// LIVE FIXTURES
+router.get("/live", async (req, res) => {
   try {
-    const data = await apiFootball("/fixtures", {
-      status: "NS",
-      next: 100,
-    });
+    const r = await fetch(`${API_URL}/fixtures?live=all`, { headers });
+    const j = await r.json();
 
     res.json({
-      count: data.response.length,
-      fixtures: data.response,
+      count: j.response.length,
+      fixtures: j.response
     });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: "Failed to fetch upcoming fixtures" });
+  } catch (e) {
+    res.status(500).json({ error: "Live fixtures failed" });
+  }
+});
+
+// UPCOMING FIXTURES (GLOBAL STABLE)
+router.get("/upcoming", async (req, res) => {
+  try {
+    const r = await fetch(
+      `${API_URL}/fixtures?status=NS&next=200`,
+      { headers }
+    );
+    const j = await r.json();
+
+    res.json({
+      count: j.response.length,
+      fixtures: j.response
+    });
+  } catch (e) {
+    res.status(500).json({ error: "Upcoming fixtures failed" });
   }
 });
 

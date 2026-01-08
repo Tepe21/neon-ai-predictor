@@ -28,8 +28,15 @@ router.get("/live", async (req, res) => {
 // UPCOMING FIXTURES (GLOBAL STABLE)
 router.get("/upcoming", async (req, res) => {
   try {
+    const today = new Date();
+    const from = today.toISOString().split("T")[0];
+
+    const toDate = new Date();
+    toDate.setDate(today.getDate() + 4);
+    const to = toDate.toISOString().split("T")[0];
+
     const r = await fetch(
-      `${API_URL}/fixtures?status=NS&next=200`,
+      `${API_URL}/fixtures?from=${from}&to=${to}`,
       { headers }
     );
     const j = await r.json();
@@ -39,6 +46,7 @@ router.get("/upcoming", async (req, res) => {
       fixtures: j.response
     });
   } catch (e) {
+    console.error(e);
     res.status(500).json({ error: "Upcoming fixtures failed" });
   }
 });

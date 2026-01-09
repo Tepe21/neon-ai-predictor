@@ -1,26 +1,43 @@
-import fetch from "node-fetch";
-
-const API_URL = "https://v3.football.api-sports.io";
 const API_KEY = process.env.API_FOOTBALL_KEY;
+const BASE_URL = "https://v3.football.api-sports.io";
 
-export async function fetchUpcomingBatch(next = 50) {
-  const res = await fetch(
-    `${API_URL}/fixtures?next=${next}&timezone=Europe/Athens`,
-    {
-      headers: {
-        "x-apisports-key": API_KEY
-      }
-    }
-  );
+async function apiFetch(endpoint, params = {}) {
+  const url = new URL(BASE_URL + endpoint);
+
+  Object.entries(params).forEach(([key, value]) => {
+    if (value !== undefined) url.searchParams.append(key, value);
+  });
+
+  const res = await fetch(url, {
+    headers: {
+      "x-apisports-key": API_KEY,
+    },
+  });
+
+  if (!res.ok) {
+    throw new Error(`API error ${res.status}`);
+  }
 
   const data = await res.json();
+  return data.response || [];
+}
 
-  return (data.response || []).map(f => ({
-    id: f.fixture.id,
-    date: f.fixture.date,
-    home: f.teams.home.name,
-    away: f.teams.away.name,
-    league: f.league.name,
-    statistics: {} // placeholder
-  }));
+/**
+ * 🔥 ΣΤΑΘΕΡΟ UPCOMING
+ * Χρησιμοποιεί ΜΟΝΟ next (όπως είπε το API-Football)
+ */
+export async function getUpcomingFixtures(limit = 200) {
+  return apiFetch("/fixtures", {
+    next: limit,
+    status: "NS",
+  });
+}
+
+/**
+ * LIVE fixtures (έτοιμο για alerts)
+ */
+export async function getLiveFixtures() {
+  return apiFetch("/fixtures", {
+    live: "all",
+  });
 }

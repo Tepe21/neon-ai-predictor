@@ -1,35 +1,35 @@
 import express from "express";
-import { getUpcomingFixtures } from "./fixtures.js";
-import { runManualEngine } from "../engines/manualEngine.js";
+import { getUpcomingFixtures, getLiveFixtures } from "../utils/apiFootball.js";
 
 const router = express.Router();
 
 router.post("/", async (req, res) => {
-  const { mode, market, time = "full" } = req.body;
+  const { mode, market, time } = req.body;
 
-  if (mode !== "upcoming") {
-    return res.json({
-      ok: false,
-      error: "Only upcoming mode supported"
+  try {
+    let fixtures = [];
+
+    if (mode === "upcoming") {
+      fixtures = await getUpcomingFixtures(200);
+    }
+
+    if (mode === "live") {
+      fixtures = await getLiveFixtures();
+    }
+
+    // ⬇️ εδώ μπαίνει αργότερα scoring / AI logic
+    res.json({
+      ok: true,
+      mode,
+      market,
+      time,
+      fixturesCount: fixtures.length,
+      fixtures,
     });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ ok: false, error: "Analyze failed" });
   }
-
-  const fixtures = await getUpcomingFixtures(200);
-
-  const suggestions = runManualEngine({
-    fixtures,
-    market,
-    time
-  });
-
-  res.json({
-    ok: true,
-    mode,
-    market,
-    time,
-    fixturesUsed: fixtures.length,
-    suggestions
-  });
 });
 
 export default router;

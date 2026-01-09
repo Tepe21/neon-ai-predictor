@@ -1,18 +1,20 @@
-import { fetchUpcomingBatch } from "../utils/apiFootball.js";
+import express from "express";
+import { getUpcomingFixtures } from "../utils/apiFootball.js";
 
-export async function getUpcomingFixtures(limit = 200) {
-  let fixtures = [];
-  let remaining = limit;
+const router = express.Router();
 
-  while (remaining > 0) {
-    const batchSize = Math.min(50, remaining);
-    const batch = await fetchUpcomingBatch(batchSize);
+router.get("/upcoming", async (req, res) => {
+  try {
+    const fixtures = await getUpcomingFixtures(200);
 
-    if (!batch.length) break;
-
-    fixtures.push(...batch);
-    remaining -= batchSize;
+    res.json({
+      count: fixtures.length,
+      fixtures,
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Failed to fetch upcoming fixtures" });
   }
+});
 
-  return fixtures;
-}
+export default router;

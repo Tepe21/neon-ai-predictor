@@ -11,6 +11,7 @@ router.get("/upcoming", async (req, res) => {
       fixtures
     });
   } catch (err) {
+    console.error(err);
     res.status(500).json({ error: "Failed to fetch fixtures" });
   }
 });

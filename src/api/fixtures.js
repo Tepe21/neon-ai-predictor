@@ -5,14 +5,17 @@ const router = express.Router();
 
 router.get("/upcoming", async (req, res) => {
   try {
-    const fixtures = await getUpcomingFixtures(200);
+    const limit = Number(req.query.limit || 50);
+    const fixtures = await getUpcomingFixtures(limit);
+
     res.json({
       count: fixtures.length,
-      fixtures
+      fixtures,
     });
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: "Failed to fetch fixtures" });
+    res.status(500).json({
+      error: err.message,
+    });
   }
 });
 

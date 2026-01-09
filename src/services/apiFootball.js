@@ -1,36 +1,18 @@
-import fetch from "node-fetch";
+const API_BASE = "https://v3.football.api-sports.io";
 
-const API_URL = "https://v3.football.api-sports.io";
-const API_KEY = process.env.API_FOOTBALL_KEY;
+const headers = {
+  "x-apisports-key": process.env.API_FOOTBALL_KEY,
+};
 
-export async function getUpcomingFixtures(limit = 200) {
-  const response = await fetch(
-    `${API_URL}/fixtures?next=${limit}&timezone=Europe/Athens`,
-    {
-      headers: {
-        "x-apisports-key": API_KEY
-      }
-    }
-  );
+export async function getUpcomingFixtures(limit = 50) {
+  const url = `${API_BASE}/fixtures?next=${limit}`;
 
-  const data = await response.json();
-  return data.response || [];
-}
-import fetch from "node-fetch";
-
-const API_URL = "https://v3.football.api-sports.io";
-const API_KEY = process.env.API_FOOTBALL_KEY;
-
-export async function getUpcomingFixtures(limit = 200) {
-  const res = await fetch(
-    `${API_URL}/fixtures?next=${limit}&timezone=Europe/Athens`,
-    {
-      headers: {
-        "x-apisports-key": API_KEY
-      }
-    }
-  );
-
+  const res = await fetch(url, { headers });
   const data = await res.json();
-  return data.response || [];
+
+  if (!data.response) {
+    throw new Error("API-Football returned invalid response");
+  }
+
+  return data.response;
 }

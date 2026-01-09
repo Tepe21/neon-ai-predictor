@@ -1,21 +1,21 @@
 import express from "express";
-import { getUpcomingFixtures } from "../services/apiFootball.js";
+import { apiFetch } from "../services/apiFootball.js";
 
 const router = express.Router();
 
 router.get("/upcoming", async (req, res) => {
   try {
-    const limit = Number(req.query.limit || 50);
-    const fixtures = await getUpcomingFixtures(limit);
+    const fixtures = await apiFetch("/fixtures", {
+      next: 200,
+      status: "NS"
+    });
 
     res.json({
       count: fixtures.length,
-      fixtures,
+      fixtures
     });
   } catch (err) {
-    res.status(500).json({
-      error: err.message,
-    });
+    res.status(500).json({ error: err.message });
   }
 });
 

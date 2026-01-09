@@ -1,25 +1,53 @@
 import express from "express";
-import { getUpcomingFixtures } from "../services/apiFootball.js";
+import { apiFetch } from "../services/apiFootball.js";
 
 const router = express.Router();
 
 router.post("/", async (req, res) => {
-  const { mode = "upcoming", market = "goals" } = req.body;
-
   try {
-    if (mode !== "upcoming") {
-      return res.json({ ok: false, message: "Only upcoming supported" });
+    const {
+      market = "goals",
+      league,
+      country,
+      fromHour,
+      toHour
+    } = req.body;
+
+    let fixtures = await apiFetch("/fixtures", {
+      next: 200,
+      status: "NS"
+    });
+
+    // 🔍 FILTERS
+    if (league) {
+      fixtures = fixtures.filter(f => f.league?.name === league);
     }
 
-    const fixtures = await getUpcomingFixtures(50);
+    if (country) {
+      fixtures = fixtures.filter(f => f.league?.country === country);
+    }
+
+    if (fromHour !== undefined) {
+      fixtures = fixtures.filter(f => {
+        const h = new Date(f.fixture.date).getHours();
+        return h >= fromHour;
+      });
+    }
+
+    if (toHour !== undefined) {
+      fixtures = fixtures.filter(f => {
+        const h = new Date(f.fixture.date).getHours();
+        return h <= toHour;
+      });
+    }
 
     res.json({
       ok: true,
-      mode,
       market,
       fixturesCount: fixtures.length,
-      fixtures,
+      fixtures
     });
+
   } catch (err) {
     res.status(500).json({ error: err.message });
   }

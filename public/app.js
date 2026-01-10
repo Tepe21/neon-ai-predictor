@@ -1,135 +1,104 @@
-// ================================
-// AI Football Picks - Frontend Logic
-// Manual Search UI Wiring
-// ================================
+// public/app.js
 
 document.addEventListener("DOMContentLoaded", () => {
 
-  // ----------------------------
-  // Dropdown click toggle system
-  // ----------------------------
-  function setupDropdown(buttonId, menuId) {
-    const btn = document.getElementById(buttonId);
-    const menu = document.getElementById(menuId);
+  // --- Mode dropdown (Live / Upcoming)
+  const modeBtn = document.querySelector("#mode-btn");
+  const modeDropdown = document.querySelector("#mode-dropdown");
+  const modeLabel = document.querySelector("#mode-label");
 
-    if (!btn || !menu) return;
+  // --- Market dropdown (Goals / Corners)
+  const marketBtn = document.querySelector("#market-btn");
+  const marketDropdown = document.querySelector("#market-dropdown");
+  const marketLabel = document.querySelector("#market-label");
 
-    btn.addEventListener("click", (e) => {
-      e.stopPropagation();
-      closeAllDropdowns();
-      menu.classList.toggle("open");
-    });
-  }
+  // --- Language dropdown
+  const langBtn = document.querySelector("#lang-btn");
+  const langDropdown = document.querySelector("#lang-dropdown");
+  const langLabel = document.querySelector("#lang-label");
 
-  function closeAllDropdowns() {
-    document.querySelectorAll(".dropdown-menu").forEach((m) => {
-      m.classList.remove("open");
-    });
-  }
+  // --- Analyze button
+  const analyzeBtn = document.querySelector("#analyze-btn");
+  const matchInput = document.querySelector("#match-input");
 
-  document.addEventListener("click", () => {
-    closeAllDropdowns();
-  });
-
-  // Connect dropdowns
-  setupDropdown("btn-live-upcoming", "menu-live-upcoming");
-  setupDropdown("btn-goals-corners", "menu-goals-corners");
-  setupDropdown("btn-language", "menu-language");
-
-
-  // ----------------------------
-  // Store selected filter values
-  // ----------------------------
   let selectedMode = "live";
   let selectedMarket = "goals";
-  let selectedLanguage = "en";
+  let selectedLang = "EN";
 
+  // ----------- SAFETY CHECK
+  if (!modeBtn || !marketBtn || !langBtn || !analyzeBtn) {
+    console.error("UI elements not found in DOM");
+    return;
+  }
 
-  // Mode dropdown
-  document.querySelectorAll("#menu-live-upcoming div").forEach((item) => {
+  // ----------- MODE DROPDOWN
+  modeBtn.addEventListener("click", () => {
+    modeDropdown.classList.toggle("show");
+  });
+
+  modeDropdown.querySelectorAll("[data-mode]").forEach(item => {
     item.addEventListener("click", () => {
-      selectedMode = item.dataset.value;
-      document.getElementById("btn-live-upcoming").innerText = item.innerText;
-      closeAllDropdowns();
+      selectedMode = item.dataset.mode;
+      modeLabel.innerText = selectedMode.charAt(0).toUpperCase() + selectedMode.slice(1);
+      modeDropdown.classList.remove("show");
     });
   });
 
-  // Market dropdown
-  document.querySelectorAll("#menu-goals-corners div").forEach((item) => {
+  // ----------- MARKET DROPDOWN
+  marketBtn.addEventListener("click", () => {
+    marketDropdown.classList.toggle("show");
+  });
+
+  marketDropdown.querySelectorAll("[data-market]").forEach(item => {
     item.addEventListener("click", () => {
-      selectedMarket = item.dataset.value;
-      document.getElementById("btn-goals-corners").innerText = item.innerText;
-      closeAllDropdowns();
+      selectedMarket = item.dataset.market;
+      marketLabel.innerText = selectedMarket.charAt(0).toUpperCase() + selectedMarket.slice(1);
+      marketDropdown.classList.remove("show");
     });
   });
 
-  // Language dropdown
-  document.querySelectorAll("#menu-language div").forEach((item) => {
+  // ----------- LANGUAGE DROPDOWN
+  langBtn.addEventListener("click", () => {
+    langDropdown.classList.toggle("show");
+  });
+
+  langDropdown.querySelectorAll("[data-lang]").forEach(item => {
     item.addEventListener("click", () => {
-      selectedLanguage = item.dataset.value;
-      document.getElementById("btn-language").innerText = item.innerText;
-      closeAllDropdowns();
-      applyLanguage();
+      selectedLang = item.dataset.lang;
+      langLabel.innerText = selectedLang;
+      langDropdown.classList.remove("show");
     });
   });
 
+  // ----------- ANALYZE BUTTON
+  analyzeBtn.addEventListener("click", async () => {
+    const query = matchInput.value.trim();
+    if (!query) return;
 
-  // ----------------------------
-  // Apply language switch
-  // ----------------------------
-  function applyLanguage() {
-    const input = document.getElementById("input-fixture");
-    const analyzeBtn = document.getElementById("analyze-btn");
+    analyzeBtn.innerText = "Analyzing...";
 
-    if (!input || !analyzeBtn) return;
+    try {
+      const res = await fetch("/api/analyze", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          mode: selectedMode,
+          market: selectedMarket,
+          query: query
+        })
+      });
 
-    if (selectedLanguage === "el") {
-      input.placeholder = "Εισαγωγή αγώνα";
-      analyzeBtn.innerText = "Ανάλυση";
-    } else {
-      input.placeholder = "Enter match";
-      analyzeBtn.innerText = "Analyze";
+      const data = await res.json();
+      console.log("Analysis result:", data);
+
+      alert("Analysis completed. Check console for result.");
+
+    } catch (err) {
+      console.error("Analyze error:", err);
+      alert("Error contacting backend");
     }
-  }
 
-
-  // ----------------------------
-  // Analyze button → Backend call
-  // ----------------------------
-  const analyzeBtn = document.getElementById("analyze-btn");
-
-  if (analyzeBtn) {
-    analyzeBtn.addEventListener("click", async () => {
-
-      const fixtureInput = document.getElementById("input-fixture").value.trim();
-
-      if (!fixtureInput) {
-        alert("Insert match ID or name");
-        return;
-      }
-
-      const payload = {
-        mode: selectedMode,
-        market: selectedMarket,
-        query: fixtureInput
-      };
-
-      try {
-        const res = await fetch("/api/analyze", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload)
-        });
-
-        const data = await res.json();
-        console.log("Analyze response:", data);
-
-        alert("Analyze OK → Check console");
-      } catch (err) {
-        console.error("Analyze error:", err);
-        alert("Backend error");
-      }
-    });
-  }
+    analyzeBtn.innerText = "Analyze";
+  });
 
 });

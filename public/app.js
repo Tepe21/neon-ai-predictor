@@ -1,37 +1,35 @@
-// public/app.js
-
 document.addEventListener("DOMContentLoaded", () => {
 
-  // --- Mode dropdown (Live / Upcoming)
-  const modeBtn = document.querySelector("#mode-btn");
-  const modeDropdown = document.querySelector("#mode-dropdown");
-  const modeLabel = document.querySelector("#mode-label");
+  // --- Mode button (Live / Upcoming)
+  const modeBtn = document.querySelector(".mode-selector");
+  const modeDropdown = document.querySelector(".mode-dropdown");
+  const modeLabel = modeBtn?.querySelector("span");
 
-  // --- Market dropdown (Goals / Corners)
-  const marketBtn = document.querySelector("#market-btn");
-  const marketDropdown = document.querySelector("#market-dropdown");
-  const marketLabel = document.querySelector("#market-label");
+  // --- Market button (Goals / Corners)
+  const marketBtn = document.querySelector(".market-selector");
+  const marketDropdown = document.querySelector(".market-dropdown");
+  const marketLabel = marketBtn?.querySelector("span");
 
-  // --- Language dropdown
-  const langBtn = document.querySelector("#lang-btn");
-  const langDropdown = document.querySelector("#lang-dropdown");
-  const langLabel = document.querySelector("#lang-label");
+  // --- Language button
+  const langBtn = document.querySelector(".lang-selector");
+  const langDropdown = document.querySelector(".lang-dropdown");
+  const langLabel = langBtn?.querySelector("span");
 
-  // --- Analyze button
-  const analyzeBtn = document.querySelector("#analyze-btn");
-  const matchInput = document.querySelector("#match-input");
+  // --- Input + Analyze
+  const matchInput = document.querySelector("input[type='text']");
+  const analyzeBtn = document.querySelector(".analyze-btn");
 
-  let selectedMode = "live";
-  let selectedMarket = "goals";
-  let selectedLang = "EN";
-
-  // ----------- SAFETY CHECK
+  // --- Debug check
   if (!modeBtn || !marketBtn || !langBtn || !analyzeBtn) {
     console.error("UI elements not found in DOM");
     return;
   }
 
-  // ----------- MODE DROPDOWN
+  let selectedMode = "live";
+  let selectedMarket = "goals";
+  let selectedLang = "EN";
+
+  // ---------------- Mode dropdown
   modeBtn.addEventListener("click", () => {
     modeDropdown.classList.toggle("show");
   });
@@ -39,12 +37,12 @@ document.addEventListener("DOMContentLoaded", () => {
   modeDropdown.querySelectorAll("[data-mode]").forEach(item => {
     item.addEventListener("click", () => {
       selectedMode = item.dataset.mode;
-      modeLabel.innerText = selectedMode.charAt(0).toUpperCase() + selectedMode.slice(1);
+      modeLabel.innerText = item.innerText;
       modeDropdown.classList.remove("show");
     });
   });
 
-  // ----------- MARKET DROPDOWN
+  // ---------------- Market dropdown
   marketBtn.addEventListener("click", () => {
     marketDropdown.classList.toggle("show");
   });
@@ -52,12 +50,12 @@ document.addEventListener("DOMContentLoaded", () => {
   marketDropdown.querySelectorAll("[data-market]").forEach(item => {
     item.addEventListener("click", () => {
       selectedMarket = item.dataset.market;
-      marketLabel.innerText = selectedMarket.charAt(0).toUpperCase() + selectedMarket.slice(1);
+      marketLabel.innerText = item.innerText;
       marketDropdown.classList.remove("show");
     });
   });
 
-  // ----------- LANGUAGE DROPDOWN
+  // ---------------- Language dropdown
   langBtn.addEventListener("click", () => {
     langDropdown.classList.toggle("show");
   });
@@ -70,7 +68,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
-  // ----------- ANALYZE BUTTON
+  // ---------------- Analyze
   analyzeBtn.addEventListener("click", async () => {
     const query = matchInput.value.trim();
     if (!query) return;
@@ -84,18 +82,16 @@ document.addEventListener("DOMContentLoaded", () => {
         body: JSON.stringify({
           mode: selectedMode,
           market: selectedMarket,
-          query: query
+          query
         })
       });
 
       const data = await res.json();
-      console.log("Analysis result:", data);
-
-      alert("Analysis completed. Check console for result.");
-
+      console.log("Analysis:", data);
+      alert("Analysis completed. Check console.");
     } catch (err) {
       console.error("Analyze error:", err);
-      alert("Error contacting backend");
+      alert("Backend error");
     }
 
     analyzeBtn.innerText = "Analyze";

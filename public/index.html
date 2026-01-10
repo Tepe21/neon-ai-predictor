@@ -1,77 +1,62 @@
 <!DOCTYPE html>
-<html lang="el">
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
   <title>AI Football Picks</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="stylesheet" href="styles.css" />
+  <link rel="icon" href="data:,">
 </head>
 <body>
 
-<!-- BETA BANNER -->
-<div class="beta-banner">
-  <div class="banner-track">
-    🚀 FREE BETA LIVE • AI Football Picks • Goals • Corners • Live Alerts •
-    🚀 FREE BETA LIVE • AI Football Picks • Goals • Corners • Live Alerts •
-  </div>
+<!-- Top scrolling banner -->
+<div class="top-banner">
+  ⚡ FREE BETA LIVE — AI Football Picks — Live Alerts — Goals — Corners — FREE BETA LIVE ⚡
 </div>
 
-<!-- HEADER -->
-<header class="header">
-  <div class="title">
-    ⚽ <h1>AI Football Picks</h1>
-  </div>
-  <p class="subtitle">Live Match Intelligence Engine</p>
+<div class="app-container">
 
-  <!-- LANGUAGE -->
-  <div class="lang">
-    🌍 EN ▼
-    <div class="lang-menu">
-      <div>EN</div>
-      <div>EL</div>
-    </div>
-  </div>
-</header>
+  <header>
+    <h1>⚽ AI Football Picks</h1>
+    <h2>Live Match Intelligence Engine</h2>
+  </header>
 
-<!-- MAIN -->
-<main class="app">
-
-  <!-- TABS -->
   <div class="tabs">
     <button class="tab active">🔍 Manual Search</button>
     <button class="tab">🔔 Live Alerts</button>
   </div>
 
-  <!-- CONTROLS -->
   <div class="controls">
 
-    <!-- LIVE / UPCOMING -->
     <div class="dropdown">
-      <button class="drop-btn">⏱ Live</button>
+      <button class="drop-btn">🟢 Live ▾</button>
       <div class="drop-menu">
-        <div>Live</div>
-        <div>📅 Upcoming</div>
+        <div>🟢 Live</div>
       </div>
     </div>
 
-    <!-- GOALS / CORNERS -->
     <div class="dropdown">
-      <button class="drop-btn">⚽ Goals</button>
+      <button class="drop-btn">🚩 Corners ▾</button>
       <div class="drop-menu">
-        <div>Goals</div>
         <div>🚩 Corners</div>
+        <div>⚽ Goals</div>
       </div>
     </div>
 
-    <!-- INPUT -->
-    <input class="match-input" placeholder="Εισαγωγή αγώνα" />
+    <input id="matchInput" placeholder="Enter match name..." />
 
-    <!-- ANALYZE -->
-    <button class="analyze-btn">🔎 Analyze</button>
+    <button id="analyzeBtn">🤖 Analyze</button>
   </div>
 
-</main>
-<script src="app.js"></script>
+  <div id="resultBox" class="result hidden">
+    <div id="matchTitle"></div>
+    <div id="minute"></div>
+    <div id="suggestion"></div>
+    <div id="confidence"></div>
+  </div>
 
+</div>
+
+<script src="app.js"></script>
 </body>
 </html>

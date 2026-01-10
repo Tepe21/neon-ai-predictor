@@ -147,3 +147,16 @@ body {
   color: #000;
   font-weight: bold;
 }
+/* =========================
+Dropdown open state (click)
+========================= */
+.dropdown-menu {
+  display: none;
+  position: absolute;
+  z-index: 20;
+}
+
+.dropdown-menu.open {
+  display: block;
+}
+

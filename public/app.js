@@ -1,156 +1,122 @@
 // ================================
-// AI Football Picks - UI Wiring
+// AI Football Picks - Frontend Logic
+// Manual Search UI Wiring
 // ================================
 
-// ---- STATE ----
-let mode = "live";        // live | upcoming
-let market = "goals";     // goals | corners
-let time = "full";        // full | half
-let language = "en";      // en | gr
 
-// ---- ELEMENTS ----
-const liveUpcomingBtn = document.getElementById("btn-live-upcoming");
-const goalsCornersBtn = document.getElementById("btn-goals-corners");
-const timeBtn = document.getElementById("btn-time"); // if exists
-const analyzeBtn = document.getElementById("btn-analyze");
-const matchInput = document.getElementById("match-input");
-const resultsBox = document.getElementById("results-box");
-const langBtn = document.getElementById("btn-language");
+// ----------------------------
+// Dropdown click toggle system
+// ----------------------------
+function setupDropdown(buttonId, menuId) {
+  const btn = document.getElementById(buttonId);
+  const menu = document.getElementById(menuId);
 
-// dropdown items
-const liveOption = document.getElementById("opt-live");
-const upcomingOption = document.getElementById("opt-upcoming");
-const goalsOption = document.getElementById("opt-goals");
-const cornersOption = document.getElementById("opt-corners");
-const fullOption = document.getElementById("opt-full");
-const halfOption = document.getElementById("opt-half");
-const langEN = document.getElementById("lang-en");
-const langGR = document.getElementById("lang-gr");
+  if (!btn || !menu) return;
 
-// ================================
-// ---- TOGGLES ----
-// ================================
+  btn.addEventListener("click", (e) => {
+    e.stopPropagation();
+    closeAllDropdowns();
+    menu.classList.toggle("open");
+  });
+}
 
-liveOption?.addEventListener("click", () => {
-  mode = "live";
-  liveUpcomingBtn.innerText = text("Live");
+function closeAllDropdowns() {
+  document.querySelectorAll(".dropdown-menu").forEach((m) => {
+    m.classList.remove("open");
+  });
+}
+
+document.addEventListener("click", () => {
+  closeAllDropdowns();
 });
 
-upcomingOption?.addEventListener("click", () => {
-  mode = "upcoming";
-  liveUpcomingBtn.innerText = text("Upcoming");
+// Connect dropdowns
+setupDropdown("btn-live-upcoming", "menu-live-upcoming");
+setupDropdown("btn-goals-corners", "menu-goals-corners");
+setupDropdown("btn-language", "menu-language");
+
+
+// ----------------------------
+// Store selected filter values
+// ----------------------------
+let selectedMode = "live";
+let selectedMarket = "goals";
+let selectedLanguage = "en";
+
+// Mode dropdown
+document.querySelectorAll("#menu-live-upcoming div").forEach((item) => {
+  item.addEventListener("click", () => {
+    selectedMode = item.dataset.value;
+    document.getElementById("btn-live-upcoming").innerText = item.innerText;
+    closeAllDropdowns();
+  });
 });
 
-goalsOption?.addEventListener("click", () => {
-  market = "goals";
-  goalsCornersBtn.innerText = text("Goals");
+// Market dropdown
+document.querySelectorAll("#menu-goals-corners div").forEach((item) => {
+  item.addEventListener("click", () => {
+    selectedMarket = item.dataset.value;
+    document.getElementById("btn-goals-corners").innerText = item.innerText;
+    closeAllDropdowns();
+  });
 });
 
-cornersOption?.addEventListener("click", () => {
-  market = "corners";
-  goalsCornersBtn.innerText = text("Corners");
+// Language dropdown
+document.querySelectorAll("#menu-language div").forEach((item) => {
+  item.addEventListener("click", () => {
+    selectedLanguage = item.dataset.value;
+    document.getElementById("btn-language").innerText = item.innerText;
+    closeAllDropdowns();
+    applyLanguage();
+  });
 });
 
-fullOption?.addEventListener("click", () => {
-  time = "full";
-  timeBtn.innerText = text("Full Time");
-});
 
-halfOption?.addEventListener("click", () => {
-  time = "half";
-  timeBtn.innerText = text("Half Time");
-});
+// ----------------------------
+// Apply language switch
+// ----------------------------
+function applyLanguage() {
+  if (selectedLanguage === "el") {
+    document.getElementById("input-fixture").placeholder = "Εισαγωγή αγώνα";
+    document.getElementById("analyze-btn").innerText = "Ανάλυση";
+  } else {
+    document.getElementById("input-fixture").placeholder = "Enter match";
+    document.getElementById("analyze-btn").innerText = "Analyze";
+  }
+}
 
-// ================================
-// ---- LANGUAGE SWITCH ----
-// ================================
 
-langEN?.addEventListener("click", () => {
-  language = "en";
-  refreshTexts();
-});
+// ----------------------------
+// Analyze button → Backend call
+// ----------------------------
+document.getElementById("analyze-btn").addEventListener("click", async () => {
+  const fixtureInput = document.getElementById("input-fixture").value.trim();
 
-langGR?.addEventListener("click", () => {
-  language = "gr";
-  refreshTexts();
-});
+  if (!fixtureInput) {
+    alert("Insert match ID or name");
+    return;
+  }
 
-function text(key) {
-  const dict = {
-    en: {
-      Live: "Live",
-      Upcoming: "Upcoming",
-      Goals: "Goals",
-      Corners: "Corners",
-      "Full Time": "Full Time",
-      "Half Time": "Half Time",
-      Analyze: "Analyze",
-      "Insert Match": "Insert match"
-    },
-    gr: {
-      Live: "Live",
-      Upcoming: "Επερχόμενα",
-      Goals: "Γκολ",
-      Corners: "Κόρνερ",
-      "Full Time": "Τελικό",
-      "Half Time": "Ημίχρονο",
-      Analyze: "Ανάλυση",
-      "Insert Match": "Εισαγωγή αγώνα"
-    }
+  const payload = {
+    mode: selectedMode,
+    market: selectedMarket,
+    query: fixtureInput
   };
-  return dict[language][key] || key;
-}
-
-function refreshTexts() {
-  liveUpcomingBtn.innerText = text(liveUpcomingBtn.innerText);
-  goalsCornersBtn.innerText = text(goalsCornersBtn.innerText);
-  if (timeBtn) timeBtn.innerText = text(timeBtn.innerText);
-  analyzeBtn.innerText = text("Analyze");
-  matchInput.placeholder = text("Insert Match");
-}
-
-// ================================
-// ---- ANALYZE BUTTON ----
-// ================================
-
-analyzeBtn?.addEventListener("click", async () => {
-  resultsBox.innerHTML = text("Analyze") + "...";
 
   try {
     const res = await fetch("/api/analyze", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        mode,
-        market,
-        time,
-        match: matchInput.value || ""
-      })
+      body: JSON.stringify(payload)
     });
 
     const data = await res.json();
+    console.log("Analyze response:", data);
 
-    if (!data.results || data.results.length === 0) {
-      resultsBox.innerHTML = "No results";
-      return;
-    }
-
-    const r = data.results[0];
-
-    resultsBox.innerHTML = `
-      <div class="result-card">
-        <div class="result-suggestion">${r.suggestion}</div>
-        <div class="result-confidence">${r.confidence}%</div>
-        <div class="result-tag">${r.tag}</div>
-      </div>
-    `;
-
-  } catch (e) {
-    resultsBox.innerHTML = "Error";
+    // προσωρινό output
+    alert("Analyze OK → Check console");
+  } catch (err) {
+    console.error("Analyze error:", err);
+    alert("Backend error");
   }
 });
-
-// ================================
-// ---- INIT ----
-// ================================
-refreshTexts();

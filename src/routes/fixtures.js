@@ -1,18 +1,14 @@
 import express from "express";
-import { apiFetch } from "../services/apiFootball.js";
+import { fetchUpcomingFixtures } from "../services/apiFootball.js";
 
 const router = express.Router();
 
 router.get("/upcoming", async (req, res) => {
   try {
-    const fixtures = await apiFetch("/fixtures", {
-      next: 200,
-      status: "NS"
-    });
-
+    const fixtures = await fetchUpcomingFixtures(200);
     res.json({
       count: fixtures.length,
-      fixtures
+      fixtures,
     });
   } catch (err) {
     res.status(500).json({ error: err.message });

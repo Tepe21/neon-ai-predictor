@@ -1,100 +1,111 @@
+// public/app.js
+
 document.addEventListener("DOMContentLoaded", () => {
 
-  // --- Mode button (Live / Upcoming)
-  const modeBtn = document.querySelector(".mode-selector");
-  const modeDropdown = document.querySelector(".mode-dropdown");
-  const modeLabel = modeBtn?.querySelector("span");
+  // ===== Tabs (Manual Search / Live Alerts) =====
+  const tabs = document.querySelectorAll(".tab");
 
-  // --- Market button (Goals / Corners)
-  const marketBtn = document.querySelector(".market-selector");
-  const marketDropdown = document.querySelector(".market-dropdown");
-  const marketLabel = marketBtn?.querySelector("span");
+  tabs.forEach(tab => {
+    tab.addEventListener("click", () => {
+      tabs.forEach(t => t.classList.remove("active"));
+      tab.classList.add("active");
+    });
+  });
 
-  // --- Language button
-  const langBtn = document.querySelector(".lang-selector");
-  const langDropdown = document.querySelector(".lang-dropdown");
-  const langLabel = langBtn?.querySelector("span");
 
-  // --- Input + Analyze
-  const matchInput = document.querySelector("input[type='text']");
-  const analyzeBtn = document.querySelector(".analyze-btn");
+  // ===== Dropdowns (Live/Upcoming & Goals/Corners) =====
+  const dropdowns = document.querySelectorAll(".dropdown");
 
-  // --- Debug check
-  if (!modeBtn || !marketBtn || !langBtn || !analyzeBtn) {
-    console.error("UI elements not found in DOM");
-    return;
+  dropdowns.forEach(dropdown => {
+    const button = dropdown.querySelector(".drop-btn");
+    const menu = dropdown.querySelector(".drop-menu");
+
+    button.addEventListener("click", (e) => {
+      e.stopPropagation();
+      closeAllDropdowns();
+      menu.classList.toggle("show");
+    });
+
+    // επιλογή item
+    menu.querySelectorAll("div").forEach(item => {
+      item.addEventListener("click", () => {
+        button.innerHTML = item.innerHTML;
+        menu.classList.remove("show");
+      });
+    });
+  });
+
+  function closeAllDropdowns() {
+    document.querySelectorAll(".drop-menu").forEach(m => {
+      m.classList.remove("show");
+    });
   }
 
-  let selectedMode = "live";
-  let selectedMarket = "goals";
-  let selectedLang = "EN";
+  document.addEventListener("click", closeAllDropdowns);
 
-  // ---------------- Mode dropdown
-  modeBtn.addEventListener("click", () => {
-    modeDropdown.classList.toggle("show");
+
+  // ===== Language switch =====
+  const langBox = document.querySelector(".lang");
+  const langMenu = document.querySelector(".lang-menu");
+
+  langBox.addEventListener("click", (e) => {
+    e.stopPropagation();
+    langMenu.classList.toggle("show");
   });
 
-  modeDropdown.querySelectorAll("[data-mode]").forEach(item => {
+  langMenu.querySelectorAll("div").forEach(item => {
     item.addEventListener("click", () => {
-      selectedMode = item.dataset.mode;
-      modeLabel.innerText = item.innerText;
-      modeDropdown.classList.remove("show");
+      langBox.innerHTML = `🌐 ${item.innerText} ▼`;
+      langMenu.classList.remove("show");
     });
   });
 
-  // ---------------- Market dropdown
-  marketBtn.addEventListener("click", () => {
-    marketDropdown.classList.toggle("show");
+  document.addEventListener("click", () => {
+    langMenu.classList.remove("show");
   });
 
-  marketDropdown.querySelectorAll("[data-market]").forEach(item => {
-    item.addEventListener("click", () => {
-      selectedMarket = item.dataset.market;
-      marketLabel.innerText = item.innerText;
-      marketDropdown.classList.remove("show");
-    });
-  });
 
-  // ---------------- Language dropdown
-  langBtn.addEventListener("click", () => {
-    langDropdown.classList.toggle("show");
-  });
+  // ===== Analyze button =====
+  const analyzeBtn = document.querySelector(".analyze-btn");
+  const matchInput = document.querySelector(".match-input");
 
-  langDropdown.querySelectorAll("[data-lang]").forEach(item => {
-    item.addEventListener("click", () => {
-      selectedLang = item.dataset.lang;
-      langLabel.innerText = selectedLang;
-      langDropdown.classList.remove("show");
-    });
-  });
-
-  // ---------------- Analyze
   analyzeBtn.addEventListener("click", async () => {
-    const query = matchInput.value.trim();
-    if (!query) return;
 
-    analyzeBtn.innerText = "Analyzing...";
+    const match = matchInput.value.trim();
+    if (!match) {
+      alert("Εισάγετε όνομα αγώνα");
+      return;
+    }
+
+    // πάρε mode από Live/Upcoming
+    const mode = document.querySelectorAll(".drop-btn")[0].innerText.toLowerCase().includes("upcoming")
+      ? "upcoming"
+      : "live";
+
+    // πάρε market από Goals/Corners
+    const market = document.querySelectorAll(".drop-btn")[1].innerText.toLowerCase().includes("corners")
+      ? "corners"
+      : "goals";
+
+    analyzeBtn.innerText = "Loading...";
 
     try {
       const res = await fetch("/api/analyze", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          mode: selectedMode,
-          market: selectedMarket,
-          query
-        })
+        body: JSON.stringify({ mode, market, query: match })
       });
 
       const data = await res.json();
-      console.log("Analysis:", data);
-      alert("Analysis completed. Check console.");
+      console.log("Analyze result:", data);
+      alert("Check console for result ✔");
+
     } catch (err) {
-      console.error("Analyze error:", err);
-      alert("Backend error");
+      console.error(err);
+      alert("API error");
     }
 
-    analyzeBtn.innerText = "Analyze";
+    analyzeBtn.innerText = "🔎 Analyze";
   });
 
 });

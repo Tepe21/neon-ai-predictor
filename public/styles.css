@@ -159,4 +159,13 @@ Dropdown open state (click)
 .dropdown-menu.open {
   display: block;
 }
+.drop-menu,
+.lang-menu {
+  display: none;
+}
+
+.drop-menu.show,
+.lang-menu.show {
+  display: block;
+}
 

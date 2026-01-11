@@ -1,87 +1,59 @@
-// ---------- LANGUAGE SYSTEM ----------
-const translations = {
-  en: {
-    title: "AI Football Picks",
-    subtitle: "Live Match Intelligence Engine",
-    manual: "Manual Search",
-    alerts: "Live Alerts",
-    live: "Live",
-    corners: "Corners",
-    goals: "Goals",
-    nextgoal: "Next Goal",
-    halftime: "Half Time",
-    fulltime: "Full Time",
-    analyze: "Analyze",
-    inputPlaceholder: "Enter match name..."
-  },
-  el: {
-    title: "AI Football Picks",
-    subtitle: "Μηχανή Ανάλυσης Ζωντανών Αγώνων",
-    manual: "Χειροκίνητη Αναζήτηση",
-    alerts: "Live Alerts",
-    live: "Live",
-    corners: "Κόρνερ",
-    goals: "Γκολ",
-    nextgoal: "Επόμενο Γκολ",
-    halftime: "Ημίχρονο",
-    fulltime: "Κανονικός Αγώνας",
-    analyze: "Ανάλυση",
-    inputPlaceholder: "Εισαγωγή αγώνα..."
-  }
+// Tabs
+const tabManual = document.getElementById("tabManual");
+const tabAlerts = document.getElementById("tabAlerts");
+const panelManual = document.getElementById("panelManual");
+const panelAlerts = document.getElementById("panelAlerts");
+
+tabManual.onclick = () => {
+  tabManual.classList.add("active");
+  tabAlerts.classList.remove("active");
+  panelManual.classList.add("active");
+  panelAlerts.classList.remove("active");
 };
 
-let currentLang = "en";
+tabAlerts.onclick = () => {
+  tabAlerts.classList.add("active");
+  tabManual.classList.remove("active");
+  panelAlerts.classList.add("active");
+  panelManual.classList.remove("active");
+};
 
-function applyLanguage() {
-  document.querySelectorAll("[data-i18n]").forEach(el=>{
-    const key = el.getAttribute("data-i18n");
-    el.innerText = translations[currentLang][key];
-  });
+// Category dropdown
+const catBtn = document.getElementById("catBtn");
+const catMenu = document.getElementById("catMenu");
 
-  document.querySelectorAll("[data-i18n-placeholder]").forEach(el=>{
-    const key = el.getAttribute("data-i18n-placeholder");
-    el.placeholder = translations[currentLang][key];
-  });
+catBtn.onclick = () => {
+  catMenu.style.display = catMenu.style.display === "block" ? "none" : "block";
+};
 
-  document.getElementById("langSwitch").childNodes[0].textContent =
-    currentLang === "en" ? "🇬🇧 EN ▾" : "🇬🇷 EL ▾";
-}
-
-document.querySelectorAll("#langMenu div").forEach(opt=>{
-  opt.addEventListener("click", ()=>{
-    currentLang = opt.dataset.lang;
-    applyLanguage();
-  });
+catMenu.querySelectorAll("div").forEach(item => {
+  item.onclick = () => {
+    catBtn.innerHTML = item.innerHTML + " ▾";
+    catMenu.style.display = "none";
+  };
 });
 
-applyLanguage();
+// Language dropdown
+const langBtn = document.getElementById("langBtn");
+const langMenu = document.getElementById("langMenu");
 
-// ---------- CATEGORY DROPDOWN ----------
-const categoryBtn = document.getElementById("categoryBtn");
-document.querySelectorAll("#categoryMenu div").forEach(item=>{
-  item.addEventListener("click", ()=>{
-    categoryBtn.innerHTML = item.innerHTML + " ▾";
-  });
+langBtn.onclick = () => {
+  langMenu.style.display = langMenu.style.display === "block" ? "none" : "block";
+};
+
+langMenu.querySelectorAll("div").forEach(item => {
+  item.onclick = () => {
+    langBtn.innerHTML = item.innerHTML + " ▾";
+    langMenu.style.display = "none";
+  };
 });
 
-// ---------- TIME DROPDOWN ----------
-const timeBtn = document.getElementById("timeBtn");
-document.querySelectorAll("#timeMenu div").forEach(item=>{
-  item.addEventListener("click", ()=>{
-    timeBtn.innerHTML = item.innerHTML + " ▾";
-  });
-});
-
-// ---------- DEMO RESULT (backend remains same) ----------
-document.getElementById("analyzeBtn").addEventListener("click", ()=>{
-  const resultBox = document.getElementById("resultBox");
-  resultBox.classList.remove("hidden");
-
-  document.getElementById("matchTitle").innerText =
-    "Guarani Campinas vs Primavera SP";
-  document.getElementById("minute").innerText = "Minute: 82'";
-  document.getElementById("suggestion").innerText =
-    "Suggestion: Over 9.5 Total Corners";
-  document.getElementById("confidence").innerText =
-    "Confidence: 69%";
+// Close menus on outside click
+document.addEventListener("click", (e) => {
+  if (!catBtn.contains(e.target) && !catMenu.contains(e.target)) {
+    catMenu.style.display = "none";
+  }
+  if (!langBtn.contains(e.target) && !langMenu.contains(e.target)) {
+    langMenu.style.display = "none";
+  }
 });

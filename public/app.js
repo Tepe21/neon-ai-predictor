@@ -38,6 +38,23 @@ catMenu.querySelectorAll("div").forEach(item => {
 });
 
 // =====================
+// Half / Full Time Dropdown
+// =====================
+const timeBtn = document.getElementById("timeBtn");
+const timeMenu = document.getElementById("timeMenu");
+
+timeBtn.onclick = () => {
+  timeMenu.style.display = timeMenu.style.display === "block" ? "none" : "block";
+};
+
+timeMenu.querySelectorAll("div").forEach(item => {
+  item.onclick = () => {
+    timeBtn.innerHTML = item.innerHTML + " ▾";
+    timeMenu.style.display = "none";
+  };
+});
+
+// =====================
 // Language Switch
 // =====================
 const langBtn = document.getElementById("langBtn");
@@ -64,12 +81,8 @@ const translations = {
   }
 };
 
-let currentLang = "EN";
-
 function applyLanguage(lang) {
-  currentLang = lang;
   const t = translations[lang];
-
   tabManual.innerText = t.manualTab;
   tabAlerts.innerText = t.alertsTab;
   document.querySelector("h2").innerText = t.subtitle;
@@ -77,8 +90,7 @@ function applyLanguage(lang) {
   document.getElementById("analyzeBtn").innerText = t.analyze;
   document.getElementById("matchInput").placeholder = t.inputPlaceholder;
   document.querySelector(".coming-soon").innerText = t.comingSoon;
-
-  langBtn.innerHTML = (lang === "EN" ? "🇬🇧 EN ▾" : "🇬🇷 EL ▾");
+  langBtn.innerHTML = lang === "EN" ? "🇬🇧 EN ▾" : "🇬🇷 EL ▾";
 }
 
 langBtn.onclick = () => {
@@ -87,16 +99,20 @@ langBtn.onclick = () => {
 
 langMenu.querySelectorAll("div").forEach(item => {
   item.onclick = () => {
-    const lang = item.getAttribute("data-lang");
-    applyLanguage(lang);
+    applyLanguage(item.getAttribute("data-lang"));
     langMenu.style.display = "none";
   };
 });
 
-// Close dropdowns
+// =====================
+// Close dropdowns on outside click
+// =====================
 document.addEventListener("click", (e) => {
   if (!catBtn.contains(e.target) && !catMenu.contains(e.target)) {
     catMenu.style.display = "none";
+  }
+  if (!timeBtn.contains(e.target) && !timeMenu.contains(e.target)) {
+    timeMenu.style.display = "none";
   }
   if (!langBtn.contains(e.target) && !langMenu.contains(e.target)) {
     langMenu.style.display = "none";
@@ -104,15 +120,18 @@ document.addEventListener("click", (e) => {
 });
 
 // =====================
-// ANALYZE BUTTON -> BACKEND
+// ANALYZE BUTTON
 // =====================
 document.getElementById("analyzeBtn").onclick = async () => {
   const match = document.getElementById("matchInput").value.trim();
-  const categoryText = document.getElementById("catBtn").innerText.toLowerCase();
+  const categoryText = catBtn.innerText.toLowerCase();
+  const timeText = timeBtn.innerText.toLowerCase();
 
   let category = "goals";
   if (categoryText.includes("corner")) category = "corners";
   if (categoryText.includes("next")) category = "nextgoal";
+
+  const halftime = timeText.includes("half");
 
   const box = document.getElementById("resultsBox");
   box.innerHTML = "<p style='color:#7b8cff'>Analyzing live match...</p>";
@@ -120,7 +139,7 @@ document.getElementById("analyzeBtn").onclick = async () => {
   const res = await fetch("/api/analyze", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ match, category })
+    body: JSON.stringify({ match, category, halftime })
   });
 
   const data = await res.json();

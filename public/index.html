@@ -18,10 +18,8 @@
 
 <div class="page">
 
-  <!-- Left neon panel -->
   <div class="side left"></div>
 
-  <!-- MAIN APP -->
   <div class="app">
 
     <!-- Language Switch -->
@@ -63,6 +61,15 @@
           </div>
         </div>
 
+        <!-- NEW: HALF / FULL TIME -->
+        <div class="dropdown">
+          <button class="drop-btn" id="timeBtn">⏱ Full Time ▾</button>
+          <div class="drop-menu" id="timeMenu">
+            <div data-time="full">⏱ Full Time</div>
+            <div data-time="half">🕒 Half Time</div>
+          </div>
+        </div>
+
         <!-- MATCH INPUT -->
         <input class="match-input" id="matchInput" placeholder="Enter match">
 
@@ -70,7 +77,7 @@
         <button class="analyze-btn" id="analyzeBtn">🤖 Analyze</button>
       </div>
 
-      <!-- Results placeholder -->
+      <!-- Results -->
       <div id="resultsBox"></div>
 
     </div>
@@ -83,7 +90,6 @@
 
   </div>
 
-  <!-- Right neon panel -->
   <div class="side right"></div>
 
 </div>

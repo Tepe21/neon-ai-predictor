@@ -1,7 +1,6 @@
 import express from "express";
 import fetch from "node-fetch";
 import cors from "cors";
-import { buildSuggestionEngine } from "./engines/suggestionEngine.js";
 
 const app = express();
 app.use(cors());
@@ -32,6 +31,64 @@ async function getLiveFixtures() {
 }
 
 // ====================
+// SIMPLE LIVE SUGGESTION ENGINE
+// ====================
+function buildSuggestion(found, category, halftime) {
+  const minute = found.fixture.status.elapsed;
+
+  const goalsHome = found.goals.home || 0;
+  const goalsAway = found.goals.away || 0;
+  const totalGoals = goalsHome + goalsAway;
+
+  const cornersHome = found.statistics?.find(s => s.team.id === found.teams.home.id)
+    ?.statistics.find(x => x.type === "Corner Kicks")?.value || 0;
+
+  const cornersAway = found.statistics?.find(s => s.team.id === found.teams.away.id)
+    ?.statistics.find(x => x.type === "Corner Kicks")?.value || 0;
+
+  const totalCorners = cornersHome + cornersAway;
+
+  let suggestion = "";
+  let confidence = 50;
+
+  // ===== GOALS =====
+  if (category === "goals") {
+    if (halftime && minute > 45) {
+      return { error: "Half Time market not available after halftime" };
+    }
+
+    if (totalGoals >= 2) {
+      suggestion = "No Goal Market Available";
+      confidence = 0;
+    } else {
+      suggestion = halftime
+        ? "Over 0.5 Half Time Goals"
+        : "Over 1.5 Total Goals";
+      confidence = 72;
+    }
+  }
+
+  // ===== CORNERS =====
+  else if (category === "corners") {
+    if (totalCorners >= 10) {
+      suggestion = "No Corner Market Available";
+      confidence = 0;
+    } else {
+      suggestion = "Over 9.5 Total Corners";
+      confidence = 69;
+    }
+  }
+
+  // ===== NEXT GOAL =====
+  else if (category === "nextgoal") {
+    suggestion = `Next Goal: ${found.teams.home.name}`;
+    confidence = 64;
+  }
+
+  return { suggestion, confidence };
+}
+
+// ====================
 // ANALYZE ENDPOINT
 // ====================
 app.post("/api/analyze", async (req, res) => {
@@ -44,76 +101,27 @@ app.post("/api/analyze", async (req, res) => {
 
     const fixtures = await getLiveFixtures();
 
-    // ---------- FIND MATCH ----------
     const found = fixtures.find(f => {
-      const home = f.teams.home.name.toLowerCase();
-      const away = f.teams.away.name.toLowerCase();
-      const input = match.toLowerCase();
-
-      return (
-        home.includes(input) ||
-        away.includes(input) ||
-        `${home} vs ${away}`.includes(input) ||
-        `${home}-${away}`.includes(input)
-      );
+      const full = `${f.teams.home.name} vs ${f.teams.away.name}`.toLowerCase();
+      return full.includes(match.toLowerCase());
     });
 
     if (!found) {
       return res.json({ error: "Match not found or not live" });
     }
 
-    const minute = found.fixture.status.elapsed;
+    const result = buildSuggestion(found, category, halftime);
 
-    // If user selected Half-Time but match already passed HT
-    if (halftime === true && minute > 45) {
-      return res.json({ 
-        error: "Half-Time suggestions not available after HT"
-      });
+    if (result.error) {
+      return res.json({ error: result.error });
     }
 
-    // ---------- EXTRACT LIVE STATS ----------
-    let cornersHome = 0;
-    let cornersAway = 0;
-
-    if (found.statistics) {
-      const cornersStat = found.statistics.find(
-        s => s.type === "Corner Kicks"
-      );
-      if (cornersStat) {
-        cornersHome = cornersStat.value.home || 0;
-        cornersAway = cornersStat.value.away || 0;
-      }
-    }
-
-    const matchData = {
-      minute,
-      goalsHome: found.goals.home,
-      goalsAway: found.goals.away,
-      cornersHome,
-      cornersAway
-    };
-
-    // ---------- RUN ENGINE ----------
-    const engine = buildSuggestionEngine(matchData);
-
-    let suggestionObj;
-
-    if (category === "corners") {
-      suggestionObj = engine.getCornerSuggestion();
-    } 
-    else if (category === "nextgoal") {
-      suggestionObj = engine.getNextGoalSuggestion();
-    } 
-    else {
-      suggestionObj = engine.getGoalSuggestion();
-    }
-
-    // ---------- RESPONSE ----------
     res.json({
       match: `${found.teams.home.name} vs ${found.teams.away.name}`,
-      minute,
-      suggestion: suggestionObj.text,
-      confidence: suggestionObj.confidence
+      category,
+      suggestion: result.suggestion,
+      confidence: result.confidence,
+      minute: found.fixture.status.elapsed
     });
 
   } catch (err) {

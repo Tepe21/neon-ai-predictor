@@ -1,6 +1,7 @@
 import express from "express";
 import fetch from "node-fetch";
 import cors from "cors";
+import { buildSuggestionEngine } from "./engines/suggestionEngine.js";
 
 const app = express();
 app.use(cors());
@@ -35,7 +36,7 @@ async function getLiveFixtures() {
 // ====================
 app.post("/api/analyze", async (req, res) => {
   try {
-    const { match, category } = req.body;
+    const { match, category, halftime } = req.body;
 
     if (!match || match.trim().length < 3) {
       return res.json({ error: "Please enter a match name" });
@@ -43,41 +44,76 @@ app.post("/api/analyze", async (req, res) => {
 
     const fixtures = await getLiveFixtures();
 
-    // Find live match
+    // ---------- FIND MATCH ----------
     const found = fixtures.find(f => {
-      const full = `${f.teams.home.name} vs ${f.teams.away.name}`.toLowerCase();
-      return full.includes(match.toLowerCase());
+      const home = f.teams.home.name.toLowerCase();
+      const away = f.teams.away.name.toLowerCase();
+      const input = match.toLowerCase();
+
+      return (
+        home.includes(input) ||
+        away.includes(input) ||
+        `${home} vs ${away}`.includes(input) ||
+        `${home}-${away}`.includes(input)
+      );
     });
 
     if (!found) {
       return res.json({ error: "Match not found or not live" });
     }
 
-    // ====================
-    // DEMO ANALYSIS ENGINE
-    // ====================
-    let suggestion = "";
-    let confidence = 0;
+    const minute = found.fixture.status.elapsed;
+
+    // If user selected Half-Time but match already passed HT
+    if (halftime === true && minute > 45) {
+      return res.json({ 
+        error: "Half-Time suggestions not available after HT"
+      });
+    }
+
+    // ---------- EXTRACT LIVE STATS ----------
+    let cornersHome = 0;
+    let cornersAway = 0;
+
+    if (found.statistics) {
+      const cornersStat = found.statistics.find(
+        s => s.type === "Corner Kicks"
+      );
+      if (cornersStat) {
+        cornersHome = cornersStat.value.home || 0;
+        cornersAway = cornersStat.value.away || 0;
+      }
+    }
+
+    const matchData = {
+      minute,
+      goalsHome: found.goals.home,
+      goalsAway: found.goals.away,
+      cornersHome,
+      cornersAway
+    };
+
+    // ---------- RUN ENGINE ----------
+    const engine = buildSuggestionEngine(matchData);
+
+    let suggestionObj;
 
     if (category === "corners") {
-      suggestion = "Over 9.5 Total Corners";
-      confidence = 69;
-    }
+      suggestionObj = engine.getCornerSuggestion();
+    } 
     else if (category === "nextgoal") {
-      suggestion = `Next Goal: ${found.teams.home.name}`;
-      confidence = 64;
-    }
+      suggestionObj = engine.getNextGoalSuggestion();
+    } 
     else {
-      suggestion = "Over 1.5 Total Goals";
-      confidence = 72;
+      suggestionObj = engine.getGoalSuggestion();
     }
 
+    // ---------- RESPONSE ----------
     res.json({
       match: `${found.teams.home.name} vs ${found.teams.away.name}`,
-      category,
-      suggestion,
-      confidence,
-      minute: found.fixture.status.elapsed
+      minute,
+      suggestion: suggestionObj.text,
+      confidence: suggestionObj.confidence
     });
 
   } catch (err) {

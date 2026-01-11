@@ -1,53 +1,80 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8">
   <title>AI Football Picks</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <link rel="stylesheet" href="styles.css" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="styles.css">
   <link rel="icon" href="data:,">
 </head>
 <body>
 
-<!-- Top scrolling banner -->
+<!-- TOP LIVE BANNER -->
 <div class="top-banner">
-  ⚡ FREE BETA LIVE — AI Football Picks — Live Alerts — Goals — Corners — FREE BETA LIVE ⚡
+  ⚡ FREE LIVE BETA — AI Football Picks — Live Alerts — Goals — Corners — Next Goal ⚡
 </div>
 
 <div class="app-container">
 
+  <!-- LANGUAGE SWITCH -->
+  <div class="lang-switch" id="langSwitch">
+    🇬🇧 EN ▾
+    <div class="lang-menu" id="langMenu">
+      <div data-lang="en">🇬🇧 English</div>
+      <div data-lang="el">🇬🇷 Ελληνικά</div>
+    </div>
+  </div>
+
+  <!-- HEADER -->
   <header>
-    <h1>⚽ AI Football Picks</h1>
-    <h2>Live Match Intelligence Engine</h2>
+    <h1>⚽ <span data-i18n="title">AI Football Picks</span></h1>
+    <h2 data-i18n="subtitle">Live Match Intelligence Engine</h2>
   </header>
 
+  <!-- TABS -->
   <div class="tabs">
-    <button class="tab active">🔍 Manual Search</button>
-    <button class="tab">🔔 Live Alerts</button>
+    <button class="tab active" data-i18n="manual">🔍 Manual Search</button>
+    <button class="tab" data-i18n="alerts">🔔 Live Alerts</button>
   </div>
 
+  <!-- CONTROLS -->
   <div class="controls">
 
+    <!-- LIVE -->
     <div class="dropdown">
-      <button class="drop-btn">🟢 Live ▾</button>
+      <button class="drop-btn">🟢 <span data-i18n="live">Live</span> ▾</button>
       <div class="drop-menu">
-        <div>🟢 Live</div>
+        <div>🟢 <span data-i18n="live">Live</span></div>
       </div>
     </div>
 
+    <!-- CATEGORY -->
     <div class="dropdown">
-      <button class="drop-btn">🚩 Corners ▾</button>
-      <div class="drop-menu">
-        <div>🚩 Corners</div>
-        <div>⚽ Goals</div>
+      <button class="drop-btn" id="categoryBtn">🚩 Corners ▾</button>
+      <div class="drop-menu" id="categoryMenu">
+        <div data-cat="corners">🚩 <span data-i18n="corners">Corners</span></div>
+        <div data-cat="goals">⚽ <span data-i18n="goals">Goals</span></div>
+        <div data-cat="nextgoal">🥅 <span data-i18n="nextgoal">Next Goal</span></div>
       </div>
     </div>
 
-    <input id="matchInput" placeholder="Enter match name..." />
+    <!-- HALF / FULL -->
+    <div class="dropdown">
+      <button class="drop-btn" id="timeBtn">⏱ Full Time ▾</button>
+      <div class="drop-menu" id="timeMenu">
+        <div data-time="full">⏱ <span data-i18n="fulltime">Full Time</span></div>
+        <div data-time="half">⏱ <span data-i18n="halftime">Half Time</span></div>
+      </div>
+    </div>
 
-    <button id="analyzeBtn">🤖 Analyze</button>
+    <!-- MATCH INPUT -->
+    <input id="matchInput" data-i18n-placeholder="inputPlaceholder" placeholder="Enter match name...">
+
+    <!-- ANALYZE -->
+    <button id="analyzeBtn">🤖 <span data-i18n="analyze">Analyze</span></button>
   </div>
 
+  <!-- RESULT -->
   <div id="resultBox" class="result hidden">
     <div id="matchTitle"></div>
     <div id="minute"></div>

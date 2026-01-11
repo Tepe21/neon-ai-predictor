@@ -8,65 +8,83 @@
 </head>
 <body>
 
-<!-- Live Beta Banner -->
+<!-- Scrolling Beta Banner -->
 <div class="beta-banner">
-  🚨 FREE BETA LIVE • AI Football Picks • Live Goals • Corners • Next Goal •
+  <div class="beta-text">
+    🚨 FREE BETA LIVE • AI Football Picks • Live Goals • Corners • Next Goal • 
+    🚨 FREE BETA LIVE • AI Football Picks • Live Goals • Corners • Next Goal •
+  </div>
 </div>
 
-<div class="app">
+<div class="page">
 
-  <!-- Language -->
-  <div class="lang-switch">
-    <span id="langBtn">🇬🇧 EN ▾</span>
-    <div class="lang-menu" id="langMenu">
-      <div data-lang="EN">🇬🇧 EN</div>
-      <div data-lang="EL">🇬🇷 EL</div>
-    </div>
-  </div>
+  <!-- Left neon panel -->
+  <div class="side left"></div>
 
-  <!-- Title -->
-  <h1>⚽ AI Football Picks</h1>
-  <h2>Live Match Intelligence Engine</h2>
+  <!-- MAIN APP -->
+  <div class="app">
 
-  <!-- Tabs -->
-  <div class="tabs">
-    <button class="tab active" id="tabManual">🔍 Manual Search</button>
-    <button class="tab" id="tabAlerts">🔔 Live Alerts</button>
-  </div>
-
-  <!-- Manual Search Panel -->
-  <div class="panel active" id="panelManual">
-
-    <div class="row">
-
-      <!-- Live only -->
-      <div class="dropdown">
-        <button class="drop-btn">⏱ Live ▾</button>
+    <!-- Language Switch -->
+    <div class="lang-switch">
+      <span id="langBtn">🇬🇧 EN ▾</span>
+      <div class="lang-menu" id="langMenu">
+        <div data-lang="EN">🇬🇧 English</div>
+        <div data-lang="EL">🇬🇷 Ελληνικά</div>
       </div>
+    </div>
 
-      <!-- Category -->
-      <div class="dropdown">
-        <button class="drop-btn" id="catBtn">⚽ Goals ▾</button>
-        <div class="drop-menu" id="catMenu">
-          <div data-cat="goals">⚽ Goals</div>
-          <div data-cat="corners">🚩 Corners</div>
-          <div data-cat="nextgoal">🔥 Next Goal</div>
+    <!-- Title -->
+    <h1>⚽ AI Football Picks</h1>
+    <h2>Live Match Intelligence Engine</h2>
+
+    <!-- Tabs -->
+    <div class="tabs">
+      <button class="tab active" id="tabManual">🔍 Manual Search</button>
+      <button class="tab" id="tabAlerts">🔔 Live Alerts</button>
+    </div>
+
+    <!-- Manual Search Panel -->
+    <div class="panel active" id="panelManual">
+
+      <div class="row">
+
+        <!-- LIVE ONLY -->
+        <div class="dropdown">
+          <button class="drop-btn">⏱ Live ▾</button>
         </div>
+
+        <!-- CATEGORY -->
+        <div class="dropdown">
+          <button class="drop-btn" id="catBtn">⚽ Goals ▾</button>
+          <div class="drop-menu" id="catMenu">
+            <div data-cat="goals">⚽ Goals</div>
+            <div data-cat="corners">🚩 Corners</div>
+            <div data-cat="nextgoal">🔥 Next Goal</div>
+          </div>
+        </div>
+
+        <!-- MATCH INPUT -->
+        <input class="match-input" id="matchInput" placeholder="Enter match">
+
+        <!-- ANALYZE -->
+        <button class="analyze-btn" id="analyzeBtn">🤖 Analyze</button>
       </div>
 
-      <!-- Match Input -->
-      <input class="match-input" id="matchInput" placeholder="Enter match (e.g. Arsenal vs Chelsea)">
+      <!-- Results placeholder -->
+      <div id="resultsBox"></div>
 
-      <!-- Analyze -->
-      <button class="analyze-btn">🤖 Analyze</button>
+    </div>
+
+    <!-- Live Alerts Panel -->
+    <div class="panel" id="panelAlerts">
+      <p class="coming-soon">🔔 Live Alerts Engine Connected</p>
+      <div id="alertsBox"></div>
     </div>
 
   </div>
 
-  <!-- Alerts Panel -->
-  <div class="panel" id="panelAlerts">
-    <p class="coming-soon">🔔 Live Alerts – Coming Soon</p>
-  </div>
+  <!-- Right neon panel -->
+  <div class="side right"></div>
 
 </div>
 

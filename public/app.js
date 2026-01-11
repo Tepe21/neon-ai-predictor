@@ -48,7 +48,7 @@ langMenu.querySelectorAll("div").forEach(item => {
   };
 });
 
-// Close menus on outside click
+// Close dropdowns
 document.addEventListener("click", (e) => {
   if (!catBtn.contains(e.target) && !catMenu.contains(e.target)) {
     catMenu.style.display = "none";
@@ -57,3 +57,9 @@ document.addEventListener("click", (e) => {
     langMenu.style.display = "none";
   }
 });
+
+// Analyze button placeholder action
+document.getElementById("analyzeBtn").onclick = () => {
+  const box = document.getElementById("resultsBox");
+  box.innerHTML = "<p style='color:#7b8cff'>⚙️ Backend engine will plug here next.</p>";
+};

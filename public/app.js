@@ -38,9 +38,8 @@ catMenu.querySelectorAll("div").forEach(item => {
 });
 
 // =====================
-// Language System
+// Language Switch
 // =====================
-
 const langBtn = document.getElementById("langBtn");
 const langMenu = document.getElementById("langMenu");
 
@@ -48,7 +47,6 @@ const translations = {
   EN: {
     manualTab: "🔍 Manual Search",
     alertsTab: "🔔 Live Alerts",
-    title: "⚽ AI Football Picks",
     subtitle: "Live Match Intelligence Engine",
     liveLabel: "⏱ Live ▾",
     analyze: "🤖 Analyze",
@@ -58,7 +56,6 @@ const translations = {
   EL: {
     manualTab: "🔍 Χειροκίνητη Αναζήτηση",
     alertsTab: "🔔 Live Ειδοποιήσεις",
-    title: "⚽ AI Football Picks",
     subtitle: "Μηχανή Live Ποδοσφαιρικής Ανάλυσης",
     liveLabel: "⏱ Ζωντανά ▾",
     analyze: "🤖 Ανάλυση",
@@ -75,7 +72,6 @@ function applyLanguage(lang) {
 
   tabManual.innerText = t.manualTab;
   tabAlerts.innerText = t.alertsTab;
-  document.querySelector("h1").innerText = t.title;
   document.querySelector("h2").innerText = t.subtitle;
   document.querySelector(".drop-btn").innerText = t.liveLabel;
   document.getElementById("analyzeBtn").innerText = t.analyze;
@@ -85,12 +81,10 @@ function applyLanguage(lang) {
   langBtn.innerHTML = (lang === "EN" ? "🇬🇧 EN ▾" : "🇬🇷 EL ▾");
 }
 
-// Language dropdown open
 langBtn.onclick = () => {
   langMenu.style.display = langMenu.style.display === "block" ? "none" : "block";
 };
 
-// Language selection
 langMenu.querySelectorAll("div").forEach(item => {
   item.onclick = () => {
     const lang = item.getAttribute("data-lang");
@@ -110,11 +104,46 @@ document.addEventListener("click", (e) => {
 });
 
 // =====================
-// Analyze placeholder
+// ANALYZE BUTTON -> BACKEND
 // =====================
-document.getElementById("analyzeBtn").onclick = () => {
+document.getElementById("analyzeBtn").onclick = async () => {
+  const match = document.getElementById("matchInput").value.trim();
+  const categoryText = document.getElementById("catBtn").innerText.toLowerCase();
+
+  let category = "goals";
+  if (categoryText.includes("corner")) category = "corners";
+  if (categoryText.includes("next")) category = "nextgoal";
+
   const box = document.getElementById("resultsBox");
-  box.innerHTML = "<p style='color:#7b8cff'>⚙️ Backend engine will plug here next.</p>";
+  box.innerHTML = "<p style='color:#7b8cff'>Analyzing live match...</p>";
+
+  const res = await fetch("/api/analyze", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ match, category })
+  });
+
+  const data = await res.json();
+
+  if (data.error) {
+    box.innerHTML = `<p style="color:#ff6b6b;">❌ ${data.error}</p>`;
+    return;
+  }
+
+  box.innerHTML = `
+    <div style="
+      margin-top:15px;
+      padding:15px;
+      border:2px solid #00f0ff;
+      border-radius:12px;
+      box-shadow:0 0 15px #00f0ff55;">
+      
+      <h3>${data.match}</h3>
+      <p>Minute: <strong>${data.minute}'</strong></p>
+      <p>Suggestion: <strong>${data.suggestion}</strong></p>
+      <p>Confidence: <strong>${data.confidence}%</strong></p>
+    </div>
+  `;
 };
 
 // Init default language

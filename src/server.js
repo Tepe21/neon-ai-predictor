@@ -1,91 +1,94 @@
 import express from "express";
-import path from "path";
+import fetch from "node-fetch";
 import cors from "cors";
-import dotenv from "dotenv";
-
-dotenv.config();
 
 const app = express();
 app.use(cors());
 app.use(express.json());
-
-// ====== SERVE FRONTEND ======
 app.use(express.static("public"));
 
-app.get("/", (req, res) => {
-  res.sendFile(path.resolve("public/index.html"));
-});
-
-// ====== BASIC HEALTH CHECK ======
-app.get("/api/health", (req, res) => {
-  res.json({ status: "ok", message: "Backend running" });
-});
-
-// ====== API FOOTBALL CONFIG ======
 const API_KEY = process.env.API_FOOTBALL_KEY;
-const API_HOST = "v3.football.api-sports.io";
 
-// helper fetch
-async function apiFetch(url) {
-  const res = await fetch(url, {
-    headers: {
-      "x-apisports-key": API_KEY,
-      "x-rapidapi-host": API_HOST
-    }
+// ====================
+// HEALTH CHECK
+// ====================
+app.get("/api/health", (req, res) => {
+  res.json({ status: "ok" });
+});
+
+// ====================
+// FETCH LIVE FIXTURES
+// ====================
+async function getLiveFixtures() {
+  const url = "https://v3.football.api-sports.io/fixtures?live=all";
+
+  const response = await fetch(url, {
+    headers: { "x-apisports-key": API_KEY }
   });
-  return await res.json();
+
+  const data = await response.json();
+  return data.response || [];
 }
 
-// ====== UPCOMING FIXTURES ======
-app.get("/api/fixtures/upcoming", async (req, res) => {
-  try {
-    const next = req.query.next || 200;
-    const url = `https://${API_HOST}/fixtures?next=${next}`;
-    const data = await apiFetch(url);
-    res.json(data.response || []);
-  } catch (err) {
-    console.error("Upcoming fixtures error:", err);
-    res.status(500).json({ error: "Failed to load upcoming fixtures" });
-  }
-});
-
-// ====== LIVE FIXTURES ======
-app.get("/api/fixtures/live", async (req, res) => {
-  try {
-    const url = `https://${API_HOST}/fixtures?live=all`;
-    const data = await apiFetch(url);
-    res.json(data.response || []);
-  } catch (err) {
-    console.error("Live fixtures error:", err);
-    res.status(500).json({ error: "Failed to load live fixtures" });
-  }
-});
-
-// ====== ANALYZE ENDPOINT ======
+// ====================
+// ANALYZE ENDPOINT
+// ====================
 app.post("/api/analyze", async (req, res) => {
   try {
-    const { mode, market, time } = req.body;
+    const { match, category } = req.body;
 
-    // For now return simple mock analysis
-    // (Later we plug probability engines)
+    if (!match || match.trim().length < 3) {
+      return res.json({ error: "Please enter a match name" });
+    }
 
-    const result = {
-      mode,
-      market,
-      time,
-      suggestion: market === "goals" ? "Over 1.5" : "Over 4.5",
-      confidence: Math.floor(50 + Math.random() * 40),
-      tag: "Normal"
-    };
+    const fixtures = await getLiveFixtures();
 
-    res.json({ results: [result] });
+    // Find live match
+    const found = fixtures.find(f => {
+      const full = `${f.teams.home.name} vs ${f.teams.away.name}`.toLowerCase();
+      return full.includes(match.toLowerCase());
+    });
+
+    if (!found) {
+      return res.json({ error: "Match not found or not live" });
+    }
+
+    // ====================
+    // DEMO ANALYSIS ENGINE
+    // ====================
+    let suggestion = "";
+    let confidence = 0;
+
+    if (category === "corners") {
+      suggestion = "Over 9.5 Total Corners";
+      confidence = 69;
+    }
+    else if (category === "nextgoal") {
+      suggestion = `Next Goal: ${found.teams.home.name}`;
+      confidence = 64;
+    }
+    else {
+      suggestion = "Over 1.5 Total Goals";
+      confidence = 72;
+    }
+
+    res.json({
+      match: `${found.teams.home.name} vs ${found.teams.away.name}`,
+      category,
+      suggestion,
+      confidence,
+      minute: found.fixture.status.elapsed
+    });
+
   } catch (err) {
     console.error("Analyze error:", err);
-    res.status(500).json({ error: "Analyze failed" });
+    res.json({ error: "Server error" });
   }
 });
 
-// ====== START SERVER ======
+// ====================
+// START SERVER
+// ====================
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log("AI Football Picks backend running on port " + PORT);
